@@ -200,12 +200,15 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -v
 
 ## 路线图
 
-- 流式 LLM 输出
-- 异步引擎模式
-- 多 Agent 编排
-- 上下文压缩策略
-- 可观测性集成（OpenTelemetry / LangFuse）
-- 框架完备度矩阵 — 自动化 ETCSLV 覆盖度报告
+NanoHarness 采用问题驱动、组件化的演进路线。内核负责定义稳定契约，
+可选适配器负责连接开源生态，并避免第三方对象渗透到执行引擎。
+
+- 第一阶段：正确性与组件契约
+- 第二阶段：执行、会话与恢复
+- 第三阶段：记忆与生态适配器
+- 第四阶段：可观测性与生产就绪
+
+参见[完整路线图](ROADMAP_CN.md)或[英文版](ROADMAP.md)。
 
 ---
 
