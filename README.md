@@ -200,12 +200,16 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -v
 
 ## Roadmap
 
-- Streaming LLM output
-- Async engine mode
-- Multi-agent orchestration
-- Context compaction strategies
-- Observability integration (OpenTelemetry / LangFuse)
-- Harness Completeness Matrix — automated ETCSLV coverage reporting
+NanoHarness follows a problem-driven, component-oriented roadmap. The kernel
+defines stable contracts; optional adapters connect those contracts to the
+open-source ecosystem without leaking vendor-specific objects into the engine.
+
+- Phase 1: correctness and component contracts
+- Phase 2: execution, sessions, and recovery
+- Phase 3: memory and ecosystem adapters
+- Phase 4: observability and production readiness
+
+See the [full roadmap](ROADMAP.md) or the [Chinese version](ROADMAP_CN.md).
 
 ---
 
