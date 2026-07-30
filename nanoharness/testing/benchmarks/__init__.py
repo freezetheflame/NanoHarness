@@ -17,6 +17,14 @@ from nanoharness.testing.benchmarks.agentdojo import (
     AgentDojoBenchmarkAdapter,
     AgentDojoUnavailableError,
 )
+from nanoharness.testing.benchmarks.tau2 import (
+    TAU2_BENCHMARK_VERSION,
+    TAU2_PACKAGE_VERSION,
+    TAU2_RETAIL_TASKS_SHA256,
+    TAU2_REVISION,
+    TAU2_TAG_OBJECT,
+    Tau2BenchmarkAdapter,
+)
 
 __all__ = [
     "BENCHMARK_MANIFEST_SCHEMA_VERSION",
@@ -32,4 +40,10 @@ __all__ = [
     "AGENTDOJO_REVISION",
     "AgentDojoBenchmarkAdapter",
     "AgentDojoUnavailableError",
+    "TAU2_BENCHMARK_VERSION",
+    "TAU2_PACKAGE_VERSION",
+    "TAU2_RETAIL_TASKS_SHA256",
+    "TAU2_REVISION",
+    "TAU2_TAG_OBJECT",
+    "Tau2BenchmarkAdapter",
 ]

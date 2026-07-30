@@ -252,6 +252,24 @@ Official sources consulted:
 - Current verification after this increment: 240 repository tests pass,
   including fake-contract, pinned-package, and archived-artifact audits.
 
+## 2026-07-30 — Pinned tau2 retail offline conversion
+
+- Added a dependency-free `Tau2BenchmarkAdapter` for raw JSON conversion at
+  `tau2-bench` v1.0.1 / commit
+  `fc0055dc4e0a316c3f83133267fbd6faaa770992`.
+- The file loader verifies the exact retail `tasks.json` SHA-256 and records
+  DB, policy, and split-file digests. Converted Scenarios retain the complete
+  simulated-user fixture, source split membership, unresolved upstream issues,
+  reward basis, NL assertions, and selection provenance.
+- Reference actions remain explicitly non-normative. The conversion names
+  deterministic `T0-DB` and full `T0-native-full` separately and flags tasks
+  whose full reward requires an LLM judge.
+- Validation against the eight preregistered Pilot IDs preserved test/train
+  membership, the open task-7 issue, and the three tasks with effective NL
+  assertions. This validates ingestion only; no tau2 runtime, model, native
+  reward, or Mutation Score was executed.
+- Current verification after this increment: 247 repository tests pass.
+
 ## AI assistance disclosure record
 
 Codex assisted with:

@@ -310,6 +310,16 @@ uv pip install --python .venv/bin/python -e '.[agentdojo-research]'
 Converted reference calls are non-normative and their Oracles remain unbound;
 see the Pilot README before using these Scenarios in an experiment.
 
+The tau2 converter likewise operates offline and does not import the benchmark
+package. It verifies the exact `tasks.json` bytes, pins source/package/tag
+provenance, and retains the complete simulated-user fixture, split membership,
+upstream issue status, reward basis, natural-language assertions, reference
+actions, and domain-state/policy digests. `T0-DB` and `T0-native-full` are named
+separately, and a reference action list is never converted into an exact-call
+Oracle. Native execution and grading require a separate Python 3.12 environment
+for the pinned `tau2==1.0.1`; the core NanoHarness environment remains usable
+on Python 3.10 and 3.11.
+
 The companion `agentdojo_scorer_bridge/` Pilot derives explicitly bound
 execution Scenarios and invokes the original utility over native AgentDojo
 pre/post environments. Its deterministic GroundTruthPipeline result validates
