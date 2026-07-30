@@ -119,6 +119,9 @@ Implemented evidence:
 - a versioned real-defect corpus schema, evidence and adjudication constraints,
   derivation/held-out-validation separation, agreement statistics, readiness
   gates, analysis CLI, and an explicitly unverified seed candidate.
+- an explicit-universe behavioral coverage model with preregistered targets,
+  tool-argument equivalence classes, per-hit evidence, cross-run union,
+  per-dimension results, and no default quality threshold.
 
 Still required:
 
@@ -127,7 +130,7 @@ Still required:
 - real-defect validation for the initial mutation operators;
 - executable injection at Context, state, permission, and hook boundaries;
 - branch-aware replay or sandbox subjects for control-flow-changing faults;
-- behavioral coverage and experiment reporting;
+- frozen subject-specific coverage models and empirical experiment reporting;
 - adapters or subjects beyond NanoHarness itself.
 
 ## Empirical design

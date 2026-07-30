@@ -92,6 +92,23 @@ from nanoharness.testing.defects import (
     DefectStatus,
     EvidenceKind,
 )
+from nanoharness.testing.coverage import (
+    COVERAGE_SCHEMA_VERSION,
+    ArgumentMatcher,
+    CoverageCollector,
+    CoverageConfigurationError,
+    CoverageDimensionSummary,
+    CoverageEvidence,
+    CoverageGateError,
+    CoverageKind,
+    CoverageModel,
+    CoverageModelStatus,
+    CoverageReport,
+    CoverageRun,
+    CoverageTarget,
+    CoverageTargetResult,
+    coverage_target_digest,
+)
 
 __all__ = [
     "TRACE_SCHEMA_VERSION",
@@ -172,4 +189,19 @@ __all__ = [
     "DefectRecord",
     "DefectStatus",
     "EvidenceKind",
+    "COVERAGE_SCHEMA_VERSION",
+    "ArgumentMatcher",
+    "CoverageCollector",
+    "CoverageConfigurationError",
+    "CoverageDimensionSummary",
+    "CoverageEvidence",
+    "CoverageGateError",
+    "CoverageKind",
+    "CoverageModel",
+    "CoverageModelStatus",
+    "CoverageReport",
+    "CoverageRun",
+    "CoverageTarget",
+    "CoverageTargetResult",
+    "coverage_target_digest",
 ]

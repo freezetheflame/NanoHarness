@@ -139,7 +139,10 @@ separate future layer.
 4. **Model/tool foundation implemented:** add versioned declarative fault plans,
    deterministic occurrence matching, runtime evidence, and executable Oracle
    campaigns. State, Context, permission, and hook boundaries remain.
-5. Publish the first behavioral coverage report.
+5. **Coverage foundation implemented:** add explicit versioned target universes,
+   tool-argument equivalence classes, cross-run evidence aggregation,
+   per-dimension reports, and opt-in gates. Subject-specific frozen models and
+   empirical validation remain required.
 6. **Trace-level foundation implemented:** seven initial operators,
    `MutationRunner`, outcome classification, and mutation score. Real-defect
    validation and executable control-flow mutants remain required.

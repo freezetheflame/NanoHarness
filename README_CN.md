@@ -256,6 +256,12 @@ Oracle 分类。Fault 装饰器应放在 Recording 装饰器内层，使 Trace �
 
 Candidate 记录不作为已验证缺陷计数。
 
+行为覆盖率使用预先声明的 `CoverageModel`；分母由其 Target 定义，而不是由
+已观测行为反推。`CoverageCollector` 支持 Tool 与 Argument 等价类、Run/Stop
+结果、Lifecycle 与组件故障、Oracle 结果、可执行 Fault 和 Trace Metadata。详见
+[覆盖率协议](BEHAVIORAL_COVERAGE_CN.md) 和明确未冻结的
+`research/coverage/model_template.json` Template。默认不启用 Coverage 阈值。
+
 ---
 
 ## 工具

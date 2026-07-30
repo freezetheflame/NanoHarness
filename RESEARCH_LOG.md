@@ -117,6 +117,24 @@ Official sources consulted:
 - Current verification after this increment: 162 core tests and 36 targeted
   Coding Agent regression tests pass.
 
+## 2026-07-30 — Explicit-universe behavioral coverage foundation
+
+- Added versioned `CoverageModel` and `CoverageTarget` contracts whose declared
+  targets, rather than observed behavior, define the denominator.
+- Added deterministic tool-argument equivalence classes and targets for run,
+  stop, lifecycle, errors, Oracle outcomes, fault applications/outcomes, and
+  Trace metadata.
+- Added per-hit redacted evidence, cross-run set-union aggregation,
+  per-dimension summaries, uncovered required targets, and opt-in gates with no
+  default threshold.
+- Frozen models bind a subject revision and derivation to a SHA-256 target digest;
+  experiment mode rejects templates, drafts, and post-freeze mutation.
+- Added a bilingual measurement protocol and an explicitly non-frozen generic
+  template. Subject-specific target derivation and empirical validation remain
+  required before the metric supports a paper claim.
+- Current verification after this increment: 181 core tests and 36 targeted
+  Coding Agent regression tests pass.
+
 ## AI assistance disclosure record
 
 Codex assisted with:

@@ -102,6 +102,8 @@ FaultInjectingLLM / FaultInjectingToolRegistry
   Oracle killed/survived 分类的可执行 Model/Tool Fault Campaign。
 - 版本化真实缺陷语料 Schema、证据与裁决约束、Derivation/留出 Validation
   隔离、一致性统计、Readiness Gate、分析 CLI 和显式未验证的 Seed Candidate。
+- 显式 Universe 的行为覆盖模型，包含预声明 Target、Tool Argument 等价类、
+  每个 Hit 的证据、跨运行并集、分维度结果，且不预设质量阈值。
 
 仍需完成：
 
@@ -110,7 +112,7 @@ FaultInjectingLLM / FaultInjectingToolRegistry
 - 对初始 Mutation Operator 的真实缺陷验证；
 - Context、State、Permission 和 Hook 边界的可执行注入；
 - 用于控制流变异的 branch-aware Replay 或 Sandbox 实验对象；
-- 行为覆盖率和实验报告；
+- 实验对象专属冻结 Coverage Model 与实证实验报告；
 - NanoHarness 之外的 Adapter 或实验对象。
 
 ## 实验设计

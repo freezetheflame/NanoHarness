@@ -264,6 +264,14 @@ defines evidence and freeze gates. Inspect the current draft corpus with:
 
 Candidate records are not counted as verified defects.
 
+Behavioral coverage uses a preregistered `CoverageModel`; its targets—not the
+behaviors already observed—define the denominator. `CoverageCollector` supports
+tool and argument classes, run/stop outcomes, lifecycle and component failures,
+Oracle outcomes, executable faults, and Trace metadata. See the
+[coverage protocol](BEHAVIORAL_COVERAGE.md) and the explicitly non-frozen
+template at `research/coverage/model_template.json`. No coverage threshold is
+enabled by default.
+
 ---
 
 ## Tools

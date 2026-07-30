@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "model_id": "agent-behavior-template-v0",
+  "status": "template",
+  "targets": [
+    {
+      "target_id": "run.completed",
+      "kind": "run_status",
+      "parameters": {"status": "completed"}
+    },
+    {
+      "target_id": "run.stopped",
+      "kind": "run_status",
+      "parameters": {"status": "stopped"}
+    },
+    {
+      "target_id": "run.exhausted",
+      "kind": "run_status",
+      "parameters": {"status": "exhausted"}
+    },
+    {
+      "target_id": "stop.model-terminated",
+      "kind": "stop_reason",
+      "parameters": {"reason": "model_terminated"}
+    },
+    {
+      "target_id": "stop.evaluator",
+      "kind": "stop_reason",
+      "parameters": {"reason": "evaluator_stopped"}
+    },
+    {
+      "target_id": "stop.max-steps",
+      "kind": "stop_reason",
+      "parameters": {"reason": "max_steps"}
+    },
+    {
+      "target_id": "lifecycle.task-started",
+      "kind": "lifecycle_event",
+      "parameters": {"event_type": "task_started"},
+      "required": true
+    },
+    {
+      "target_id": "lifecycle.task-completed",
+      "kind": "lifecycle_event",
+      "parameters": {"event_type": "task_completed"},
+      "required": true
+    },
+    {
+      "target_id": "error.model",
+      "kind": "component_error",
+      "parameters": {"component": "model"}
+    },
+    {
+      "target_id": "error.tool",
+      "kind": "component_error",
+      "parameters": {"component": "tool"}
+    },
+    {
+      "target_id": "error.hook",
+      "kind": "component_error",
+      "parameters": {"component": "hook"}
+    },
+    {
+      "target_id": "fault.model-response-drop",
+      "kind": "fault_action",
+      "parameters": {"component": "model", "action": "model_response_drop", "effective": true}
+    },
+    {
+      "target_id": "fault.tool-name-swap",
+      "kind": "fault_action",
+      "parameters": {"component": "model", "action": "tool_name_swap", "effective": true}
+    },
+    {
+      "target_id": "fault.tool-argument-drop",
+      "kind": "fault_action",
+      "parameters": {"component": "tool", "action": "tool_argument_drop", "effective": true}
+    },
+    {
+      "target_id": "fault.tool-result-stale",
+      "kind": "fault_action",
+      "parameters": {"component": "tool", "action": "tool_result_stale", "effective": true}
+    },
+    {
+      "target_id": "fault.tool-call-duplicate",
+      "kind": "fault_action",
+      "parameters": {"component": "tool", "action": "tool_call_duplicate", "effective": true}
+    }
+  ],
+  "metadata": {
+    "claim_warning": "This generic template is not a frozen subject-specific experimental denominator. Add tool, argument, Oracle, policy, and subject-specific targets before use."
+  }
+}

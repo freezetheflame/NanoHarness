@@ -127,7 +127,9 @@ TERMINATED_AS_SUCCESS     将模型停止误认为任务完成
 4. **Model/Tool 基础已实现：**增加版本化声明式 Fault Plan、确定性
    occurrence 匹配、运行时证据和可执行 Oracle Campaign；State、
    Context、Permission 和 Hook 边界仍待完成。
-5. 发布第一版行为覆盖率报告。
+5. **Coverage 基础已实现：**增加显式版本化 Target Universe、Tool
+   Argument 等价类、跨运行证据聚合、分维度报告和可选 Gate；实验对象
+   专属冻结模型和实证验证仍待完成。
 6. **Trace-level 基础已实现：**七个初始算子、`MutationRunner`、结果分类与
    Mutation Score；真实缺陷验证和可执行控制流 Mutant 仍待完成。
 7. **语料协议基础已实现：**增加版本化 Defect/Evidence 模型、防泄漏
