@@ -16,6 +16,12 @@ from nanoharness.testing.adapters.langgraph import (
     LangGraphSubjectAdapter,
     LangGraphUnavailableError,
 )
+from nanoharness.testing.adapters.agentdojo import (
+    AGENTDOJO_UTILITY_BINDING,
+    AgentDojoPipelineFactory,
+    AgentDojoRuntimeFactory,
+    AgentDojoSubjectAdapter,
+)
 
 __all__ = [
     "CallableSubjectAdapter",
@@ -30,4 +36,8 @@ __all__ = [
     "LangGraphResultMapper",
     "LangGraphSubjectAdapter",
     "LangGraphUnavailableError",
+    "AGENTDOJO_UTILITY_BINDING",
+    "AgentDojoPipelineFactory",
+    "AgentDojoRuntimeFactory",
+    "AgentDojoSubjectAdapter",
 ]

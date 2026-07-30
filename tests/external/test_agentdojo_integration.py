@@ -7,12 +7,18 @@ import pytest
 
 pytest.importorskip("agentdojo.task_suite.load_suites")
 
+from agentdojo.agent_pipeline.ground_truth_pipeline import (  # noqa: E402
+    GroundTruthPipeline,
+)
 from nanoharness.testing import (  # noqa: E402
     AGENTDOJO_PACKAGE_VERSION,
     AGENTDOJO_REVISION,
     AgentDojoBenchmarkAdapter,
+    AgentDojoSubjectAdapter,
     BenchmarkConfigurationError,
     BenchmarkManifest,
+    SubjectIdentity,
+    TraceEventType,
 )
 
 
@@ -85,3 +91,53 @@ def test_archived_agentdojo_conversion_matches_frozen_manifests_and_checksums():
     assert hashlib.sha256(summary_raw).hexdigest() == expected_checksums[
         "conversion_summary.json"
     ]
+
+
+def test_real_agentdojo_ground_truth_pipeline_uses_original_utility_scorer():
+    root = (
+        Path(__file__).parents[2]
+        / "research"
+        / "pilots"
+        / "agentdojo_offline_conversion"
+        / "raw"
+    )
+    manifest = BenchmarkManifest.model_validate_json(
+        (root / "banking_manifest.json").read_text()
+    )
+    identity = SubjectIdentity(
+        subject_id="agentdojo-ground-truth@0.1.35",
+        runtime="agentdojo",
+        version="0.1.35",
+        revision=manifest.source.revision,
+        source_url=manifest.source.source_url,
+        independently_developed=True,
+        metadata={"pipeline": "GroundTruthPipeline"},
+    )
+    adapter = AgentDojoSubjectAdapter.from_installed(
+        identity,
+        manifest,
+        lambda scenario, task: GroundTruthPipeline(task),
+    )
+
+    reports = [
+        adapter.run(adapter.scenario_for(record.source_task_id, seed=0))
+        for record in manifest.tasks
+    ]
+
+    assert all(report.passed for report in reports)
+    assert all(report.result.evaluation.achieved for report in reports)
+    assert all(
+        any(
+            event.event_type is TraceEventType.TOOL_STARTED
+            for event in report.trace.events
+        )
+        for report in reports
+    )
+    assert all(
+        any(
+            event.payload.get("adapter_event") == "utility_scored"
+            and event.payload.get("scorer_path") == "utility"
+            for event in report.trace.events
+        )
+        for report in reports
+    )

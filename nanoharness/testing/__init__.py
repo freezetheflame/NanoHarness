@@ -137,6 +137,10 @@ from nanoharness.testing.adapters import (
     LangGraphResultMapper,
     LangGraphSubjectAdapter,
     LangGraphUnavailableError,
+    AGENTDOJO_UTILITY_BINDING,
+    AgentDojoPipelineFactory,
+    AgentDojoRuntimeFactory,
+    AgentDojoSubjectAdapter,
 )
 from nanoharness.testing.experiment import (
     EXPERIMENT_SCHEMA_VERSION,
@@ -302,6 +306,10 @@ __all__ = [
     "LangGraphResultMapper",
     "LangGraphSubjectAdapter",
     "LangGraphUnavailableError",
+    "AGENTDOJO_UTILITY_BINDING",
+    "AgentDojoPipelineFactory",
+    "AgentDojoRuntimeFactory",
+    "AgentDojoSubjectAdapter",
     "EXPERIMENT_SCHEMA_VERSION",
     "ExperimentCell",
     "ExperimentConfigurationError",
