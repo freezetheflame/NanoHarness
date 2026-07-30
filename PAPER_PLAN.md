@@ -94,6 +94,12 @@ ReplaySession
 ReplayLLM   ReplayToolRegistry
        |
 CoverageCollector + MutationReport
+
+FaultCampaignRunner ---- versioned FaultPlan / FaultSession
+       |
+FaultInjectingLLM / FaultInjectingToolRegistry
+       |
+fresh deterministic fixture or sandbox execution
 ```
 
 Implemented evidence:
@@ -107,13 +113,17 @@ Implemented evidence:
   scenario execution reports.
 - trace-level mutation campaigns with seven initial operators, explicit outcome
   classification, and correctly scoped mutation score.
+- executable model/tool fault campaigns with deterministic occurrence matching,
+  fresh-engine isolation, runtime application evidence, and Oracle-based
+  killed/survived classification.
 
 Still required:
 
 - the dedicated pytest fixture/marker plugin;
 - the real-defect corpus and mutation taxonomy protocol;
 - real-defect validation for the initial mutation operators;
-- executable control-flow mutation beyond detached trace/report mutation;
+- executable injection at Context, state, permission, and hook boundaries;
+- branch-aware replay or sandbox subjects for control-flow-changing faults;
 - behavioral coverage and experiment reporting;
 - adapters or subjects beyond NanoHarness itself.
 

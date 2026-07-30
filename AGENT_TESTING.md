@@ -135,7 +135,9 @@ separate future layer.
 3. **Core implemented:** define serializable `Scenario`, deterministic
    `TestOracle`, and `ScenarioRunner` contracts. A dedicated pytest fixture and
    marker plugin remains to be implemented.
-4. Add declarative fault injection for model, tool, state, and hook boundaries.
+4. **Model/tool foundation implemented:** add versioned declarative fault plans,
+   deterministic occurrence matching, runtime evidence, and executable Oracle
+   campaigns. State, Context, permission, and hook boundaries remain.
 5. Publish the first behavioral coverage report.
 6. **Trace-level foundation implemented:** seven initial operators,
    `MutationRunner`, outcome classification, and mutation score. Real-defect

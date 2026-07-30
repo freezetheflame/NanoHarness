@@ -80,6 +80,25 @@ Official sources consulted:
   oracles. They do not yet execute arbitrary control-flow-changing agent
   mutants. The paper and experiments must keep that distinction explicit.
 
+## 2026-07-30 — Executable model/tool fault injection foundation
+
+- Added versioned, serializable `FaultPlan` and `FaultRule` contracts with
+  deterministic zero-based occurrence matching and validation of action/boundary
+  compatibility.
+- Added shared, thread-safe `FaultSession` evidence with ordered applications,
+  effective/ineffective distinctions, and explicit untriggered rules.
+- Added model and tool decorators for injected errors, dropped model responses,
+  swapped tool names, dropped tool arguments, stale tool results, and duplicate
+  tool execution.
+- Added `FaultCampaignRunner`, which runs a clean baseline and a fresh engine
+  per plan, records fault provenance in Trace metadata, and classifies executable
+  outcomes through the same deterministic Scenario Oracles.
+- Current verification after this increment: 145 core tests and 36 targeted
+  Coding Agent regression tests pass.
+- Scope limitation: this layer supports model/tool boundaries with deterministic
+  fixtures or sandboxed live dependencies. Context, state, permission, hook,
+  and branch-aware replay injection remain future work.
+
 ## AI assistance disclosure record
 
 Codex assisted with:

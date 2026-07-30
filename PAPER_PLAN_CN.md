@@ -79,6 +79,12 @@ ReplaySession
 ReplayLLM   ReplayToolRegistry
        |
 CoverageCollector + MutationReport
+
+FaultCampaignRunner ---- 版本化 FaultPlan / FaultSession
+       |
+FaultInjectingLLM / FaultInjectingToolRegistry
+       |
+全新的确定性 Fixture 或 Sandbox 执行
 ```
 
 已有证据：
@@ -92,13 +98,16 @@ CoverageCollector + MutationReport
   执行报告。
 - 包含七个初始算子、显式结果分类和正确 Mutation Score 分母的 Trace-level
   Mutation Campaign。
+- 具有确定性 occurrence 匹配、全新 Engine 隔离、运行时应用证据和
+  Oracle killed/survived 分类的可执行 Model/Tool Fault Campaign。
 
 仍需完成：
 
 - 专用 pytest fixture/marker 插件；
 - 真实缺陷语料与变异分类的构建协议；
 - 对初始 Mutation Operator 的真实缺陷验证；
-- 超越离线 Trace/Report 修改的可执行控制流变异；
+- Context、State、Permission 和 Hook 边界的可执行注入；
+- 用于控制流变异的 branch-aware Replay 或 Sandbox 实验对象；
 - 行为覆盖率和实验报告；
 - NanoHarness 之外的 Adapter 或实验对象。
 

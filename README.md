@@ -244,6 +244,14 @@ failures, non-applicable, equivalent, invalid, and erroneous mutants are
 explicit outcomes and are excluded rather than silently counted as survived
 mutants.
 
+For faults that must affect real control flow, `FaultPlan` rules can be applied
+at live or deterministic-fixture model/tool boundaries with
+`FaultInjectingLLM` and `FaultInjectingToolRegistry`. `FaultCampaignRunner`
+runs a clean baseline plus a fresh engine for every plan, records exactly which
+rules triggered and whether they changed a value, then classifies the execution
+through the same Scenario Oracles. Place the fault decorators inside the
+recording decorators so the resulting Trace contains the injected behavior.
+
 ---
 
 ## Tools

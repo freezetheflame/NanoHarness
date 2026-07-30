@@ -238,6 +238,13 @@ Mutation Score 的分母只包含 killed 与 survived Mutant。Baseline 失败�
 适用、等价、无效和变异执行错误都会被显式分类，而不会悄悄当作 survived
 Mutant。
 
+对于必须影响真实控制流的故障，`FaultPlan` 可通过 `FaultInjectingLLM`
+和 `FaultInjectingToolRegistry` 应用在真实或确定性 Fixture 的 Model/Tool
+边界。`FaultCampaignRunner` 会运行干净 Baseline，并为每个 Plan 创建全新
+Engine，记录规则是否触发以及是否真正改了值，再使用同一组 Scenario
+Oracle 分类。Fault 装饰器应放在 Recording 装饰器内层，使 Trace 记录注入
+后的行为。
+
 ---
 
 ## 工具

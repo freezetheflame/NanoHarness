@@ -123,7 +123,9 @@ TERMINATED_AS_SUCCESS     将模型停止误认为任务完成
    检查请求内容和跨组件调用顺序。
 3. **核心已实现：**定义可序列化 `Scenario`、确定性 `TestOracle` 和
    `ScenarioRunner` 契约；专用 pytest fixture 与 marker 插件仍待实现。
-4. 为模型、工具、状态和 Hook 边界增加声明式故障注入。
+4. **Model/Tool 基础已实现：**增加版本化声明式 Fault Plan、确定性
+   occurrence 匹配、运行时证据和可执行 Oracle Campaign；State、
+   Context、Permission 和 Hook 边界仍待完成。
 5. 发布第一版行为覆盖率报告。
 6. **Trace-level 基础已实现：**七个初始算子、`MutationRunner`、结果分类与
    Mutation Score；真实缺陷验证和可执行控制流 Mutant 仍待完成。
