@@ -180,6 +180,30 @@ Official sources consulted:
   installed real LangGraph integration and archived Artifact audit) and 36
   targeted Coding Agent regression tests pass.
 
+## 2026-07-30 — External executable LangGraph Tool-Fault Pilot
+
+- Added Recorder-aware LangGraph builders and a digest-bound external
+  `SubjectFaultCampaignRunner` that creates a fresh Adapter for baseline and
+  every Fault Plan.
+- Corrected Tool fault instrumentation so underlying attempts use
+  `TOOL_STARTED`/`TOOL_COMPLETED`/`TOOL_ERROR`, while one final `TOOL_EXCHANGE`
+  records the Observation delivered to graph state and cumulative
+  `attempt_count`.
+- Froze the three-Plan Manifest
+  `b9269b84e0f29400de90b6aa2b29ff2aea92ee6c9ded9b0dd048d8d1e1abe01e`
+  against Harness/subject revision
+  `457922a4beccf9372fb5daf39068389ad78395ed`.
+- The real `langgraph==1.2.10` Pilot baseline passed. Stale result, duplicate
+  call, and required-argument drop were all killed; the plumbing Mutation Score
+  is `3/3=1.0`. Raw Campaign SHA-256 is
+  `854add94ab1d9f2e7bcd765f72f94d4b58d63e2f9f3ddb1b2c524b2f740798c1`.
+- Claim limitation: the three hand-selected Mutants and one deterministic local
+  tool are not held-out or representative. This result validates integration
+  and trace semantics only, not the paper's mutation-effectiveness claim.
+- Current verification after this increment: 226 core tests (including both
+  installed LangGraph integrations and archived Artifact audits) and 36 targeted
+  Coding Agent regression tests pass.
+
 ## AI assistance disclosure record
 
 Codex assisted with:

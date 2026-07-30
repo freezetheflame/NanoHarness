@@ -139,7 +139,8 @@ TERMINATED_AS_SUCCESS     将模型停止误认为任务完成
 8. 增加差分执行与自动失败样例缩减。
 9. **外部 Subject 基础已实现：**增加不可变 Subject Identity、冻结 Experiment
    Manifest、原始 Observation Report 和锁定真实 LangGraph Adapter Pilot；论文级
-   Tool/Fault Scenario 与 Benchmark 来源仍待完成。
+   第二个 Pilot 在真实 StateGraph 中执行并杀死 Stale-result、Duplicate-call 和
+   Argument-drop Fault；论文级 Scenario 与 Benchmark 来源仍待完成。
 
 每一步都需要自己的契约测试。除非缺失的运行时事件或模型本身就是需要引入的
 契约，否则测试组件不应要求修改 `NanoEngine`。

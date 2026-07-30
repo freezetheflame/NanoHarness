@@ -291,6 +291,12 @@ uv pip install --python .venv/bin/python -e '.[research]'
 See the [experiment protocol](EXPERIMENT_PROTOCOL.md) and Pilot README for its
 strict claim boundary; the echo Pilot is not paper-scale evidence.
 
+The companion `research/pilots/langgraph_tool_faults/` Pilot runs three
+executable Tool mutants inside a real StateGraph. Its attempt-aware Trace keeps
+duplicate underlying executions distinct from the single Observation delivered
+to graph state. All three are killed in the archived plumbing run, but the
+handcrafted sample is not a paper Mutation Score.
+
 ---
 
 ## Tools

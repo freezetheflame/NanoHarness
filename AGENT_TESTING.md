@@ -155,8 +155,9 @@ separate future layer.
 8. Add differential execution and automatic failure reduction.
 9. **External-subject foundation implemented:** add immutable subject identity,
    frozen experiment manifests, raw observation reports, and a pinned real
-   LangGraph Adapter pilot. Paper-scale tool/fault scenarios and a Benchmark
-   source remain required.
+   LangGraph Adapter pilot. A second Pilot executes and kills stale-result,
+   duplicate-call, and argument-drop faults inside a real StateGraph. Paper-scale
+   scenarios and a Benchmark source remain required.
 
 Each step includes its own contract suite. Testing components must not require
 changes to `NanoEngine` unless a missing runtime event or model is itself the

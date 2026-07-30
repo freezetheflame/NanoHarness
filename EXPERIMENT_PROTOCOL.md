@@ -39,6 +39,12 @@ At least one pinned real dependency must execute in CI or a separately recorded
 integration job. The current LangGraph pilot satisfies this plumbing check but
 is deliberately too small to count as paper-scale external validation.
 
+Executable external Fault Campaigns use a separate digest-bound Manifest that
+includes the exact Fault Plans. A fresh Adapter/graph is constructed for the
+baseline and every Plan. For tools, underlying attempt events and the final
+delivered Observation are distinct so argument mutation, duplicate execution,
+and stale result delivery cannot be hidden by decorator ordering.
+
 ## Experimental conditions
 
 For each eligible subject/scenario pair, preserve raw results for these

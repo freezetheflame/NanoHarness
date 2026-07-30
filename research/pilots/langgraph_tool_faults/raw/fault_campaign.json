@@ -1,0 +1,1561 @@
+{
+  "schema_version": 1,
+  "manifest": {
+    "schema_version": 1,
+    "experiment_id": "langgraph-tool-fault-pilot-v1",
+    "subject": {
+      "subject_id": "langgraph@pypi-1.2.10",
+      "runtime": "langgraph",
+      "version": "1.2.10",
+      "revision": "pypi:1.2.10",
+      "source_url": "https://github.com/langchain-ai/langgraph",
+      "independently_developed": true,
+      "metadata": {
+        "distribution": "langgraph"
+      }
+    },
+    "scenario": {
+      "schema_version": 1,
+      "scenario_id": "langgraph-tool-faults",
+      "query": "  Hello Agent  ",
+      "seed": null,
+      "tags": [
+        "pilot",
+        "external",
+        "langgraph",
+        "tool",
+        "fault"
+      ],
+      "fixtures": {
+        "expected_answer": "hello agent"
+      },
+      "metadata": {},
+      "oracles": [
+        {
+          "oracle_id": null,
+          "kind": "goal_achievement",
+          "parameters": {
+            "expected": true
+          },
+          "severity": "error"
+        },
+        {
+          "oracle_id": null,
+          "kind": "run_status",
+          "parameters": {
+            "allowed": [
+              "completed"
+            ]
+          },
+          "severity": "error"
+        },
+        {
+          "oracle_id": null,
+          "kind": "stop_reason",
+          "parameters": {
+            "allowed": [
+              "subject_completed"
+            ]
+          },
+          "severity": "error"
+        },
+        {
+          "oracle_id": null,
+          "kind": "tool_calls",
+          "parameters": {
+            "required": [
+              "echo"
+            ],
+            "max_counts": {
+              "echo": 1
+            },
+            "required_arguments": {
+              "echo": [
+                "text"
+              ]
+            },
+            "expected_arguments": {
+              "echo": {
+                "text": "hello agent"
+              }
+            }
+          },
+          "severity": "error"
+        },
+        {
+          "oracle_id": null,
+          "kind": "tool_results",
+          "parameters": {
+            "expected_last": {
+              "echo": {
+                "echo": "hello agent",
+                "call_number": 1
+              }
+            }
+          },
+          "severity": "error"
+        },
+        {
+          "oracle_id": null,
+          "kind": "lifecycle",
+          "parameters": {},
+          "severity": "error"
+        }
+      ]
+    },
+    "plans": [
+      {
+        "schema_version": 2,
+        "plan_id": "tool-result-stale",
+        "rules": [
+          {
+            "rule_id": "stale-echo",
+            "component": "tool",
+            "action": "tool_result_stale",
+            "occurrence": 0,
+            "tool_name": "echo",
+            "argument": null,
+            "replacement": {
+              "echo": "stale",
+              "call_number": -1
+            },
+            "replacement_tool_name": null,
+            "message_role": null,
+            "state_key": null,
+            "hook_stage": null,
+            "message": "injected component failure",
+            "enabled": true
+          }
+        ]
+      },
+      {
+        "schema_version": 2,
+        "plan_id": "tool-call-duplicate",
+        "rules": [
+          {
+            "rule_id": "duplicate-echo",
+            "component": "tool",
+            "action": "tool_call_duplicate",
+            "occurrence": 0,
+            "tool_name": "echo",
+            "argument": null,
+            "replacement": null,
+            "replacement_tool_name": null,
+            "message_role": null,
+            "state_key": null,
+            "hook_stage": null,
+            "message": "injected component failure",
+            "enabled": true
+          }
+        ]
+      },
+      {
+        "schema_version": 2,
+        "plan_id": "tool-argument-drop",
+        "rules": [
+          {
+            "rule_id": "drop-echo-text",
+            "component": "tool",
+            "action": "tool_argument_drop",
+            "occurrence": 0,
+            "tool_name": "echo",
+            "argument": "text",
+            "replacement": null,
+            "replacement_tool_name": null,
+            "message_role": null,
+            "state_key": null,
+            "hook_stage": null,
+            "message": "injected component failure",
+            "enabled": true
+          }
+        ]
+      }
+    ],
+    "frozen_at": "2026-07-30T20:00:00+08:00",
+    "manifest_digest": "b9269b84e0f29400de90b6aa2b29ff2aea92ee6c9ded9b0dd048d8d1e1abe01e",
+    "metadata": {
+      "status": "pilot",
+      "purpose": "Validate executable tool faults inside a pinned real LangGraph StateGraph; not a confirmatory paper experiment.",
+      "dependency": "langgraph==1.2.10",
+      "harness_revision": "457922a4beccf9372fb5daf39068389ad78395ed"
+    }
+  },
+  "started_at": "2026-07-30T06:44:10.690793Z",
+  "finished_at": "2026-07-30T06:44:10.719796Z",
+  "campaign": {
+    "schema_version": 2,
+    "scenario_id": "langgraph-tool-faults",
+    "baseline": {
+      "schema_version": 1,
+      "scenario_id": "langgraph-tool-faults",
+      "passed": true,
+      "result": {
+        "status": "completed",
+        "stop_reason": "subject_completed",
+        "stop_detail": "",
+        "final_answer": "hello agent",
+        "evaluation": {
+          "achieved": true,
+          "confidence": 1.0,
+          "explanation": "Exact deterministic answer comparison",
+          "evidence": [
+            "expected='hello agent'",
+            "actual='hello agent'",
+            "snapshots=4"
+          ]
+        },
+        "trajectory": [],
+        "avg_thought_length": 0.0
+      },
+      "trace": {
+        "schema_version": 2,
+        "trace_id": "4560f295-851d-4444-9107-2d1678ee7068",
+        "started_at": 1785393850.6916807,
+        "events": [
+          {
+            "schema_version": 2,
+            "event_id": "940fa417-4279-4587-9011-d34f956a7088",
+            "trace_id": "4560f295-851d-4444-9107-2d1678ee7068",
+            "sequence": 0,
+            "event_type": "task_started",
+            "timestamp": 1785393850.691923,
+            "payload": {
+              "query": "  Hello Agent  ",
+              "adapter_managed": true
+            },
+            "metadata": {}
+          },
+          {
+            "schema_version": 2,
+            "event_id": "be84b15c-56c4-4973-85ca-f40c067d7ddb",
+            "trace_id": "4560f295-851d-4444-9107-2d1678ee7068",
+            "sequence": 1,
+            "event_type": "custom",
+            "timestamp": 1785393850.6996903,
+            "payload": {
+              "adapter": "langgraph",
+              "adapter_event": "state_snapshot",
+              "snapshot_index": 0,
+              "state": {
+                "query": "  Hello Agent  "
+              }
+            },
+            "metadata": {}
+          },
+          {
+            "schema_version": 2,
+            "event_id": "b0a2a7b3-409b-4863-a386-be86d75df0a3",
+            "trace_id": "4560f295-851d-4444-9107-2d1678ee7068",
+            "sequence": 2,
+            "event_type": "custom",
+            "timestamp": 1785393850.7002974,
+            "payload": {
+              "adapter": "langgraph",
+              "adapter_event": "state_snapshot",
+              "snapshot_index": 1,
+              "state": {
+                "query": "  Hello Agent  ",
+                "tool_name": "echo",
+                "arguments": {
+                  "text": "hello agent"
+                }
+              }
+            },
+            "metadata": {}
+          },
+          {
+            "schema_version": 2,
+            "event_id": "833f605a-ec17-483e-8015-52f4b3904dfa",
+            "trace_id": "4560f295-851d-4444-9107-2d1678ee7068",
+            "sequence": 3,
+            "event_type": "tool_exchange",
+            "timestamp": 1785393850.7007074,
+            "payload": {
+              "name": "echo",
+              "arguments": {
+                "text": "hello agent"
+              },
+              "result": {
+                "echo": "hello agent",
+                "call_number": 1
+              },
+              "attempt_count": 1,
+              "duration_ms": 0.008854000043356791
+            },
+            "metadata": {}
+          },
+          {
+            "schema_version": 2,
+            "event_id": "28de8872-4288-4815-b90e-701d5c6c3057",
+            "trace_id": "4560f295-851d-4444-9107-2d1678ee7068",
+            "sequence": 4,
+            "event_type": "custom",
+            "timestamp": 1785393850.7011046,
+            "payload": {
+              "adapter": "langgraph",
+              "adapter_event": "state_snapshot",
+              "snapshot_index": 2,
+              "state": {
+                "query": "  Hello Agent  ",
+                "tool_name": "echo",
+                "arguments": {
+                  "text": "hello agent"
+                },
+                "observation": {
+                  "echo": "hello agent",
+                  "call_number": 1
+                }
+              }
+            },
+            "metadata": {}
+          },
+          {
+            "schema_version": 2,
+            "event_id": "6ffa05aa-950a-45bf-a8bf-a0abba903678",
+            "trace_id": "4560f295-851d-4444-9107-2d1678ee7068",
+            "sequence": 5,
+            "event_type": "custom",
+            "timestamp": 1785393850.7014823,
+            "payload": {
+              "adapter": "langgraph",
+              "adapter_event": "state_snapshot",
+              "snapshot_index": 3,
+              "state": {
+                "query": "  Hello Agent  ",
+                "tool_name": "echo",
+                "arguments": {
+                  "text": "hello agent"
+                },
+                "observation": {
+                  "echo": "hello agent",
+                  "call_number": 1
+                },
+                "answer": "hello agent"
+              }
+            },
+            "metadata": {}
+          },
+          {
+            "schema_version": 2,
+            "event_id": "16e92bd4-a87b-4577-b367-df62f8e266e7",
+            "trace_id": "4560f295-851d-4444-9107-2d1678ee7068",
+            "sequence": 6,
+            "event_type": "task_completed",
+            "timestamp": 1785393850.701685,
+            "payload": {
+              "result": {
+                "status": "completed",
+                "stop_reason": "subject_completed",
+                "stop_detail": "",
+                "final_answer": "hello agent",
+                "evaluation": {
+                  "achieved": true,
+                  "confidence": 1.0,
+                  "explanation": "Exact deterministic answer comparison",
+                  "evidence": [
+                    "expected='hello agent'",
+                    "actual='hello agent'",
+                    "snapshots=4"
+                  ]
+                },
+                "trajectory": [],
+                "avg_thought_length": 0.0
+              },
+              "adapter_managed": true
+            },
+            "metadata": {}
+          }
+        ],
+        "metadata": {
+          "scenario_id": "langgraph-tool-faults",
+          "seed": null,
+          "tags": [
+            "pilot",
+            "external",
+            "langgraph",
+            "tool",
+            "fault"
+          ],
+          "subject": {
+            "subject_id": "langgraph@pypi-1.2.10",
+            "runtime": "langgraph",
+            "version": "1.2.10",
+            "revision": "pypi:1.2.10",
+            "source_url": "https://github.com/langchain-ai/langgraph",
+            "independently_developed": true,
+            "metadata": {
+              "distribution": "langgraph"
+            }
+          },
+          "execution_mode": "subject_baseline"
+        }
+      },
+      "execution_error": null,
+      "verdicts": [
+        {
+          "oracle_id": "goal_achievement:0",
+          "kind": "goal_achievement",
+          "passed": true,
+          "message": "Expected goal achievement True, got True",
+          "severity": "error",
+          "evidence": {
+            "expected": true,
+            "actual": true
+          }
+        },
+        {
+          "oracle_id": "run_status:1",
+          "kind": "run_status",
+          "passed": true,
+          "message": "Expected run status in ['completed'], got completed",
+          "severity": "error",
+          "evidence": {
+            "allowed": [
+              "completed"
+            ],
+            "actual": "completed"
+          }
+        },
+        {
+          "oracle_id": "stop_reason:2",
+          "kind": "stop_reason",
+          "passed": true,
+          "message": "Expected stop reason in ['subject_completed'], got subject_completed",
+          "severity": "error",
+          "evidence": {
+            "allowed": [
+              "subject_completed"
+            ],
+            "actual": "subject_completed"
+          }
+        },
+        {
+          "oracle_id": "tool_calls:3",
+          "kind": "tool_calls",
+          "passed": true,
+          "message": "Tool-call constraints satisfied",
+          "severity": "error",
+          "evidence": {
+            "counts": {
+              "echo": 1
+            },
+            "calls": [
+              {
+                "sequence": 3,
+                "name": "echo",
+                "arguments": {
+                  "text": "hello agent"
+                },
+                "attempt_count": 1
+              }
+            ]
+          }
+        },
+        {
+          "oracle_id": "tool_results:4",
+          "kind": "tool_results",
+          "passed": true,
+          "message": "Tool-result constraints satisfied",
+          "severity": "error",
+          "evidence": {
+            "last_results": {
+              "echo": {
+                "echo": "hello agent",
+                "call_number": 1
+              }
+            }
+          }
+        },
+        {
+          "oracle_id": "lifecycle:5",
+          "kind": "lifecycle",
+          "passed": true,
+          "message": "Lifecycle contains 1 start event(s) and 1 end event(s)",
+          "severity": "error",
+          "evidence": {
+            "start_sequences": [
+              0
+            ],
+            "end_sequences": [
+              6
+            ]
+          }
+        }
+      ]
+    },
+    "outcomes": [
+      {
+        "plan_id": "tool-result-stale",
+        "status": "killed",
+        "message": "At least one Oracle detected the executable faults",
+        "scenario_report": {
+          "schema_version": 1,
+          "scenario_id": "langgraph-tool-faults",
+          "passed": false,
+          "result": {
+            "status": "completed",
+            "stop_reason": "subject_completed",
+            "stop_detail": "",
+            "final_answer": "stale",
+            "evaluation": {
+              "achieved": false,
+              "confidence": 1.0,
+              "explanation": "Exact deterministic answer comparison",
+              "evidence": [
+                "expected='hello agent'",
+                "actual='stale'",
+                "snapshots=4"
+              ]
+            },
+            "trajectory": [],
+            "avg_thought_length": 0.0
+          },
+          "trace": {
+            "schema_version": 2,
+            "trace_id": "f90d50d6-b924-4dfd-9125-8f620ddb19b6",
+            "started_at": 1785393850.7032232,
+            "events": [
+              {
+                "schema_version": 2,
+                "event_id": "10ca4f73-0f70-4c9c-871c-b264911ab4f6",
+                "trace_id": "f90d50d6-b924-4dfd-9125-8f620ddb19b6",
+                "sequence": 0,
+                "event_type": "task_started",
+                "timestamp": 1785393850.703315,
+                "payload": {
+                  "query": "  Hello Agent  ",
+                  "adapter_managed": true
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "245fbaf5-7af7-4bcf-9ba4-17c10fb6f842",
+                "trace_id": "f90d50d6-b924-4dfd-9125-8f620ddb19b6",
+                "sequence": 1,
+                "event_type": "custom",
+                "timestamp": 1785393850.7060895,
+                "payload": {
+                  "adapter": "langgraph",
+                  "adapter_event": "state_snapshot",
+                  "snapshot_index": 0,
+                  "state": {
+                    "query": "  Hello Agent  "
+                  }
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "7ef2466b-6cac-42dd-bdcf-b231a5b876f5",
+                "trace_id": "f90d50d6-b924-4dfd-9125-8f620ddb19b6",
+                "sequence": 2,
+                "event_type": "custom",
+                "timestamp": 1785393850.7065356,
+                "payload": {
+                  "adapter": "langgraph",
+                  "adapter_event": "state_snapshot",
+                  "snapshot_index": 1,
+                  "state": {
+                    "query": "  Hello Agent  ",
+                    "tool_name": "echo",
+                    "arguments": {
+                      "text": "hello agent"
+                    }
+                  }
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "a2109986-f4a4-4744-ba0b-bbe488035848",
+                "trace_id": "f90d50d6-b924-4dfd-9125-8f620ddb19b6",
+                "sequence": 3,
+                "event_type": "tool_started",
+                "timestamp": 1785393850.706685,
+                "payload": {
+                  "name": "echo",
+                  "arguments": {
+                    "text": "hello agent"
+                  },
+                  "attempt_index": 0
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "5b864038-dcb8-48b4-b4d8-3b3844d3eceb",
+                "trace_id": "f90d50d6-b924-4dfd-9125-8f620ddb19b6",
+                "sequence": 4,
+                "event_type": "tool_completed",
+                "timestamp": 1785393850.7067819,
+                "payload": {
+                  "name": "echo",
+                  "arguments": {
+                    "text": "hello agent"
+                  },
+                  "result": {
+                    "echo": "hello agent",
+                    "call_number": 1
+                  },
+                  "attempt_index": 0,
+                  "duration_ms": 0.05208099901210517
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "369b765b-1631-4d1b-af0c-3de8939db8ef",
+                "trace_id": "f90d50d6-b924-4dfd-9125-8f620ddb19b6",
+                "sequence": 5,
+                "event_type": "tool_exchange",
+                "timestamp": 1785393850.7069752,
+                "payload": {
+                  "name": "echo",
+                  "arguments": {
+                    "text": "hello agent"
+                  },
+                  "result": {
+                    "echo": "stale",
+                    "call_number": -1
+                  },
+                  "attempt_count": 1
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "7f71a597-2b9b-49c2-91e2-9d502d4cec77",
+                "trace_id": "f90d50d6-b924-4dfd-9125-8f620ddb19b6",
+                "sequence": 6,
+                "event_type": "custom",
+                "timestamp": 1785393850.7072904,
+                "payload": {
+                  "adapter": "langgraph",
+                  "adapter_event": "state_snapshot",
+                  "snapshot_index": 2,
+                  "state": {
+                    "query": "  Hello Agent  ",
+                    "tool_name": "echo",
+                    "arguments": {
+                      "text": "hello agent"
+                    },
+                    "observation": {
+                      "echo": "stale",
+                      "call_number": -1
+                    }
+                  }
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "443bb813-0e0b-4902-9a83-5122e572c3d9",
+                "trace_id": "f90d50d6-b924-4dfd-9125-8f620ddb19b6",
+                "sequence": 7,
+                "event_type": "custom",
+                "timestamp": 1785393850.707602,
+                "payload": {
+                  "adapter": "langgraph",
+                  "adapter_event": "state_snapshot",
+                  "snapshot_index": 3,
+                  "state": {
+                    "query": "  Hello Agent  ",
+                    "tool_name": "echo",
+                    "arguments": {
+                      "text": "hello agent"
+                    },
+                    "observation": {
+                      "echo": "stale",
+                      "call_number": -1
+                    },
+                    "answer": "stale"
+                  }
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "6e97bc6a-456d-46fa-9c6c-25d563ed36be",
+                "trace_id": "f90d50d6-b924-4dfd-9125-8f620ddb19b6",
+                "sequence": 8,
+                "event_type": "task_completed",
+                "timestamp": 1785393850.7077456,
+                "payload": {
+                  "result": {
+                    "status": "completed",
+                    "stop_reason": "subject_completed",
+                    "stop_detail": "",
+                    "final_answer": "stale",
+                    "evaluation": {
+                      "achieved": false,
+                      "confidence": 1.0,
+                      "explanation": "Exact deterministic answer comparison",
+                      "evidence": [
+                        "expected='hello agent'",
+                        "actual='stale'",
+                        "snapshots=4"
+                      ]
+                    },
+                    "trajectory": [],
+                    "avg_thought_length": 0.0
+                  },
+                  "adapter_managed": true
+                },
+                "metadata": {}
+              }
+            ],
+            "metadata": {
+              "scenario_id": "langgraph-tool-faults",
+              "seed": null,
+              "tags": [
+                "pilot",
+                "external",
+                "langgraph",
+                "tool",
+                "fault"
+              ],
+              "subject": {
+                "subject_id": "langgraph@pypi-1.2.10",
+                "runtime": "langgraph",
+                "version": "1.2.10",
+                "revision": "pypi:1.2.10",
+                "source_url": "https://github.com/langchain-ai/langgraph",
+                "independently_developed": true,
+                "metadata": {
+                  "distribution": "langgraph"
+                }
+              },
+              "execution_mode": "subject_fault_injected",
+              "fault_plan_id": "tool-result-stale"
+            }
+          },
+          "execution_error": null,
+          "verdicts": [
+            {
+              "oracle_id": "goal_achievement:0",
+              "kind": "goal_achievement",
+              "passed": false,
+              "message": "Expected goal achievement True, got False",
+              "severity": "error",
+              "evidence": {
+                "expected": true,
+                "actual": false
+              }
+            },
+            {
+              "oracle_id": "run_status:1",
+              "kind": "run_status",
+              "passed": true,
+              "message": "Expected run status in ['completed'], got completed",
+              "severity": "error",
+              "evidence": {
+                "allowed": [
+                  "completed"
+                ],
+                "actual": "completed"
+              }
+            },
+            {
+              "oracle_id": "stop_reason:2",
+              "kind": "stop_reason",
+              "passed": true,
+              "message": "Expected stop reason in ['subject_completed'], got subject_completed",
+              "severity": "error",
+              "evidence": {
+                "allowed": [
+                  "subject_completed"
+                ],
+                "actual": "subject_completed"
+              }
+            },
+            {
+              "oracle_id": "tool_calls:3",
+              "kind": "tool_calls",
+              "passed": true,
+              "message": "Tool-call constraints satisfied",
+              "severity": "error",
+              "evidence": {
+                "counts": {
+                  "echo": 1
+                },
+                "calls": [
+                  {
+                    "sequence": 5,
+                    "name": "echo",
+                    "arguments": {
+                      "text": "hello agent"
+                    },
+                    "attempt_count": 1
+                  }
+                ]
+              }
+            },
+            {
+              "oracle_id": "tool_results:4",
+              "kind": "tool_results",
+              "passed": false,
+              "message": "tool 'echo' result expected {'echo': 'hello agent', 'call_number': 1}, got {'echo': 'stale', 'call_number': -1}",
+              "severity": "error",
+              "evidence": {
+                "last_results": {
+                  "echo": {
+                    "echo": "stale",
+                    "call_number": -1
+                  }
+                }
+              }
+            },
+            {
+              "oracle_id": "lifecycle:5",
+              "kind": "lifecycle",
+              "passed": true,
+              "message": "Lifecycle contains 1 start event(s) and 1 end event(s)",
+              "severity": "error",
+              "evidence": {
+                "start_sequences": [
+                  0
+                ],
+                "end_sequences": [
+                  8
+                ]
+              }
+            }
+          ]
+        },
+        "fault_report": {
+          "schema_version": 2,
+          "plan_id": "tool-result-stale",
+          "configured_rules": [
+            {
+              "rule_id": "stale-echo",
+              "component": "tool",
+              "action": "tool_result_stale",
+              "occurrence": 0,
+              "tool_name": "echo",
+              "argument": null,
+              "replacement": {
+                "echo": "stale",
+                "call_number": -1
+              },
+              "replacement_tool_name": null,
+              "message_role": null,
+              "state_key": null,
+              "hook_stage": null,
+              "message": "injected component failure",
+              "enabled": true
+            }
+          ],
+          "applications": [
+            {
+              "sequence": 0,
+              "rule_id": "stale-echo",
+              "component": "tool",
+              "action": "tool_result_stale",
+              "boundary_index": 0,
+              "tool_name": "echo",
+              "message_role": null,
+              "state_key": null,
+              "hook_stage": null,
+              "effective": true,
+              "details": {
+                "original_result": {
+                  "echo": "hello agent",
+                  "call_number": 1
+                },
+                "replacement_result": {
+                  "echo": "stale",
+                  "call_number": -1
+                }
+              }
+            }
+          ]
+        },
+        "error_type": null
+      },
+      {
+        "plan_id": "tool-call-duplicate",
+        "status": "killed",
+        "message": "At least one Oracle detected the executable faults",
+        "scenario_report": {
+          "schema_version": 1,
+          "scenario_id": "langgraph-tool-faults",
+          "passed": false,
+          "result": {
+            "status": "completed",
+            "stop_reason": "subject_completed",
+            "stop_detail": "",
+            "final_answer": "hello agent",
+            "evaluation": {
+              "achieved": true,
+              "confidence": 1.0,
+              "explanation": "Exact deterministic answer comparison",
+              "evidence": [
+                "expected='hello agent'",
+                "actual='hello agent'",
+                "snapshots=4"
+              ]
+            },
+            "trajectory": [],
+            "avg_thought_length": 0.0
+          },
+          "trace": {
+            "schema_version": 2,
+            "trace_id": "3a1d52ca-89a4-4803-b9ee-12f0f1cb6666",
+            "started_at": 1785393850.7090268,
+            "events": [
+              {
+                "schema_version": 2,
+                "event_id": "7a373272-07e3-4a1e-8672-6fd119dc748b",
+                "trace_id": "3a1d52ca-89a4-4803-b9ee-12f0f1cb6666",
+                "sequence": 0,
+                "event_type": "task_started",
+                "timestamp": 1785393850.7091115,
+                "payload": {
+                  "query": "  Hello Agent  ",
+                  "adapter_managed": true
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "52cd362b-04c8-48c5-bbf8-9423e851ee6b",
+                "trace_id": "3a1d52ca-89a4-4803-b9ee-12f0f1cb6666",
+                "sequence": 1,
+                "event_type": "custom",
+                "timestamp": 1785393850.711807,
+                "payload": {
+                  "adapter": "langgraph",
+                  "adapter_event": "state_snapshot",
+                  "snapshot_index": 0,
+                  "state": {
+                    "query": "  Hello Agent  "
+                  }
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "0efcd30e-148f-4fe4-acb1-c75e4cd26099",
+                "trace_id": "3a1d52ca-89a4-4803-b9ee-12f0f1cb6666",
+                "sequence": 2,
+                "event_type": "custom",
+                "timestamp": 1785393850.7122784,
+                "payload": {
+                  "adapter": "langgraph",
+                  "adapter_event": "state_snapshot",
+                  "snapshot_index": 1,
+                  "state": {
+                    "query": "  Hello Agent  ",
+                    "tool_name": "echo",
+                    "arguments": {
+                      "text": "hello agent"
+                    }
+                  }
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "d6fd54cb-08fa-4ad3-853f-81d497eab383",
+                "trace_id": "3a1d52ca-89a4-4803-b9ee-12f0f1cb6666",
+                "sequence": 3,
+                "event_type": "tool_started",
+                "timestamp": 1785393850.7125146,
+                "payload": {
+                  "name": "echo",
+                  "arguments": {
+                    "text": "hello agent"
+                  },
+                  "attempt_index": 0
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "70ef4238-54c4-430c-9449-2bfdb45ae09c",
+                "trace_id": "3a1d52ca-89a4-4803-b9ee-12f0f1cb6666",
+                "sequence": 4,
+                "event_type": "tool_completed",
+                "timestamp": 1785393850.7125926,
+                "payload": {
+                  "name": "echo",
+                  "arguments": {
+                    "text": "hello agent"
+                  },
+                  "result": {
+                    "echo": "hello agent",
+                    "call_number": 1
+                  },
+                  "attempt_index": 0,
+                  "duration_ms": 0.058852001529885456
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "bb19a181-0ca9-4dfc-8fa1-b99311c6668f",
+                "trace_id": "3a1d52ca-89a4-4803-b9ee-12f0f1cb6666",
+                "sequence": 5,
+                "event_type": "tool_started",
+                "timestamp": 1785393850.7126954,
+                "payload": {
+                  "name": "echo",
+                  "arguments": {
+                    "text": "hello agent"
+                  },
+                  "attempt_index": 1
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "da95a62e-9a77-47b8-85e9-2b9a11a71d7d",
+                "trace_id": "3a1d52ca-89a4-4803-b9ee-12f0f1cb6666",
+                "sequence": 6,
+                "event_type": "tool_completed",
+                "timestamp": 1785393850.7127843,
+                "payload": {
+                  "name": "echo",
+                  "arguments": {
+                    "text": "hello agent"
+                  },
+                  "result": {
+                    "echo": "hello agent",
+                    "call_number": 2
+                  },
+                  "attempt_index": 1,
+                  "duration_ms": 0.06978900273679756
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "208e1a58-42b4-4c1b-9689-43b081bb719d",
+                "trace_id": "3a1d52ca-89a4-4803-b9ee-12f0f1cb6666",
+                "sequence": 7,
+                "event_type": "tool_exchange",
+                "timestamp": 1785393850.7129245,
+                "payload": {
+                  "name": "echo",
+                  "arguments": {
+                    "text": "hello agent"
+                  },
+                  "result": {
+                    "echo": "hello agent",
+                    "call_number": 2
+                  },
+                  "attempt_count": 2
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "3bb456a8-9b03-4894-bd08-ddd140aa3dcb",
+                "trace_id": "3a1d52ca-89a4-4803-b9ee-12f0f1cb6666",
+                "sequence": 8,
+                "event_type": "custom",
+                "timestamp": 1785393850.713454,
+                "payload": {
+                  "adapter": "langgraph",
+                  "adapter_event": "state_snapshot",
+                  "snapshot_index": 2,
+                  "state": {
+                    "query": "  Hello Agent  ",
+                    "tool_name": "echo",
+                    "arguments": {
+                      "text": "hello agent"
+                    },
+                    "observation": {
+                      "echo": "hello agent",
+                      "call_number": 2
+                    }
+                  }
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "0332d877-aaa6-4a5d-aa1c-21ec388fa6e3",
+                "trace_id": "3a1d52ca-89a4-4803-b9ee-12f0f1cb6666",
+                "sequence": 9,
+                "event_type": "custom",
+                "timestamp": 1785393850.7138796,
+                "payload": {
+                  "adapter": "langgraph",
+                  "adapter_event": "state_snapshot",
+                  "snapshot_index": 3,
+                  "state": {
+                    "query": "  Hello Agent  ",
+                    "tool_name": "echo",
+                    "arguments": {
+                      "text": "hello agent"
+                    },
+                    "observation": {
+                      "echo": "hello agent",
+                      "call_number": 2
+                    },
+                    "answer": "hello agent"
+                  }
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "96f5eb0e-a269-4679-9701-ba25100ffd96",
+                "trace_id": "3a1d52ca-89a4-4803-b9ee-12f0f1cb6666",
+                "sequence": 10,
+                "event_type": "task_completed",
+                "timestamp": 1785393850.7140527,
+                "payload": {
+                  "result": {
+                    "status": "completed",
+                    "stop_reason": "subject_completed",
+                    "stop_detail": "",
+                    "final_answer": "hello agent",
+                    "evaluation": {
+                      "achieved": true,
+                      "confidence": 1.0,
+                      "explanation": "Exact deterministic answer comparison",
+                      "evidence": [
+                        "expected='hello agent'",
+                        "actual='hello agent'",
+                        "snapshots=4"
+                      ]
+                    },
+                    "trajectory": [],
+                    "avg_thought_length": 0.0
+                  },
+                  "adapter_managed": true
+                },
+                "metadata": {}
+              }
+            ],
+            "metadata": {
+              "scenario_id": "langgraph-tool-faults",
+              "seed": null,
+              "tags": [
+                "pilot",
+                "external",
+                "langgraph",
+                "tool",
+                "fault"
+              ],
+              "subject": {
+                "subject_id": "langgraph@pypi-1.2.10",
+                "runtime": "langgraph",
+                "version": "1.2.10",
+                "revision": "pypi:1.2.10",
+                "source_url": "https://github.com/langchain-ai/langgraph",
+                "independently_developed": true,
+                "metadata": {
+                  "distribution": "langgraph"
+                }
+              },
+              "execution_mode": "subject_fault_injected",
+              "fault_plan_id": "tool-call-duplicate"
+            }
+          },
+          "execution_error": null,
+          "verdicts": [
+            {
+              "oracle_id": "goal_achievement:0",
+              "kind": "goal_achievement",
+              "passed": true,
+              "message": "Expected goal achievement True, got True",
+              "severity": "error",
+              "evidence": {
+                "expected": true,
+                "actual": true
+              }
+            },
+            {
+              "oracle_id": "run_status:1",
+              "kind": "run_status",
+              "passed": true,
+              "message": "Expected run status in ['completed'], got completed",
+              "severity": "error",
+              "evidence": {
+                "allowed": [
+                  "completed"
+                ],
+                "actual": "completed"
+              }
+            },
+            {
+              "oracle_id": "stop_reason:2",
+              "kind": "stop_reason",
+              "passed": true,
+              "message": "Expected stop reason in ['subject_completed'], got subject_completed",
+              "severity": "error",
+              "evidence": {
+                "allowed": [
+                  "subject_completed"
+                ],
+                "actual": "subject_completed"
+              }
+            },
+            {
+              "oracle_id": "tool_calls:3",
+              "kind": "tool_calls",
+              "passed": false,
+              "message": "tool 'echo' count 2 exceeds 1",
+              "severity": "error",
+              "evidence": {
+                "counts": {
+                  "echo": 2
+                },
+                "calls": [
+                  {
+                    "sequence": 7,
+                    "name": "echo",
+                    "arguments": {
+                      "text": "hello agent"
+                    },
+                    "attempt_count": 2
+                  }
+                ]
+              }
+            },
+            {
+              "oracle_id": "tool_results:4",
+              "kind": "tool_results",
+              "passed": false,
+              "message": "tool 'echo' result expected {'echo': 'hello agent', 'call_number': 1}, got {'echo': 'hello agent', 'call_number': 2}",
+              "severity": "error",
+              "evidence": {
+                "last_results": {
+                  "echo": {
+                    "echo": "hello agent",
+                    "call_number": 2
+                  }
+                }
+              }
+            },
+            {
+              "oracle_id": "lifecycle:5",
+              "kind": "lifecycle",
+              "passed": true,
+              "message": "Lifecycle contains 1 start event(s) and 1 end event(s)",
+              "severity": "error",
+              "evidence": {
+                "start_sequences": [
+                  0
+                ],
+                "end_sequences": [
+                  10
+                ]
+              }
+            }
+          ]
+        },
+        "fault_report": {
+          "schema_version": 2,
+          "plan_id": "tool-call-duplicate",
+          "configured_rules": [
+            {
+              "rule_id": "duplicate-echo",
+              "component": "tool",
+              "action": "tool_call_duplicate",
+              "occurrence": 0,
+              "tool_name": "echo",
+              "argument": null,
+              "replacement": null,
+              "replacement_tool_name": null,
+              "message_role": null,
+              "state_key": null,
+              "hook_stage": null,
+              "message": "injected component failure",
+              "enabled": true
+            }
+          ],
+          "applications": [
+            {
+              "sequence": 0,
+              "rule_id": "duplicate-echo",
+              "component": "tool",
+              "action": "tool_call_duplicate",
+              "boundary_index": 0,
+              "tool_name": "echo",
+              "message_role": null,
+              "state_key": null,
+              "hook_stage": null,
+              "effective": true,
+              "details": {
+                "duplicate_attempt_number": 2
+              }
+            }
+          ]
+        },
+        "error_type": null
+      },
+      {
+        "plan_id": "tool-argument-drop",
+        "status": "killed",
+        "message": "At least one Oracle detected the executable faults",
+        "scenario_report": {
+          "schema_version": 1,
+          "scenario_id": "langgraph-tool-faults",
+          "passed": false,
+          "result": null,
+          "trace": {
+            "schema_version": 2,
+            "trace_id": "7f115d26-2294-47a8-ae20-2c409e2a032f",
+            "started_at": 1785393850.715834,
+            "events": [
+              {
+                "schema_version": 2,
+                "event_id": "3f0727c4-a4e0-48c1-8400-ddd546e045aa",
+                "trace_id": "7f115d26-2294-47a8-ae20-2c409e2a032f",
+                "sequence": 0,
+                "event_type": "task_started",
+                "timestamp": 1785393850.7159185,
+                "payload": {
+                  "query": "  Hello Agent  ",
+                  "adapter_managed": true
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "756926a1-91f0-4fd8-a63f-33ba1cb2a749",
+                "trace_id": "7f115d26-2294-47a8-ae20-2c409e2a032f",
+                "sequence": 1,
+                "event_type": "custom",
+                "timestamp": 1785393850.7182586,
+                "payload": {
+                  "adapter": "langgraph",
+                  "adapter_event": "state_snapshot",
+                  "snapshot_index": 0,
+                  "state": {
+                    "query": "  Hello Agent  "
+                  }
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "b72f893f-2809-4020-b0f2-992142a5af7c",
+                "trace_id": "7f115d26-2294-47a8-ae20-2c409e2a032f",
+                "sequence": 2,
+                "event_type": "custom",
+                "timestamp": 1785393850.718805,
+                "payload": {
+                  "adapter": "langgraph",
+                  "adapter_event": "state_snapshot",
+                  "snapshot_index": 1,
+                  "state": {
+                    "query": "  Hello Agent  ",
+                    "tool_name": "echo",
+                    "arguments": {
+                      "text": "hello agent"
+                    }
+                  }
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "209f9446-55fb-4462-a0d3-d67d97ffc885",
+                "trace_id": "7f115d26-2294-47a8-ae20-2c409e2a032f",
+                "sequence": 3,
+                "event_type": "tool_started",
+                "timestamp": 1785393850.7190685,
+                "payload": {
+                  "name": "echo",
+                  "arguments": {},
+                  "attempt_index": 0
+                },
+                "metadata": {}
+              },
+              {
+                "schema_version": 2,
+                "event_id": "6d6b2053-92e4-412f-9de0-8ac60ec8c206",
+                "trace_id": "7f115d26-2294-47a8-ae20-2c409e2a032f",
+                "sequence": 4,
+                "event_type": "tool_error",
+                "timestamp": 1785393850.7191455,
+                "payload": {
+                  "name": "echo",
+                  "arguments": {},
+                  "attempt_index": 0,
+                  "attempt_count": 1,
+                  "error_type": "TypeError",
+                  "error_message": "build_adapter.<locals>.graph_builder.<locals>.echo() missing 1 required positional argument: 'text'",
+                  "duration_ms": 0.07916300091892481
+                },
+                "metadata": {}
+              }
+            ],
+            "metadata": {
+              "scenario_id": "langgraph-tool-faults",
+              "seed": null,
+              "tags": [
+                "pilot",
+                "external",
+                "langgraph",
+                "tool",
+                "fault"
+              ],
+              "subject": {
+                "subject_id": "langgraph@pypi-1.2.10",
+                "runtime": "langgraph",
+                "version": "1.2.10",
+                "revision": "pypi:1.2.10",
+                "source_url": "https://github.com/langchain-ai/langgraph",
+                "independently_developed": true,
+                "metadata": {
+                  "distribution": "langgraph"
+                }
+              },
+              "execution_mode": "subject_fault_injected",
+              "fault_plan_id": "tool-argument-drop"
+            }
+          },
+          "execution_error": {
+            "error_type": "TypeError",
+            "message": "build_adapter.<locals>.graph_builder.<locals>.echo() missing 1 required positional argument: 'text'"
+          },
+          "verdicts": [
+            {
+              "oracle_id": "goal_achievement:0",
+              "kind": "goal_achievement",
+              "passed": false,
+              "message": "Expected goal achievement True, got None",
+              "severity": "error",
+              "evidence": {
+                "expected": true,
+                "actual": null
+              }
+            },
+            {
+              "oracle_id": "run_status:1",
+              "kind": "run_status",
+              "passed": false,
+              "message": "Expected run status in ['completed'], got None",
+              "severity": "error",
+              "evidence": {
+                "allowed": [
+                  "completed"
+                ],
+                "actual": null
+              }
+            },
+            {
+              "oracle_id": "stop_reason:2",
+              "kind": "stop_reason",
+              "passed": false,
+              "message": "Expected stop reason in ['subject_completed'], got None",
+              "severity": "error",
+              "evidence": {
+                "allowed": [
+                  "subject_completed"
+                ],
+                "actual": null
+              }
+            },
+            {
+              "oracle_id": "tool_calls:3",
+              "kind": "tool_calls",
+              "passed": false,
+              "message": "tool 'echo' call at sequence 4 misses ['text']; tool 'echo' argument 'text' expected 'hello agent', got None",
+              "severity": "error",
+              "evidence": {
+                "counts": {
+                  "echo": 1
+                },
+                "calls": [
+                  {
+                    "sequence": 4,
+                    "name": "echo",
+                    "arguments": {},
+                    "attempt_count": 1
+                  }
+                ]
+              }
+            },
+            {
+              "oracle_id": "tool_results:4",
+              "kind": "tool_results",
+              "passed": false,
+              "message": "tool 'echo' has no successful result",
+              "severity": "error",
+              "evidence": {
+                "last_results": {}
+              }
+            },
+            {
+              "oracle_id": "lifecycle:5",
+              "kind": "lifecycle",
+              "passed": false,
+              "message": "Lifecycle contains 1 start event(s) and 0 end event(s)",
+              "severity": "error",
+              "evidence": {
+                "start_sequences": [
+                  0
+                ],
+                "end_sequences": []
+              }
+            },
+            {
+              "oracle_id": "implicit:unexpected_execution_error",
+              "kind": "execution_error",
+              "passed": false,
+              "message": "Unexpected TypeError: build_adapter.<locals>.graph_builder.<locals>.echo() missing 1 required positional argument: 'text'",
+              "severity": "error",
+              "evidence": {
+                "error_type": "TypeError",
+                "message": "build_adapter.<locals>.graph_builder.<locals>.echo() missing 1 required positional argument: 'text'"
+              }
+            }
+          ]
+        },
+        "fault_report": {
+          "schema_version": 2,
+          "plan_id": "tool-argument-drop",
+          "configured_rules": [
+            {
+              "rule_id": "drop-echo-text",
+              "component": "tool",
+              "action": "tool_argument_drop",
+              "occurrence": 0,
+              "tool_name": "echo",
+              "argument": "text",
+              "replacement": null,
+              "replacement_tool_name": null,
+              "message_role": null,
+              "state_key": null,
+              "hook_stage": null,
+              "message": "injected component failure",
+              "enabled": true
+            }
+          ],
+          "applications": [
+            {
+              "sequence": 0,
+              "rule_id": "drop-echo-text",
+              "component": "tool",
+              "action": "tool_argument_drop",
+              "boundary_index": 0,
+              "tool_name": "echo",
+              "message_role": null,
+              "state_key": null,
+              "hook_stage": null,
+              "effective": true,
+              "details": {
+                "dropped_argument": "text"
+              }
+            }
+          ]
+        },
+        "error_type": null
+      }
+    ],
+    "killed": 3,
+    "survived": 0,
+    "not_applicable": 0,
+    "equivalent": 0,
+    "errors": 0,
+    "mutation_score": 1.0
+  }
+}

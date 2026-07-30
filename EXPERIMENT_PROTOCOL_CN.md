@@ -31,6 +31,11 @@ Seed 是执行 Metadata，不是确定性证明。允许重复相同 Seed 来测
 必须在 CI 或单独记录的 Integration Job 中执行。当前 LangGraph Pilot 满足 Plumbing Check，
 但刻意保持小规模，不能当作论文级外部验证。
 
+可执行外部 Fault Campaign 使用独立 Digest-bound Manifest，其中包含完整 Fault Plan。
+Baseline 和每个 Plan 都创建全新 Adapter/Graph。对 Tool 而言，底层 Attempt Event 与
+最终交付 Observation 分离，避免 Argument Mutation、Duplicate Execution 或 Stale Result
+因装饰器顺序而被隐藏。
+
 ## 实验条件
 
 对每个符合条件的 Subject/Scenario Pair，在支持时保留以下原始结果：

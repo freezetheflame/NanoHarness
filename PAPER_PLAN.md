@@ -128,6 +128,9 @@ Implemented evidence:
 - immutable external-subject provenance, digest-bound experiment manifests,
   serial raw observations, and a real pinned `langgraph==1.2.10` Adapter pilot
   with six successful deterministic observations.
+- a frozen executable LangGraph Tool-Fault Pilot in which deterministic Oracles
+  kill stale-result, duplicate-call, and required-argument-drop Mutants, with
+  distinct underlying-attempt and delivered-Observation evidence.
 
 Still required:
 
@@ -166,10 +169,11 @@ Candidate external environments are tau3-bench and AgentDojo. A separate
 runtime such as Google ADK or LangGraph would strengthen external validity more
 than adding only another scenario set.
 
-The current `langgraph==1.2.10` pilot executes a real compiled StateGraph through
-the external Adapter, but contains only two deterministic echo scenarios and no
-model, tool side effects, or mutants. It validates replication plumbing and does
-not yet satisfy the paper's external-validity gate.
+The current `langgraph==1.2.10` Pilots execute real compiled StateGraphs through
+the external Adapter. The second Pilot adds a deterministic tool and three
+executable faults, all killed by composed Oracles. Both remain handcrafted,
+small, model-free integration checks without a Benchmark dataset or held-out
+Mutants; they do not satisfy the paper's external-validity gate.
 
 ### Defects and mutants
 

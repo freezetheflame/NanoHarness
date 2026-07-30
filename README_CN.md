@@ -279,6 +279,11 @@ uv pip install --python .venv/bin/python -e '.[research]'
 详见[实验协议](EXPERIMENT_PROTOCOL_CN.md) 和 Pilot README 中的严格主张边界；
 Echo Pilot 不是论文级证据。
 
+配套的 `research/pilots/langgraph_tool_faults/` Pilot 在真实 StateGraph 中运行三个
+可执行 Tool Mutant。Attempt-aware Trace 会区分重复的底层执行和交付给 Graph State
+的单一 Observation。归档 Plumbing Run 杀死了三个 Mutant，但该手工样本不是论文
+Mutation Score。
+
 ---
 
 ## 工具

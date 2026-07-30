@@ -110,6 +110,9 @@ FaultInjecting Model / Tool / Context / State / Hook / Permission 边界
 - 不可变外部 Subject Provenance、Digest 绑定 Experiment Manifest、串行原始
   Observation，以及包含 6 个成功确定性 Observation 的真实锁定
   `langgraph==1.2.10` Adapter Pilot。
+- 冻结可执行 LangGraph Tool-Fault Pilot：确定性 Oracle 杀死 Stale-result、
+  Duplicate-call 和 Required-argument-drop Mutant，并分别保留底层 Attempt 和交付
+  Observation 证据。
 
 仍需完成：
 
@@ -144,9 +147,10 @@ Oracle。它直接衡量 Oracle 能否发现可观测数据损坏，同时排除
 候选外部环境包括 tau3-bench 与 AgentDojo。若能增加 Google ADK 或 LangGraph
 之类的独立运行时，会比只增加另一套场景更能增强外部有效性。
 
-当前 `langgraph==1.2.10` Pilot 通过外部 Adapter 执行真实 Compiled StateGraph，
-但只包含两个确定性 Echo Scenario，没有 Model、Tool Side Effect 或 Mutant。它只验证
-Replication Plumbing，尚未满足论文的外部有效性门槛。
+当前 `langgraph==1.2.10` Pilot 通过外部 Adapter 执行真实 Compiled StateGraph。
+第二个 Pilot 增加确定性 Tool 和三个可执行 Fault，并由组合 Oracle 全部杀死。
+两者仍是手工构造、小规模、无 Model 的 Integration Check，没有 Benchmark Dataset
+或留出 Mutant，尚未满足论文的外部有效性门槛。
 
 ### 缺陷与 Mutant
 
