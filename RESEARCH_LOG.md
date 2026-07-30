@@ -227,6 +227,31 @@ Official sources consulted:
 - Current verification after this increment: 230 non-AgentDojo tests and 2
   real-package AgentDojo integration/artifact tests pass.
 
+## 2026-07-30 — AgentDojo original-scorer execution bridge
+
+- Added `AgentDojoSubjectAdapter`, which derives a scorer-bound execution
+  Scenario without mutating the frozen unbound Benchmark conversion.
+- The bridge validates source provenance and the exact converted Scenario,
+  rejects initialized pre-environment drift, creates a fresh native Runtime and
+  pipeline, and invokes `utility_from_traces` with strict `utility` fallback in
+  the same order as AgentDojo.
+- Preserved AgentDojo's three-attempt/final-attempt scorer-trace semantics while
+  recording all observed attempts, native tool starts/completions/errors,
+  delivered observations, model messages, scorer path, function trace, and
+  pre/post environment digests.
+- Froze a four-cell GroundTruthPipeline Manifest at digest
+  `a7d5ad3025193c09ee8283774bbf04a9a01430495ac521a29d107f110d7d7b9f`
+  against bridge revision `b693aaa924ae1c0694f40fd9064982a633893206`.
+  All four original utility Verdicts pass with zero execution errors; archived
+  report SHA-256 is
+  `6a2e9fe14941ae7cdd87a6e67f06db0428525469da612f6027897a05de2424ab`.
+- Claim limitation: GroundTruthPipeline directly executes task-author
+  reference calls and invokes no live model. Its expected `4/4` validates
+  scorer binding and instrumentation only, not agent performance, Benchmark
+  generality, prompt-injection security, or mutation effectiveness.
+- Current verification after this increment: 240 repository tests pass,
+  including fake-contract, pinned-package, and archived-artifact audits.
+
 ## AI assistance disclosure record
 
 Codex assisted with:

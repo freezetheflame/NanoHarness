@@ -117,6 +117,10 @@ FaultInjecting Model / Tool / Context / State / Hook / Permission 边界
   Provenance、Digest 绑定 Task Selection Manifest、Pre-environment Digest、非规范性
   Reference Call 和原始 Scorer Provenance；四任务真实包 Pilot 验证转换，并显式保持
   Oracle 未绑定。
+- AgentDojo Scorer-bound Subject Bridge：拒绝 Environment Drift，保留 Final-attempt
+  Trace 语义，调用原始 Strict Utility，并记录原生 Tool Attempt、交付 Observation、
+  Scorer Path 与 Pre/Post Environment Digest；冻结 GroundTruthPipeline Pilot 验证四个
+  Development Cell。
 
 仍需完成：
 
@@ -126,7 +130,8 @@ FaultInjecting Model / Tool / Context / State / Hook / Permission 边界
 - 用于控制流变异的 branch-aware Replay 或 Sandbox 实验对象；
 - 在外部 Runtime 和 Recovery Scenario 上验证边界 Fault；
 - 实验对象专属冻结 Coverage Model 与实证实验报告；
-- 论文级 LangGraph Tool/Fault Scenario 和已绑定原始 Scorer 的外部 Benchmark Cell；
+- 论文级 LangGraph Tool/Fault Scenario，以及由真实 Agent Subject 执行并绑定原始
+  Scorer 的外部 Benchmark Cell；
 - Confirmatory Manifest、原始数据和 Cluster-aware 分析脚本。
 
 ## 实验设计
@@ -161,6 +166,11 @@ User Task，并冻结保留语义边界的 Scenario 转换。它验证了外部 
 Provenance，但没有执行 AgentDojo Pipeline、调用 Live Model 或绑定其有状态 Utility
 Scorer；Reference Call 也不是 Exact-plan Oracle。因此它补齐的是数据接入缺口，而非
 论文级外部有效性门槛。
+
+Scorer Bridge Pilot 补齐了下一处语义缺口：四个派生执行 Scenario 由 AgentDojo 原始
+Utility 基于原生 Pre/Post Environment 判断，并在确定性 GroundTruthPipeline 下全部通过。
+该 Pipeline 直接执行任务作者的 Reference Call，不是真实 Agent。因此 `4/4` 是预期的
+集成证据，不是 Task-success Estimate、Mutation 结果或 Confirmatory Benchmark 证据。
 
 ### 缺陷与 Mutant
 

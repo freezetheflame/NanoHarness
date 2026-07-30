@@ -17,6 +17,8 @@ from nanoharness.testing import (  # noqa: E402
     AgentDojoSubjectAdapter,
     BenchmarkConfigurationError,
     BenchmarkManifest,
+    ExperimentManifest,
+    ExperimentReport,
     SubjectIdentity,
     TraceEventType,
 )
@@ -140,4 +142,50 @@ def test_real_agentdojo_ground_truth_pipeline_uses_original_utility_scorer():
             for event in report.trace.events
         )
         for report in reports
+    )
+
+
+def test_archived_agentdojo_scorer_bridge_preserves_original_utility_evidence():
+    root = (
+        Path(__file__).parents[2]
+        / "research"
+        / "pilots"
+        / "agentdojo_scorer_bridge"
+    )
+    manifest_raw = (root / "manifest.json").read_bytes()
+    report_raw = (root / "raw" / "experiment_report.json").read_bytes()
+    manifest = ExperimentManifest.model_validate_json(manifest_raw)
+    report = ExperimentReport.model_validate_json(report_raw)
+
+    assert report.manifest == manifest
+    assert manifest.manifest_digest == (
+        "a7d5ad3025193c09ee8283774bbf04a9a01430495ac521a29d107f110d7d7b9f"
+    )
+    assert len(report.observations) == 4
+    assert all(observation.report.passed for observation in report.observations)
+    assert all(
+        observation.report.result.evaluation.achieved
+        for observation in report.observations
+    )
+    assert all(
+        observation.report.trace.metadata["benchmark"]["oracle_binding"]
+        == "agentdojo_user_utility"
+        for observation in report.observations
+    )
+    for observation in report.observations:
+        scored = [
+            event
+            for event in observation.report.trace.events
+            if event.payload.get("adapter_event") == "utility_scored"
+        ]
+        assert len(scored) == 1
+        assert scored[0].payload["scorer_path"] == "utility"
+        assert scored[0].payload["scorer_trace_scope"] == "final_attempt"
+        assert scored[0].payload["pre_environment_digest"]
+        assert scored[0].payload["post_environment_digest"]
+    assert hashlib.sha256(manifest_raw).hexdigest() == (
+        "a857f6f13eab6b1dae3ff1dd3d9d5e96e4e48809a4de16309755cc135cf44bd1"
+    )
+    assert hashlib.sha256(report_raw).hexdigest() == (
+        "6a2e9fe14941ae7cdd87a6e67f06db0428525469da612f6027897a05de2424ab"
     )

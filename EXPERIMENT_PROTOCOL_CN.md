@@ -39,6 +39,12 @@ Metadata 与转换后的 Scenario。除非源 Benchmark 将 Reference Plan 定�
 State 语义并调用原始 Scorer 前，不得报告 Task Success。AgentDojo 转换 Pilot 属于此类
 数据接入检查，不是结果复现。
 
+Scorer-bound Bridge 应派生新的执行 Scenario，而不是修改未绑定的源转换。它必须拒绝
+Source Manifest 与 Pre-environment Drift，说明由哪次 Retry Attempt 提供 Scorer Trace，
+保留 Scorer Callable/Path 与 Strictness，并记录原生 Pre/Post Digest。AgentDojo
+GroundTruthPipeline 通过只能验证该绑定机制，因为它不调用 Model，而是直接执行任务作者的
+Reference Call。
+
 可执行外部 Fault Campaign 使用独立 Digest-bound Manifest，其中包含完整 Fault Plan。
 Baseline 和每个 Plan 都创建全新 Adapter/Graph。对 Tool 而言，底层 Attempt Event 与
 最终交付 Observation 分离，避免 Argument Mutation、Duplicate Execution 或 Stale Result

@@ -50,6 +50,13 @@ task success until a Runtime bridge preserves those state semantics and invokes
 the original scorer. The AgentDojo conversion Pilot is such an ingestion check,
 not a result reproduction.
 
+A scorer-bound bridge derives a new execution Scenario rather than mutating the
+unbound source conversion. It must reject source-Manifest and pre-environment
+drift, state which retry attempt supplies the scorer trace, retain the scorer
+callable/path and strictness, and record native pre/post digests. Passing the
+AgentDojo GroundTruthPipeline checks this binding mechanism only because that
+pipeline executes task-author reference calls without a model.
+
 Executable external Fault Campaigns use a separate digest-bound Manifest that
 includes the exact Fault Plans. A fresh Adapter/graph is constructed for the
 baseline and every Plan. For tools, underlying attempt events and the final

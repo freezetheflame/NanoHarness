@@ -136,6 +136,11 @@ Implemented evidence:
   non-normative reference calls, and original scorer provenance; a four-task
   real-package Pilot validates conversion while explicitly leaving Oracles
   unbound.
+- a scorer-bound AgentDojo subject bridge that rejects environment drift,
+  preserves final-attempt trace semantics, invokes the original strict utility,
+  and records native tool attempts, delivered observations, scorer path, and
+  pre/post environment digests; a frozen GroundTruthPipeline Pilot validates
+  all four development cells.
 
 Still required:
 
@@ -146,7 +151,7 @@ Still required:
 - validation of boundary faults on external runtimes and recovery scenarios;
 - frozen subject-specific coverage models and empirical experiment reporting;
 - paper-scale LangGraph tool/fault scenarios and scorer-bound external
-  Benchmark cells;
+  Benchmark cells executed by real agent subjects;
 - confirmatory manifests, raw data, and cluster-aware analysis scripts.
 
 ## Empirical design
@@ -187,6 +192,13 @@ an external Benchmark source and provenance check, but it does not execute an
 AgentDojo pipeline, invoke a live model, or bind the stateful utility scorer.
 Its reference calls are not exact-plan Oracles. It therefore closes the data
 ingestion gap, not the paper-scale external-validation gate.
+
+The scorer-bridge Pilot closes the next semantic gap: the four derived
+execution Scenarios are judged by AgentDojo's original utility over native
+pre/post environments, and all pass under its deterministic GroundTruthPipeline.
+That pipeline directly executes task-author reference calls and is not a real
+agent. Thus `4/4` is expected integration evidence, not a task-success estimate,
+mutation result, or confirmatory Benchmark evidence.
 
 ### Defects and mutants
 

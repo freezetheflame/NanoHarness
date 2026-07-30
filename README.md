@@ -310,6 +310,11 @@ uv pip install --python .venv/bin/python -e '.[agentdojo-research]'
 Converted reference calls are non-normative and their Oracles remain unbound;
 see the Pilot README before using these Scenarios in an experiment.
 
+The companion `agentdojo_scorer_bridge/` Pilot derives explicitly bound
+execution Scenarios and invokes the original utility over native AgentDojo
+pre/post environments. Its deterministic GroundTruthPipeline result validates
+the bridge only; it is not an agent-performance result.
+
 ---
 
 ## Tools

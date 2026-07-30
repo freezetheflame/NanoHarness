@@ -297,6 +297,10 @@ uv pip install --python .venv/bin/python -e '.[agentdojo-research]'
 转换后的 Reference Call 不是规范性唯一答案，Oracle 也保持未绑定；将这些 Scenario
 用于实验前请先阅读 Pilot README 的主张边界。
 
+配套的 `agentdojo_scorer_bridge/` Pilot 会派生显式绑定的执行 Scenario，并让原始
+Utility 在 AgentDojo 原生 Pre/Post Environment 上评分。确定性 GroundTruthPipeline
+结果只验证 Bridge，不是 Agent 性能结果。
+
 ---
 
 ## 工具

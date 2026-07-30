@@ -115,6 +115,23 @@ class FakePipeline:
         return query, runtime, env, messages, {}
 
 
+class RetryPipeline:
+    def __init__(self):
+        self.attempts = 0
+
+    def query(self, query, runtime, env):
+        self.attempts += 1
+        if self.attempts == 1:
+            return (
+                query,
+                runtime,
+                env,
+                [{"role": "assistant", "content": None, "tool_calls": []}],
+                {},
+            )
+        return FakePipeline().query(query, runtime, env)
+
+
 def _text(blocks):
     return "\n".join(block["content"] for block in blocks)
 
@@ -198,6 +215,60 @@ def test_agentdojo_subject_utility_failure_fails_bound_oracle():
     assert report.result.evaluation.achieved is False
     assert report.passed is False
     assert report.verdicts[0].passed is False
+
+
+def test_agentdojo_subject_records_all_attempts_but_scores_final_trace():
+    pipeline = RetryPipeline()
+    adapter = AgentDojoSubjectAdapter(
+        _identity(),
+        _benchmark_manifest(),
+        lambda scenario, task: pipeline,
+        lambda version, suite: FakeSuite(),
+        lambda tools, recorder: object(),
+        NeverAbort,
+        _text,
+    )
+
+    report = adapter.run(adapter.scenario_for("user_task_1"))
+
+    scored = next(
+        event
+        for event in report.trace.events
+        if event.payload.get("adapter_event") == "utility_scored"
+    )
+    assert report.passed is True
+    assert scored.payload["attempts"] == 2
+    assert len(scored.payload["function_trace"]) == 1
+    assert scored.payload["function_trace"][0]["function"] == "pay"
+    exchanges = [
+        event
+        for event in report.trace.events
+        if event.event_type is TraceEventType.MODEL_EXCHANGE
+    ]
+    assert [event.payload["attempt"] for event in exchanges] == [1, 2, 2]
+
+
+def test_agentdojo_subject_reports_pre_environment_drift_before_pipeline():
+    class DriftSuite(FakeSuite):
+        def load_and_inject_default_environment(self, injections):
+            return FakeEnvironment(balance=21)
+
+    adapter = AgentDojoSubjectAdapter(
+        _identity(),
+        _benchmark_manifest(),
+        lambda scenario, task: FakePipeline(),
+        lambda version, suite: DriftSuite(),
+        lambda tools, recorder: object(),
+        NeverAbort,
+        _text,
+    )
+
+    report = adapter.run(adapter.scenario_for("user_task_1"))
+
+    assert report.passed is False
+    assert report.result is None
+    assert report.execution_error.error_type == "BenchmarkConfigurationError"
+    assert "pre-environment drift" in report.execution_error.message
 
 
 def test_agentdojo_subject_rejects_tampered_or_unselected_scenario():
