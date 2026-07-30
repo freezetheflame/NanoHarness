@@ -80,12 +80,18 @@ def _manifest(identity=None, scenario=None, seeds=None):
         scenario=scenario or _scenario(),
         seeds=seeds or [11, 29],
     )
+    frozen_at = datetime(2026, 7, 30, tzinfo=timezone.utc)
     return ExperimentManifest(
         experiment_id="pilot-v1",
         subjects=[identity],
         cells=[cell],
-        frozen_at=datetime(2026, 7, 30, tzinfo=timezone.utc),
-        manifest_digest=experiment_manifest_digest("pilot-v1", [identity], [cell]),
+        frozen_at=frozen_at,
+        manifest_digest=experiment_manifest_digest(
+            "pilot-v1",
+            [identity],
+            [cell],
+            frozen_at=frozen_at,
+        ),
     )
 
 
@@ -154,16 +160,18 @@ def test_manifest_rejects_unknown_subject_and_bad_digest():
         scenario=_scenario(),
         seeds=[1],
     )
+    frozen_at = datetime.now(timezone.utc)
     with pytest.raises(ValidationError, match="unknown subjects"):
         ExperimentManifest(
             experiment_id="unknown",
             subjects=[_identity()],
             cells=[cell],
-            frozen_at=datetime.now(timezone.utc),
+            frozen_at=frozen_at,
             manifest_digest=experiment_manifest_digest(
                 "unknown",
                 [_identity()],
                 [cell],
+                frozen_at=frozen_at,
             ),
         )
     with pytest.raises(ValidationError, match="manifest_digest"):
@@ -207,6 +215,10 @@ def test_experiment_runner_preserves_seed_order_raw_reports_and_summary():
     assert report.subjects[0].pass_rate == 1.0
     restored = type(report).model_validate_json(report.model_dump_json())
     assert restored == report
+    tampered = report.model_dump()
+    tampered["observations"][0]["seed"] = 999
+    with pytest.raises(ValidationError, match="does not match frozen Manifest"):
+        type(report).model_validate(tampered)
 
 
 def test_runner_rejects_manifest_mutation_or_adapter_identity_drift_before_run():

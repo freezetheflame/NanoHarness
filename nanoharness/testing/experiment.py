@@ -69,6 +69,7 @@ class ExperimentManifest(BaseModel):
             self.experiment_id,
             self.subjects,
             self.cells,
+            frozen_at=self.frozen_at,
             metadata=self.metadata,
         )
         if self.manifest_digest != expected:
@@ -80,6 +81,7 @@ class ExperimentManifest(BaseModel):
             self.experiment_id,
             self.subjects,
             self.cells,
+            frozen_at=self.frozen_at,
             metadata=self.metadata,
         )
         if self.manifest_digest != expected:
@@ -129,6 +131,51 @@ class ExperimentReport(BaseModel):
             )
         if self.finished_at < self.started_at:
             raise ValueError("Experiment finished_at cannot precede started_at")
+        expected = []
+        subjects = {
+            subject.subject_id: subject for subject in self.manifest.subjects
+        }
+        for cell in self.manifest.cells:
+            for repetition, seed in enumerate(cell.seeds):
+                expected.append(
+                    (
+                        f"{cell.cell_id}:r{repetition}",
+                        cell.cell_id,
+                        subjects[cell.subject_id],
+                        cell.scenario.scenario_id,
+                        repetition,
+                        seed,
+                    )
+                )
+        if len(self.observations) != len(expected):
+            raise ValueError(
+                "Experiment observation count does not match frozen Manifest"
+            )
+        trace_ids = set()
+        for observation, expected_fields in zip(self.observations, expected):
+            actual_fields = (
+                observation.observation_id,
+                observation.cell_id,
+                observation.subject,
+                observation.scenario_id,
+                observation.repetition,
+                observation.seed,
+            )
+            if actual_fields != expected_fields:
+                raise ValueError(
+                    f"Observation {observation.observation_id!r} does not match "
+                    "frozen Manifest order or provenance"
+                )
+            trace_id = observation.report.trace.trace_id
+            if trace_id in trace_ids:
+                raise ValueError(f"Duplicate Trace ID in report: {trace_id!r}")
+            trace_ids.add(trace_id)
+        expected_summaries = _summaries(
+            self.observations,
+            self.manifest.subjects,
+        )
+        if self.subjects != expected_summaries:
+            raise ValueError("Experiment subject summaries do not match observations")
         return self
 
 
@@ -263,12 +310,15 @@ def experiment_manifest_digest(
     subjects: Sequence[SubjectIdentity],
     cells: Sequence[ExperimentCell],
     *,
+    frozen_at: datetime,
     metadata: Optional[Dict[str, Any]] = None,
 ) -> str:
     """Return the stable digest bound by a frozen experiment manifest."""
 
     payload = {
+        "schema_version": EXPERIMENT_SCHEMA_VERSION,
         "experiment_id": experiment_id,
+        "frozen_at": frozen_at.isoformat(),
         "subjects": [subject.model_dump(mode="json") for subject in subjects],
         "cells": [cell.model_dump(mode="json") for cell in cells],
         "metadata": normalize_trace_value(metadata or {}),

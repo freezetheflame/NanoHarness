@@ -77,7 +77,17 @@ def main() -> int:
         type=Path,
         default=root / "raw" / "pilot_report.json",
     )
+    parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Explicitly replace an existing output artifact",
+    )
     args = parser.parse_args()
+    if args.output.exists() and not args.overwrite:
+        parser.error(
+            f"output {args.output} already exists; choose another path or "
+            "pass --overwrite"
+        )
     manifest = ExperimentManifest.model_validate_json(args.manifest.read_text())
     adapter = LangGraphSubjectAdapter.from_installed(
         build_graph,
