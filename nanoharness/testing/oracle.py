@@ -48,11 +48,19 @@ class LifecycleParameters(_Parameters):
 NonNegativeInt = Annotated[int, Field(ge=0)]
 
 
+class ModelMessageParameters(_Parameters):
+    require_scenario_query: bool = True
+    every_exchange: bool = True
+    min_user_messages: NonNegativeInt = 1
+
+
 class ToolCallParameters(_Parameters):
     required: List[str] = Field(default_factory=list)
     forbidden: List[str] = Field(default_factory=list)
     min_counts: Dict[str, NonNegativeInt] = Field(default_factory=dict)
     max_counts: Dict[str, NonNegativeInt] = Field(default_factory=dict)
+    required_arguments: Dict[str, List[str]] = Field(default_factory=dict)
+    expected_arguments: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def validate_constraints(self):
@@ -63,6 +71,10 @@ class ToolCallParameters(_Parameters):
             if self.min_counts[name] > self.max_counts[name]:
                 raise ValueError(f"minimum exceeds maximum for tool {name!r}")
         return self
+
+
+class ToolResultParameters(_Parameters):
+    expected_last: Dict[str, Any] = Field(default_factory=dict)
 
 
 class ComponentErrorParameters(_Parameters):
@@ -201,9 +213,19 @@ class OracleEvaluator:
             _evaluate_lifecycle,
         )
         self.register(
+            OracleKind.MODEL_MESSAGES.value,
+            ModelMessageParameters,
+            _evaluate_model_messages,
+        )
+        self.register(
             OracleKind.TOOL_CALLS.value,
             ToolCallParameters,
             _evaluate_tool_calls,
+        )
+        self.register(
+            OracleKind.TOOL_RESULTS.value,
+            ToolResultParameters,
+            _evaluate_tool_results,
         )
         self.register(
             OracleKind.COMPONENT_ERRORS.value,
@@ -317,13 +339,69 @@ def _evaluate_lifecycle(spec, parameters, context, oracle_id):
     )
 
 
+def _evaluate_model_messages(spec, parameters, context, oracle_id):
+    exchanges = [
+        event
+        for event in context.trace.events
+        if event.event_type is TraceEventType.MODEL_EXCHANGE
+    ]
+    failures = []
+    evidence = []
+    for event in exchanges:
+        messages = event.payload.get("messages") or []
+        user_messages = [
+            message
+            for message in messages
+            if isinstance(message, dict) and message.get("role") == "user"
+        ]
+        contains_query = any(
+            context.scenario.query in str(message.get("content", ""))
+            for message in user_messages
+        )
+        event_ok = len(user_messages) >= parameters.min_user_messages
+        if parameters.require_scenario_query:
+            event_ok = event_ok and contains_query
+        evidence.append(
+            {
+                "sequence": event.sequence,
+                "user_message_count": len(user_messages),
+                "contains_scenario_query": contains_query,
+                "passed": event_ok,
+            }
+        )
+        if not event_ok:
+            failures.append(event.sequence)
+    if not exchanges:
+        passed = False
+    elif parameters.every_exchange:
+        passed = not failures
+    else:
+        passed = len(failures) < len(exchanges)
+    message = (
+        "Model-message constraints satisfied"
+        if passed
+        else f"Model-message constraints failed at sequences {failures}"
+    )
+    return _verdict(
+        spec,
+        oracle_id,
+        passed,
+        message,
+        {"exchanges": evidence},
+    )
+
+
 def _evaluate_tool_calls(spec, parameters, context, oracle_id):
-    calls = [
-        event.payload.get("name")
+    call_events = [
+        event
         for event in context.trace.events
         if event.event_type in {TraceEventType.TOOL_EXCHANGE, TraceEventType.TOOL_ERROR}
     ]
-    counts = Counter(name for name in calls if name is not None)
+    counts = Counter(
+        event.payload.get("name")
+        for event in call_events
+        if event.payload.get("name") is not None
+    )
     failures = []
     for name in parameters.required:
         if counts[name] == 0:
@@ -337,12 +415,70 @@ def _evaluate_tool_calls(spec, parameters, context, oracle_id):
     for name, maximum in parameters.max_counts.items():
         if counts[name] > maximum:
             failures.append(f"tool {name!r} count {counts[name]} exceeds {maximum}")
+    for name, required_arguments in parameters.required_arguments.items():
+        matching = [event for event in call_events if event.payload.get("name") == name]
+        if not matching:
+            failures.append(f"tool {name!r} has no calls for argument validation")
+        for event in matching:
+            arguments = event.payload.get("arguments") or {}
+            missing = [item for item in required_arguments if item not in arguments]
+            if missing:
+                failures.append(
+                    f"tool {name!r} call at sequence {event.sequence} misses {missing}"
+                )
+    for name, expected_arguments in parameters.expected_arguments.items():
+        matching = [event for event in call_events if event.payload.get("name") == name]
+        if not matching:
+            failures.append(f"tool {name!r} has no calls for argument comparison")
+        for event in matching:
+            arguments = event.payload.get("arguments") or {}
+            for argument, expected in expected_arguments.items():
+                actual = arguments.get(argument)
+                if actual != expected:
+                    failures.append(
+                        f"tool {name!r} argument {argument!r} expected "
+                        f"{expected!r}, got {actual!r}"
+                    )
     return _verdict(
         spec,
         oracle_id,
         not failures,
         "; ".join(failures) if failures else "Tool-call constraints satisfied",
-        {"counts": dict(counts)},
+        {
+            "counts": dict(counts),
+            "calls": [
+                {
+                    "sequence": event.sequence,
+                    "name": event.payload.get("name"),
+                    "arguments": event.payload.get("arguments"),
+                }
+                for event in call_events
+            ],
+        },
+    )
+
+
+def _evaluate_tool_results(spec, parameters, context, oracle_id):
+    results = {}
+    for event in context.trace.events:
+        if event.event_type is TraceEventType.TOOL_EXCHANGE:
+            name = event.payload.get("name")
+            if name is not None:
+                results[name] = event.payload.get("result")
+    failures = []
+    for name, expected in parameters.expected_last.items():
+        if name not in results:
+            failures.append(f"tool {name!r} has no successful result")
+        elif results[name] != expected:
+            failures.append(
+                f"tool {name!r} result expected {expected!r}, got {results[name]!r}"
+            )
+    return _verdict(
+        spec,
+        oracle_id,
+        not failures,
+        "; ".join(failures) if failures else "Tool-result constraints satisfied",
+        {"last_results": results},
     )
 
 

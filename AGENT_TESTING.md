@@ -120,6 +120,13 @@ TERMINATED_AS_SUCCESS     treat model termination as task success
 The primary metric is mutation score: detected valid mutants divided by all
 valid mutants. Equivalent and invalid mutants are reported separately.
 
+The first implementation layer mutates detached execution reports and traces,
+then reevaluates deterministic oracles. It measures oracle adequacy for
+observable faults without new model calls or external side effects. It does
+not yet claim to execute arbitrary control-flow-changing mutants; those require
+deterministic environments or sandboxed live execution and are reported as a
+separate future layer.
+
 ## Delivery sequence
 
 1. **Implemented:** define versioned `TraceEvent` models and a `TraceRecorder`.
@@ -130,7 +137,9 @@ valid mutants. Equivalent and invalid mutants are reported separately.
    marker plugin remains to be implemented.
 4. Add declarative fault injection for model, tool, state, and hook boundaries.
 5. Publish the first behavioral coverage report.
-6. Implement the initial mutation operators and mutation score.
+6. **Trace-level foundation implemented:** seven initial operators,
+   `MutationRunner`, outcome classification, and mutation score. Real-defect
+   validation and executable control-flow mutants remain required.
 7. Add differential execution and automatic failure reduction.
 8. Integrate external environments and scorers through adapters.
 

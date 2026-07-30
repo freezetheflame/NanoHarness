@@ -105,17 +105,29 @@ Implemented evidence:
 - replay of recorded dependency failures without live side effects.
 - serializable scenarios, prevalidated deterministic oracles, and fresh-engine
   scenario execution reports.
+- trace-level mutation campaigns with seven initial operators, explicit outcome
+  classification, and correctly scoped mutation score.
 
 Still required:
 
 - the dedicated pytest fixture/marker plugin;
 - the real-defect corpus and mutation taxonomy protocol;
-- at least six implemented mutation operators;
-- `MutationRunner`, validity classification, and mutation score;
+- real-defect validation for the initial mutation operators;
+- executable control-flow mutation beyond detached trace/report mutation;
 - behavioral coverage and experiment reporting;
 - adapters or subjects beyond NanoHarness itself.
 
 ## Empirical design
+
+### Mutation semantics
+
+The implemented first layer mutates detached reports and normalized traces, then
+reevaluates deterministic oracles. This directly measures whether an oracle can
+detect observable corruption while eliminating model sampling and external
+side effects. It must not be described as executing every mutated agent
+behavior. Mutants that change tool choice, branching, retries, or environment
+state require a second executable layer backed by deterministic fixtures or a
+sandbox. The evaluation must report the two layers separately.
 
 ### Subjects
 

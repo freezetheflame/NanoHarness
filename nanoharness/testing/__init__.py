@@ -41,6 +41,23 @@ from nanoharness.testing.scenario import (
     ScenarioReport,
     UnsupportedScenarioVersionError,
 )
+from nanoharness.testing.mutation import (
+    MUTATION_SCHEMA_VERSION,
+    ContextMessageDropOperator,
+    DuplicateToolCallOperator,
+    EvaluatorFlipOperator,
+    HookSkipOperator,
+    MutationApplication,
+    MutationCampaignReport,
+    MutationConfigurationError,
+    MutationKind,
+    MutationOutcome,
+    MutationRunner,
+    MutationStatus,
+    StaleToolResultOperator,
+    TerminatedAsSuccessOperator,
+    ToolArgumentDropOperator,
+)
 
 __all__ = [
     "TRACE_SCHEMA_VERSION",
@@ -76,4 +93,19 @@ __all__ = [
     "ScenarioAssertionError",
     "ScenarioReport",
     "UnsupportedScenarioVersionError",
+    "MUTATION_SCHEMA_VERSION",
+    "ContextMessageDropOperator",
+    "DuplicateToolCallOperator",
+    "EvaluatorFlipOperator",
+    "HookSkipOperator",
+    "MutationApplication",
+    "MutationCampaignReport",
+    "MutationConfigurationError",
+    "MutationKind",
+    "MutationOutcome",
+    "MutationRunner",
+    "MutationStatus",
+    "StaleToolResultOperator",
+    "TerminatedAsSuccessOperator",
+    "ToolArgumentDropOperator",
 ]

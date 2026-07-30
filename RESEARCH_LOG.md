@@ -65,6 +65,21 @@ Official sources consulted:
 - Current verification after this increment: 117 core tests pass. The dedicated
   pytest plugin named in the strategy is not yet implemented.
 
+## 2026-07-30 — Trace-level mutation testing foundation
+
+- Added model-message, tool-argument, and tool-result deterministic oracles.
+- Added seven initial trace/report mutation operators covering evaluator,
+  lifecycle, context, tool arguments, tool results, and duplicate calls.
+- Added `MutationRunner` and explicit killed, survived, not-applicable,
+  equivalent, invalid, error, and baseline-failed outcomes.
+- Mutation score excludes non-applicable, equivalent, invalid, and erroneous
+  mutants; its denominator is killed plus survived mutants.
+- Current verification after this increment: 127 core tests and 36 targeted
+  Coding Agent regression tests pass.
+- Scope limitation: these operators mutate detached observations and reevaluate
+  oracles. They do not yet execute arbitrary control-flow-changing agent
+  mutants. The paper and experiments must keep that distinction explicit.
+
 ## AI assistance disclosure record
 
 Codex assisted with:

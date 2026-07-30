@@ -90,17 +90,27 @@ CoverageCollector + MutationReport
 - 不调用真实依赖即可复现已录制的依赖异常。
 - 可序列化 Scenario、执行前验证的确定性 Oracle，以及使用全新 Engine 的场景
   执行报告。
+- 包含七个初始算子、显式结果分类和正确 Mutation Score 分母的 Trace-level
+  Mutation Campaign。
 
 仍需完成：
 
 - 专用 pytest fixture/marker 插件；
 - 真实缺陷语料与变异分类的构建协议；
-- 至少六个 Mutation Operator；
-- `MutationRunner`、有效性分类与 Mutation Score；
+- 对初始 Mutation Operator 的真实缺陷验证；
+- 超越离线 Trace/Report 修改的可执行控制流变异；
 - 行为覆盖率和实验报告；
 - NanoHarness 之外的 Adapter 或实验对象。
 
 ## 实验设计
+
+### Mutation 语义
+
+已实现的第一层修改脱离真实依赖的 Report 与统一 Trace，再重新执行确定性
+Oracle。它直接衡量 Oracle 能否发现可观测数据损坏，同时排除模型采样和外部
+副作用；不能将其描述为执行了所有变异后的 Agent 行为。改变工具选择、分支、
+重试或环境状态的 Mutant，需要由确定性 Fixture 或 Sandbox 支撑的第二层可执行
+变异。实验必须分别报告这两层结果。
 
 ### 实验对象
 

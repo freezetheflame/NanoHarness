@@ -222,6 +222,28 @@ pairing, tool-call constraints, component failures, and expected execution
 errors. Oracle configuration is validated before an engine or live dependency
 is invoked.
 
+Trace-level mutation campaigns can measure whether those oracles detect
+controlled observable faults:
+
+```python
+from nanoharness.testing import (
+    ContextMessageDropOperator,
+    HookSkipOperator,
+    MutationRunner,
+)
+
+campaign = MutationRunner(scenario_runner).run(
+    scenario,
+    [HookSkipOperator(), ContextMessageDropOperator()],
+)
+print(campaign.mutation_score)
+```
+
+The score denominator contains only killed and survived mutants. Baseline
+failures, non-applicable, equivalent, invalid, and erroneous mutants are
+explicit outcomes and are excluded rather than silently counted as survived
+mutants.
+
 ---
 
 ## Tools

@@ -111,6 +111,11 @@ TERMINATED_AS_SUCCESS     将模型停止误认为任务完成
 核心指标是 Mutation Score：被测试发现的有效变异数除以全部有效变异数；等价和
 无效变异单独报告。
 
+第一层实现会修改脱离真实依赖的执行报告与 Trace，再重新运行确定性 Oracle；它
+衡量 Oracle 对可观测故障的充分性，不会产生新的模型调用或外部副作用。这一层尚
+不能声称执行任意改变控制流的 Mutant；后者需要确定性环境或沙箱化真实执行，必须
+作为另一层单独实现和报告。
+
 ## 实施顺序
 
 1. **已实现：**定义版本化 `TraceEvent` 模型和 `TraceRecorder`。
@@ -120,7 +125,8 @@ TERMINATED_AS_SUCCESS     将模型停止误认为任务完成
    `ScenarioRunner` 契约；专用 pytest fixture 与 marker 插件仍待实现。
 4. 为模型、工具、状态和 Hook 边界增加声明式故障注入。
 5. 发布第一版行为覆盖率报告。
-6. 实现首批变异算子和 Mutation Score。
+6. **Trace-level 基础已实现：**七个初始算子、`MutationRunner`、结果分类与
+   Mutation Score；真实缺陷验证和可执行控制流 Mutant 仍待完成。
 7. 增加差分执行与自动失败样例缩减。
 8. 通过 Adapter 接入外部环境和 Scorer。
 

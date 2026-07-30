@@ -36,6 +36,10 @@ class ScenarioRunner:
         self._oracles = oracle_evaluator or OracleEvaluator()
         self._recorder_factory = recorder_factory or self._default_recorder
 
+    @property
+    def oracle_evaluator(self) -> OracleEvaluator:
+        return self._oracles
+
     def run(self, scenario: Scenario) -> ScenarioReport:
         if scenario.schema_version != SCENARIO_SCHEMA_VERSION:
             raise UnsupportedScenarioVersionError(

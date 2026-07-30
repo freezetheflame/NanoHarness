@@ -19,7 +19,9 @@ class OracleKind(str, Enum):
     RUN_STATUS = "run_status"
     STOP_REASON = "stop_reason"
     LIFECYCLE = "lifecycle"
+    MODEL_MESSAGES = "model_messages"
     TOOL_CALLS = "tool_calls"
+    TOOL_RESULTS = "tool_results"
     COMPONENT_ERRORS = "component_errors"
     EXECUTION_ERROR = "execution_error"
 
