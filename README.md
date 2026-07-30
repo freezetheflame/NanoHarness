@@ -82,7 +82,7 @@ The kernel provides **only** these six interfaces and one orchestration engine. 
 ```
 nanoharness/
   core/                  # Kernel: interfaces + engine
-    schema.py            #   ToolCall, LLMResponse, AgentMessage, StepResult, StopSignal, EvaluationResult
+    schema.py            #   Interaction, evaluation, and canonical RunResult models
     base.py              #   ETCSLV ABCs, LLMProtocol, HookStage
     engine.py            #   NanoEngine (with mid-loop evaluation)
     prompt.py            #   PromptManager (YAML template loader)
@@ -98,7 +98,7 @@ configs/
   scripts/               # Shell-script tools (auto-discovered, 27 tools)
 examples/
   coding_agent/          # Full-featured coding agent reference (434 tests)
-tests/                   # 74 kernel tests
+tests/                   # 80 kernel tests
 ```
 
 ---
@@ -146,10 +146,17 @@ NanoEngine.run(query)
           └─ L.trigger(ON_STEP_END)
 
      ├─ V.get_report()        (includes evaluate_success verdict)
+     ├─ E builds RunResult    (status + stop reason + final answer + trajectory)
      └─ L.trigger(ON_TASK_END)
 ```
 
 No memory, no prompt rendering, no permission logic inside the engine. All of that flows through injected components and hooks.
+
+`RunResult.status` describes how execution ended (`completed`, `stopped`, or
+`exhausted`), while `RunResult.evaluation.achieved` is the sole success
+verdict. Stopping is therefore not automatically treated as completing the
+user's goal. Legacy `report["summary"]` and `report["trajectory"]` access is
+kept during migration.
 
 ---
 

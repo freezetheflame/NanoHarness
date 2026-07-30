@@ -16,7 +16,10 @@ from nanoharness.core.schema import (
     AgentMessage,
     EvaluationResult,
     LLMResponse,
+    RunResult,
+    RunStatus,
     StepResult,
+    StopReason,
     StopSignal,
     ToolCall,
 )

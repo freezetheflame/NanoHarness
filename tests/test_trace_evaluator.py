@@ -60,3 +60,15 @@ class TestTraceEvaluator:
         assert report["summary"]["evaluation"]["achieved"] is True
         assert "stop_reason" in report["summary"]
         assert report["summary"]["stop_reason"] == ""
+
+    def test_evaluation_controls_legacy_success_field(self):
+        class RejectingEvaluator(TraceEvaluator):
+            def evaluate_success(self, query, trajectory):
+                return EvaluationResult(achieved=False, explanation="not done")
+
+        ev = RejectingEvaluator()
+        ev.log_step(StepResult(step_id=0, thought="stopped", status="terminated"))
+
+        report = ev.get_report("do the work")
+
+        assert report["summary"]["success"] is False

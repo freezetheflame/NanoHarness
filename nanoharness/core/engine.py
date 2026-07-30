@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from nanoharness.core.base import (
     BaseContextManager,
@@ -9,7 +9,15 @@ from nanoharness.core.base import (
     HookStage,
     LLMProtocol,
 )
-from nanoharness.core.schema import AgentMessage, StepResult, StopSignal
+from nanoharness.core.schema import (
+    AgentMessage,
+    EvaluationResult,
+    RunResult,
+    RunStatus,
+    StepResult,
+    StopReason,
+    StopSignal,
+)
 
 
 class NanoEngine:
@@ -46,11 +54,14 @@ class NanoEngine:
         self.permissions = permissions
         self.tool_hooks = tool_hooks
 
-    def run(self, user_query: str) -> Dict:
+    def run(self, user_query: str) -> RunResult:
         self.hooks.trigger(HookStage.ON_TASK_START, user_query)
         self.context.add_message(AgentMessage(role="user", content=user_query))
 
-        trajectory: list = []
+        trajectory: list[StepResult] = []
+        run_status = RunStatus.EXHAUSTED
+        stop_reason = StopReason.MAX_STEPS
+        stop_detail = ""
 
         for i in range(self.max_steps):
             step_res = self._execute_step(i)
@@ -64,14 +75,40 @@ class NanoEngine:
             stop_signal = self.evaluator.should_stop(trajectory)
             if stop_signal.should_stop:
                 step_res.stop_signal = stop_signal
+                run_status = RunStatus.STOPPED
+                stop_reason = StopReason.EVALUATOR_STOPPED
+                stop_detail = stop_signal.reason
                 break
 
             if step_res.status == "terminated":
+                run_status = RunStatus.COMPLETED
+                stop_reason = StopReason.MODEL_TERMINATED
                 break
 
-        report = self.evaluator.get_report(user_query)
-        self.hooks.trigger(HookStage.ON_TASK_END, report)
-        return report
+        legacy_report = self.evaluator.get_report(user_query)
+        summary = legacy_report.get("summary", {})
+        raw_evaluation = summary.get("evaluation")
+        evaluation = (
+            EvaluationResult.model_validate(raw_evaluation)
+            if raw_evaluation is not None
+            else self.evaluator.evaluate_success(user_query, trajectory)
+        )
+        total_steps = len(trajectory)
+        result = RunResult(
+            status=run_status,
+            stop_reason=stop_reason,
+            stop_detail=stop_detail,
+            final_answer=trajectory[-1].thought if trajectory else None,
+            evaluation=evaluation,
+            trajectory=trajectory,
+            avg_thought_length=(
+                sum(len(step.thought) for step in trajectory) / total_steps
+                if total_steps
+                else 0.0
+            ),
+        )
+        self.hooks.trigger(HookStage.ON_TASK_END, result)
+        return result
 
     def _execute_step(self, step_id: int) -> StepResult:
         # Think

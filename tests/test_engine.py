@@ -5,7 +5,16 @@ from nanoharness.components.state.json_store import JsonStateStore
 from nanoharness.components.tools.dict_registry import DictToolRegistry
 from nanoharness.core.base import BaseEvaluator
 from nanoharness.core.engine import NanoEngine
-from nanoharness.core.schema import LLMResponse, StepResult, StopSignal, ToolCall
+from nanoharness.core.schema import (
+    EvaluationResult,
+    LLMResponse,
+    RunResult,
+    RunStatus,
+    StepResult,
+    StopReason,
+    StopSignal,
+    ToolCall,
+)
 
 
 class TestEngineBasicLoop:
@@ -20,6 +29,9 @@ class TestEngineBasicLoop:
             evaluator=TraceEvaluator(),
         )
         report = engine.run("hello")
+        assert isinstance(report, RunResult)
+        assert report.status is RunStatus.COMPLETED
+        assert report.stop_reason is StopReason.MODEL_TERMINATED
         assert report["summary"]["total_steps"] == 1
         assert report["summary"]["success"] is True
 
@@ -164,6 +176,9 @@ class TestEngineMidLoopStop:
         )
         report = engine.run("test")
         assert report["summary"]["total_steps"] == 2
+        assert report.status is RunStatus.STOPPED
+        assert report.stop_reason is StopReason.EVALUATOR_STOPPED
+        assert report["summary"]["stop_reason"] == "test stop"
 
     def test_default_evaluator_no_stop(self, mock_llm):
         """Default TraceEvaluator never triggers early stop."""
@@ -218,3 +233,56 @@ class TestEngineFinalEvaluation:
         engine.run("fix the evaluator")
 
         assert evaluator.evaluated_query == "fix the evaluator"
+
+    def test_evaluation_is_the_only_success_verdict(self, mock_llm):
+        class RejectingEvaluator(TraceEvaluator):
+            def evaluate_success(self, query, trajectory):
+                return EvaluationResult(
+                    achieved=False,
+                    confidence=1.0,
+                    explanation="The goal was not achieved",
+                )
+
+        engine = NanoEngine(
+            llm_client=mock_llm([LLMResponse(content="I stopped, but failed")]),
+            tools=DictToolRegistry(),
+            context=SimpleContextManager(),
+            state=JsonStateStore("/tmp/test_failed_evaluation.json"),
+            hooks=SimpleHookManager(),
+            evaluator=RejectingEvaluator(),
+        )
+
+        result = engine.run("complete the task")
+
+        assert result.status is RunStatus.COMPLETED
+        assert result.success is False
+        assert result["summary"]["success"] is False
+
+    def test_max_steps_has_explicit_outcome(self, mock_llm):
+        reg = DictToolRegistry()
+
+        @reg.tool
+        def noop():
+            """No-op."""
+            return "ok"
+
+        engine = NanoEngine(
+            llm_client=mock_llm([
+                LLMResponse(
+                    content="still working",
+                    tool_calls=[ToolCall(name="noop", arguments={})],
+                )
+            ]),
+            tools=reg,
+            context=SimpleContextManager(),
+            state=JsonStateStore("/tmp/test_max_steps_result.json"),
+            hooks=SimpleHookManager(),
+            evaluator=TraceEvaluator(),
+            max_steps=1,
+        )
+
+        result = engine.run("keep working")
+
+        assert result.status is RunStatus.EXHAUSTED
+        assert result.stop_reason is StopReason.MAX_STEPS
+        assert result["summary"]["stop_reason"] == "max_steps"

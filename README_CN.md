@@ -82,7 +82,7 @@ NanoHarness 是一个极简的 Python Agent 框架，实现了 [Agent Harness Su
 ```
 nanoharness/
   core/                  # 内核：接口 + 引擎
-    schema.py            #   ToolCall, LLMResponse, AgentMessage, StepResult, StopSignal, EvaluationResult
+    schema.py            #   交互、评估与统一 RunResult 模型
     base.py              #   ETCSLV ABCs, LLMProtocol, HookStage
     engine.py            #   NanoEngine（含循环中评估）
     prompt.py            #   PromptManager（YAML 模板加载器）
@@ -98,7 +98,7 @@ configs/
   scripts/               # Shell 脚本工具（自动发现，27 个）
 examples/
   coding_agent/          # 完整 Coding Agent 参考（434 个测试）
-tests/                   # 74 个内核测试
+tests/                   # 80 个内核测试
 ```
 
 ---
@@ -146,10 +146,16 @@ NanoEngine.run(query)
           └─ L.trigger(ON_STEP_END)
 
      ├─ V.get_report()        （包含 evaluate_success 验证结果）
+     ├─ E 构建 RunResult      （状态 + 停止原因 + 最终回答 + 轨迹）
      └─ L.trigger(ON_TASK_END)
 ```
 
 引擎内部没有记忆、Prompt 渲染或权限逻辑——全部通过注入的组件和钩子流转。
+
+`RunResult.status` 描述执行如何结束（`completed`、`stopped` 或
+`exhausted`），`RunResult.evaluation.achieved` 则是唯一权威的成功结论。
+因此 Agent 停止不再自动等同于完成用户目标。迁移期间仍保留
+`report["summary"]` 与 `report["trajectory"]` 的旧式访问方式。
 
 ---
 

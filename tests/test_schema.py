@@ -1,4 +1,14 @@
-from nanoharness.core.schema import AgentMessage, EvaluationResult, LLMResponse, StepResult, StopSignal, ToolCall
+from nanoharness.core.schema import (
+    AgentMessage,
+    EvaluationResult,
+    LLMResponse,
+    RunResult,
+    RunStatus,
+    StepResult,
+    StopReason,
+    StopSignal,
+    ToolCall,
+)
 
 
 class TestToolCall:
@@ -84,3 +94,27 @@ class TestEvaluationResult:
         r = EvaluationResult(achieved=True, confidence=0.9, explanation="Done", evidence=["obs1"])
         assert r.achieved is True
         assert len(r.evidence) == 1
+
+    def test_evidence_is_not_shared_between_results(self):
+        first = EvaluationResult()
+        second = EvaluationResult()
+
+        first.evidence.append("first-only")
+
+        assert second.evidence == []
+
+
+class TestRunResult:
+    def test_canonical_and_legacy_views_share_one_success_verdict(self):
+        result = RunResult(
+            status=RunStatus.COMPLETED,
+            stop_reason=StopReason.MODEL_TERMINATED,
+            final_answer="stopped",
+            evaluation=EvaluationResult(achieved=False),
+            trajectory=[StepResult(step_id=0, thought="stopped", status="terminated")],
+        )
+
+        assert result.success is False
+        assert result["summary"]["success"] is False
+        assert result["summary"]["status"] == "completed"
+        assert result["trajectory"][0]["thought"] == "stopped"
