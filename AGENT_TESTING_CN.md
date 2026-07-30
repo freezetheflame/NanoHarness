@@ -137,7 +137,9 @@ TERMINATED_AS_SUCCESS     将模型停止误认为任务完成
    Derivation/Validation 分区、双 Coder 一致性、Readiness Gate 和机器可读
    草案语料；系统收集和人类 Coding 仍待完成。
 8. 增加差分执行与自动失败样例缩减。
-9. 通过 Adapter 接入外部环境和 Scorer。
+9. **外部 Subject 基础已实现：**增加不可变 Subject Identity、冻结 Experiment
+   Manifest、原始 Observation Report 和锁定真实 LangGraph Adapter Pilot；论文级
+   Tool/Fault Scenario 与 Benchmark 来源仍待完成。
 
 每一步都需要自己的契约测试。除非缺失的运行时事件或模型本身就是需要引入的
 契约，否则测试组件不应要求修改 `NanoEngine`。

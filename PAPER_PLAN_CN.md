@@ -107,6 +107,9 @@ FaultInjecting Model / Tool / Context / State / Hook / Permission 边界
   隔离、一致性统计、Readiness Gate、分析 CLI 和显式未验证的 Seed Candidate。
 - 显式 Universe 的行为覆盖模型，包含预声明 Target、Tool Argument 等价类、
   每个 Hit 的证据、跨运行并集、分维度结果，且不预设质量阈值。
+- 不可变外部 Subject Provenance、Digest 绑定 Experiment Manifest、串行原始
+  Observation，以及包含 6 个成功确定性 Observation 的真实锁定
+  `langgraph==1.2.10` Adapter Pilot。
 
 仍需完成：
 
@@ -116,7 +119,8 @@ FaultInjecting Model / Tool / Context / State / Hook / Permission 边界
 - 用于控制流变异的 branch-aware Replay 或 Sandbox 实验对象；
 - 在外部 Runtime 和 Recovery Scenario 上验证边界 Fault；
 - 实验对象专属冻结 Coverage Model 与实证实验报告；
-- NanoHarness 之外的 Adapter 或实验对象。
+- 论文级 LangGraph Tool/Fault Scenario 和外部 Benchmark 来源；
+- Confirmatory Manifest、原始数据和 Cluster-aware 分析脚本。
 
 ## 实验设计
 
@@ -139,6 +143,10 @@ Oracle。它直接衡量 Oracle 能否发现可观测数据损坏，同时排除
 
 候选外部环境包括 tau3-bench 与 AgentDojo。若能增加 Google ADK 或 LangGraph
 之类的独立运行时，会比只增加另一套场景更能增强外部有效性。
+
+当前 `langgraph==1.2.10` Pilot 通过外部 Adapter 执行真实 Compiled StateGraph，
+但只包含两个确定性 Echo Scenario，没有 Model、Tool Side Effect 或 Mutant。它只验证
+Replication Plumbing，尚未满足论文的外部有效性门槛。
 
 ### 缺陷与 Mutant
 

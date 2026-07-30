@@ -125,6 +125,9 @@ Implemented evidence:
 - an explicit-universe behavioral coverage model with preregistered targets,
   tool-argument equivalence classes, per-hit evidence, cross-run union,
   per-dimension results, and no default quality threshold.
+- immutable external-subject provenance, digest-bound experiment manifests,
+  serial raw observations, and a real pinned `langgraph==1.2.10` Adapter pilot
+  with six successful deterministic observations.
 
 Still required:
 
@@ -134,7 +137,8 @@ Still required:
 - branch-aware replay or sandbox subjects for control-flow-changing faults;
 - validation of boundary faults on external runtimes and recovery scenarios;
 - frozen subject-specific coverage models and empirical experiment reporting;
-- adapters or subjects beyond NanoHarness itself.
+- paper-scale LangGraph tool/fault scenarios and an external Benchmark source;
+- confirmatory manifests, raw data, and cluster-aware analysis scripts.
 
 ## Empirical design
 
@@ -161,6 +165,11 @@ The minimum credible study should include:
 Candidate external environments are tau3-bench and AgentDojo. A separate
 runtime such as Google ADK or LangGraph would strengthen external validity more
 than adding only another scenario set.
+
+The current `langgraph==1.2.10` pilot executes a real compiled StateGraph through
+the external Adapter, but contains only two deterministic echo scenarios and no
+model, tool side effects, or mutants. It validates replication plumbing and does
+not yet satisfy the paper's external-validity gate.
 
 ### Defects and mutants
 

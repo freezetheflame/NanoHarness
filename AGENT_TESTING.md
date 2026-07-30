@@ -153,7 +153,10 @@ separate future layer.
    agreement, readiness gates, and a machine-readable draft corpus. Systematic
    collection and human coding remain required.
 8. Add differential execution and automatic failure reduction.
-9. Integrate external environments and scorers through adapters.
+9. **External-subject foundation implemented:** add immutable subject identity,
+   frozen experiment manifests, raw observation reports, and a pinned real
+   LangGraph Adapter pilot. Paper-scale tool/fault scenarios and a Benchmark
+   source remain required.
 
 Each step includes its own contract suite. Testing components must not require
 changes to `NanoEngine` unless a missing runtime event or model is itself the

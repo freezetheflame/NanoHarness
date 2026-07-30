@@ -156,6 +156,30 @@ Official sources consulted:
 - Current verification after this increment: 207 core tests and 36 targeted
   Coding Agent regression tests pass.
 
+## 2026-07-30 — External subject and frozen experiment pilot
+
+- Added immutable `SubjectIdentity`, generic callable and ScenarioRunner
+  adapters, digest-bound experiment manifests, serial seeded execution, raw
+  observation reports, and strict Adapter/Trace provenance checks.
+- Added an optional LangGraph Adapter that creates a fresh graph per observation
+  and streams full state values instead of reconstructing reducer semantics from
+  partial updates.
+- Pinned the research dependency to `langgraph==1.2.10` and ran a real compiled
+  StateGraph integration test.
+- Froze Pilot Manifest
+  `38172c288e5d95a0a374713d768a5ec9517a798dc134a7b8a6afe7bb75f23b8a`
+  against Harness revision `10a5cb24e97e0a032f8ec289e919da60d811d0be`.
+- The archived Pilot contains two deterministic echo Scenarios, three seeds
+  each, six passed observations, zero execution errors, and raw-report SHA-256
+  `01e44e7a621bf95a7798a72fc59f2e56d7ce99e2a3c36b143cd74e905ece4094`.
+- Claim limitation: this Pilot validates the external Adapter and replication
+  pipeline only. It has no live model, tool side effects, mutants, paper-scale
+  scenarios, or external Benchmark dataset and cannot support the paper's main
+  empirical claims.
+- Current verification after this increment: 220 core tests (including the
+  installed real LangGraph integration and archived Artifact audit) and 36
+  targeted Coding Agent regression tests pass.
+
 ## AI assistance disclosure record
 
 Codex assisted with:

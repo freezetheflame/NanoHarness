@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "experiment_id": "langgraph-deterministic-pilot-v1",
+  "subjects": [
+    {
+      "subject_id": "langgraph@pypi-1.2.10",
+      "runtime": "langgraph",
+      "version": "1.2.10",
+      "revision": "pypi:1.2.10",
+      "source_url": "https://github.com/langchain-ai/langgraph",
+      "independently_developed": true,
+      "metadata": {
+        "distribution": "langgraph"
+      }
+    }
+  ],
+  "cells": [
+    {
+      "cell_id": "langgraph:langgraph-echo-basic",
+      "subject_id": "langgraph@pypi-1.2.10",
+      "scenario": {
+        "schema_version": 1,
+        "scenario_id": "langgraph-echo-basic",
+        "query": "  Hello Agent  ",
+        "seed": null,
+        "tags": ["pilot", "external", "deterministic"],
+        "fixtures": {
+          "expected": "echo:hello agent"
+        },
+        "metadata": {},
+        "oracles": [
+          {
+            "oracle_id": null,
+            "kind": "goal_achievement",
+            "parameters": {"expected": true},
+            "severity": "error"
+          },
+          {
+            "oracle_id": null,
+            "kind": "run_status",
+            "parameters": {"allowed": ["completed"]},
+            "severity": "error"
+          },
+          {
+            "oracle_id": null,
+            "kind": "stop_reason",
+            "parameters": {"allowed": ["subject_completed"]},
+            "severity": "error"
+          },
+          {
+            "oracle_id": null,
+            "kind": "lifecycle",
+            "parameters": {},
+            "severity": "error"
+          }
+        ]
+      },
+      "seeds": [101, 202, 303]
+    },
+    {
+      "cell_id": "langgraph:langgraph-echo-unicode",
+      "subject_id": "langgraph@pypi-1.2.10",
+      "scenario": {
+        "schema_version": 1,
+        "scenario_id": "langgraph-echo-unicode",
+        "query": "  Agent 测试  ",
+        "seed": null,
+        "tags": ["pilot", "external", "deterministic", "unicode"],
+        "fixtures": {
+          "expected": "echo:agent 测试"
+        },
+        "metadata": {},
+        "oracles": [
+          {
+            "oracle_id": null,
+            "kind": "goal_achievement",
+            "parameters": {"expected": true},
+            "severity": "error"
+          },
+          {
+            "oracle_id": null,
+            "kind": "run_status",
+            "parameters": {"allowed": ["completed"]},
+            "severity": "error"
+          },
+          {
+            "oracle_id": null,
+            "kind": "stop_reason",
+            "parameters": {"allowed": ["subject_completed"]},
+            "severity": "error"
+          },
+          {
+            "oracle_id": null,
+            "kind": "lifecycle",
+            "parameters": {},
+            "severity": "error"
+          }
+        ]
+      },
+      "seeds": [101, 202, 303]
+    }
+  ],
+  "frozen_at": "2026-07-30T18:00:00+08:00",
+  "manifest_digest": "38172c288e5d95a0a374713d768a5ec9517a798dc134a7b8a6afe7bb75f23b8a",
+  "metadata": {
+    "status": "pilot",
+    "purpose": "Validate the external adapter and frozen raw-result pipeline; not a paper-scale experiment.",
+    "dependency": "langgraph==1.2.10",
+    "harness_revision": "10a5cb24e97e0a032f8ec289e919da60d811d0be"
+  }
+}

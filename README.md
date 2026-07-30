@@ -277,6 +277,20 @@ Oracle outcomes, executable faults, and Trace metadata. See the
 template at `research/coverage/model_template.json`. No coverage threshold is
 enabled by default.
 
+External subjects implement a small `SubjectAdapter` contract. Frozen
+`ExperimentManifest` files bind subject revisions, complete Scenarios, cell
+order, seeds, and metadata to a digest before execution. The pinned real
+LangGraph plumbing pilot can be reproduced with:
+
+```bash
+uv pip install --python .venv/bin/python -e '.[research]'
+.venv/bin/python research/pilots/langgraph_deterministic/run.py \
+  --output /tmp/langgraph-pilot-report.json
+```
+
+See the [experiment protocol](EXPERIMENT_PROTOCOL.md) and Pilot README for its
+strict claim boundary; the echo Pilot is not paper-scale evidence.
+
 ---
 
 ## Tools

@@ -266,6 +266,19 @@ Candidate 记录不作为已验证缺陷计数。
 [覆盖率协议](BEHAVIORAL_COVERAGE_CN.md) 和明确未冻结的
 `research/coverage/model_template.json` Template。默认不启用 Coverage 阈值。
 
+外部 Subject 实现小型 `SubjectAdapter` 契约。冻结 `ExperimentManifest` 在执行前将
+Subject Revision、完整 Scenario、Cell 顺序、Seed 和 Metadata 绑定到 Digest。
+可如下复现锁定真实 LangGraph Plumbing Pilot：
+
+```bash
+uv pip install --python .venv/bin/python -e '.[research]'
+.venv/bin/python research/pilots/langgraph_deterministic/run.py \
+  --output /tmp/langgraph-pilot-report.json
+```
+
+详见[实验协议](EXPERIMENT_PROTOCOL_CN.md) 和 Pilot README 中的严格主张边界；
+Echo Pilot 不是论文级证据。
+
 ---
 
 ## 工具

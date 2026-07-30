@@ -1,0 +1,1493 @@
+{
+  "schema_version": 1,
+  "manifest": {
+    "schema_version": 1,
+    "experiment_id": "langgraph-deterministic-pilot-v1",
+    "subjects": [
+      {
+        "subject_id": "langgraph@pypi-1.2.10",
+        "runtime": "langgraph",
+        "version": "1.2.10",
+        "revision": "pypi:1.2.10",
+        "source_url": "https://github.com/langchain-ai/langgraph",
+        "independently_developed": true,
+        "metadata": {
+          "distribution": "langgraph"
+        }
+      }
+    ],
+    "cells": [
+      {
+        "cell_id": "langgraph:langgraph-echo-basic",
+        "subject_id": "langgraph@pypi-1.2.10",
+        "scenario": {
+          "schema_version": 1,
+          "scenario_id": "langgraph-echo-basic",
+          "query": "  Hello Agent  ",
+          "seed": null,
+          "tags": [
+            "pilot",
+            "external",
+            "deterministic"
+          ],
+          "fixtures": {
+            "expected": "echo:hello agent"
+          },
+          "metadata": {},
+          "oracles": [
+            {
+              "oracle_id": null,
+              "kind": "goal_achievement",
+              "parameters": {
+                "expected": true
+              },
+              "severity": "error"
+            },
+            {
+              "oracle_id": null,
+              "kind": "run_status",
+              "parameters": {
+                "allowed": [
+                  "completed"
+                ]
+              },
+              "severity": "error"
+            },
+            {
+              "oracle_id": null,
+              "kind": "stop_reason",
+              "parameters": {
+                "allowed": [
+                  "subject_completed"
+                ]
+              },
+              "severity": "error"
+            },
+            {
+              "oracle_id": null,
+              "kind": "lifecycle",
+              "parameters": {},
+              "severity": "error"
+            }
+          ]
+        },
+        "seeds": [
+          101,
+          202,
+          303
+        ]
+      },
+      {
+        "cell_id": "langgraph:langgraph-echo-unicode",
+        "subject_id": "langgraph@pypi-1.2.10",
+        "scenario": {
+          "schema_version": 1,
+          "scenario_id": "langgraph-echo-unicode",
+          "query": "  Agent 测试  ",
+          "seed": null,
+          "tags": [
+            "pilot",
+            "external",
+            "deterministic",
+            "unicode"
+          ],
+          "fixtures": {
+            "expected": "echo:agent 测试"
+          },
+          "metadata": {},
+          "oracles": [
+            {
+              "oracle_id": null,
+              "kind": "goal_achievement",
+              "parameters": {
+                "expected": true
+              },
+              "severity": "error"
+            },
+            {
+              "oracle_id": null,
+              "kind": "run_status",
+              "parameters": {
+                "allowed": [
+                  "completed"
+                ]
+              },
+              "severity": "error"
+            },
+            {
+              "oracle_id": null,
+              "kind": "stop_reason",
+              "parameters": {
+                "allowed": [
+                  "subject_completed"
+                ]
+              },
+              "severity": "error"
+            },
+            {
+              "oracle_id": null,
+              "kind": "lifecycle",
+              "parameters": {},
+              "severity": "error"
+            }
+          ]
+        },
+        "seeds": [
+          101,
+          202,
+          303
+        ]
+      }
+    ],
+    "frozen_at": "2026-07-30T18:00:00+08:00",
+    "manifest_digest": "38172c288e5d95a0a374713d768a5ec9517a798dc134a7b8a6afe7bb75f23b8a",
+    "metadata": {
+      "status": "pilot",
+      "purpose": "Validate the external adapter and frozen raw-result pipeline; not a paper-scale experiment.",
+      "dependency": "langgraph==1.2.10",
+      "harness_revision": "10a5cb24e97e0a032f8ec289e919da60d811d0be"
+    }
+  },
+  "started_at": "2026-07-30T06:22:39.689286Z",
+  "finished_at": "2026-07-30T06:22:39.710258Z",
+  "observations": [
+    {
+      "observation_id": "langgraph:langgraph-echo-basic:r0",
+      "cell_id": "langgraph:langgraph-echo-basic",
+      "subject": {
+        "subject_id": "langgraph@pypi-1.2.10",
+        "runtime": "langgraph",
+        "version": "1.2.10",
+        "revision": "pypi:1.2.10",
+        "source_url": "https://github.com/langchain-ai/langgraph",
+        "independently_developed": true,
+        "metadata": {
+          "distribution": "langgraph"
+        }
+      },
+      "scenario_id": "langgraph-echo-basic",
+      "repetition": 0,
+      "seed": 101,
+      "duration_ms": 8.250093000242487,
+      "report": {
+        "schema_version": 1,
+        "scenario_id": "langgraph-echo-basic",
+        "passed": true,
+        "result": {
+          "status": "completed",
+          "stop_reason": "subject_completed",
+          "stop_detail": "",
+          "final_answer": "echo:hello agent",
+          "evaluation": {
+            "achieved": true,
+            "confidence": 1.0,
+            "explanation": "Exact deterministic final-state comparison",
+            "evidence": [
+              "expected='echo:hello agent'",
+              "actual='echo:hello agent'",
+              "snapshots=3"
+            ]
+          },
+          "trajectory": [],
+          "avg_thought_length": 0.0
+        },
+        "trace": {
+          "schema_version": 2,
+          "trace_id": "4cee936b-6b28-4a0c-914b-f4083ca94885",
+          "started_at": 1785392559.689452,
+          "events": [
+            {
+              "schema_version": 2,
+              "event_id": "e49aa525-5ce6-4445-a928-d40e8f41b39f",
+              "trace_id": "4cee936b-6b28-4a0c-914b-f4083ca94885",
+              "sequence": 0,
+              "event_type": "task_started",
+              "timestamp": 1785392559.6896708,
+              "payload": {
+                "query": "  Hello Agent  ",
+                "adapter_managed": true
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "96e7b503-53ef-4991-863d-d4d4e2a13338",
+              "trace_id": "4cee936b-6b28-4a0c-914b-f4083ca94885",
+              "sequence": 1,
+              "event_type": "custom",
+              "timestamp": 1785392559.6962576,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 0,
+                "state": {
+                  "query": "  Hello Agent  "
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "4d05d3bb-7939-4724-9b2e-31f0f25dd79f",
+              "trace_id": "4cee936b-6b28-4a0c-914b-f4083ca94885",
+              "sequence": 2,
+              "event_type": "custom",
+              "timestamp": 1785392559.696809,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 1,
+                "state": {
+                  "query": "  Hello Agent  ",
+                  "normalized": "hello agent"
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "7ce4e29d-2a82-4849-bada-c39281e62e90",
+              "trace_id": "4cee936b-6b28-4a0c-914b-f4083ca94885",
+              "sequence": 3,
+              "event_type": "custom",
+              "timestamp": 1785392559.6971624,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 2,
+                "state": {
+                  "query": "  Hello Agent  ",
+                  "normalized": "hello agent",
+                  "answer": "echo:hello agent"
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "3026c943-6713-41f6-9980-8f7c2df8773e",
+              "trace_id": "4cee936b-6b28-4a0c-914b-f4083ca94885",
+              "sequence": 4,
+              "event_type": "task_completed",
+              "timestamp": 1785392559.6973956,
+              "payload": {
+                "result": {
+                  "status": "completed",
+                  "stop_reason": "subject_completed",
+                  "stop_detail": "",
+                  "final_answer": "echo:hello agent",
+                  "evaluation": {
+                    "achieved": true,
+                    "confidence": 1.0,
+                    "explanation": "Exact deterministic final-state comparison",
+                    "evidence": [
+                      "expected='echo:hello agent'",
+                      "actual='echo:hello agent'",
+                      "snapshots=3"
+                    ]
+                  },
+                  "trajectory": [],
+                  "avg_thought_length": 0.0
+                },
+                "adapter_managed": true
+              },
+              "metadata": {}
+            }
+          ],
+          "metadata": {
+            "scenario_id": "langgraph-echo-basic",
+            "seed": 101,
+            "tags": [
+              "pilot",
+              "external",
+              "deterministic"
+            ],
+            "subject": {
+              "subject_id": "langgraph@pypi-1.2.10",
+              "runtime": "langgraph",
+              "version": "1.2.10",
+              "revision": "pypi:1.2.10",
+              "source_url": "https://github.com/langchain-ai/langgraph",
+              "independently_developed": true,
+              "metadata": {
+                "distribution": "langgraph"
+              }
+            }
+          }
+        },
+        "execution_error": null,
+        "verdicts": [
+          {
+            "oracle_id": "goal_achievement:0",
+            "kind": "goal_achievement",
+            "passed": true,
+            "message": "Expected goal achievement True, got True",
+            "severity": "error",
+            "evidence": {
+              "expected": true,
+              "actual": true
+            }
+          },
+          {
+            "oracle_id": "run_status:1",
+            "kind": "run_status",
+            "passed": true,
+            "message": "Expected run status in ['completed'], got completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "completed"
+              ],
+              "actual": "completed"
+            }
+          },
+          {
+            "oracle_id": "stop_reason:2",
+            "kind": "stop_reason",
+            "passed": true,
+            "message": "Expected stop reason in ['subject_completed'], got subject_completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "subject_completed"
+              ],
+              "actual": "subject_completed"
+            }
+          },
+          {
+            "oracle_id": "lifecycle:3",
+            "kind": "lifecycle",
+            "passed": true,
+            "message": "Lifecycle contains 1 start event(s) and 1 end event(s)",
+            "severity": "error",
+            "evidence": {
+              "start_sequences": [
+                0
+              ],
+              "end_sequences": [
+                4
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "observation_id": "langgraph:langgraph-echo-basic:r1",
+      "cell_id": "langgraph:langgraph-echo-basic",
+      "subject": {
+        "subject_id": "langgraph@pypi-1.2.10",
+        "runtime": "langgraph",
+        "version": "1.2.10",
+        "revision": "pypi:1.2.10",
+        "source_url": "https://github.com/langchain-ai/langgraph",
+        "independently_developed": true,
+        "metadata": {
+          "distribution": "langgraph"
+        }
+      },
+      "scenario_id": "langgraph-echo-basic",
+      "repetition": 1,
+      "seed": 202,
+      "duration_ms": 3.0930690008972306,
+      "report": {
+        "schema_version": 1,
+        "scenario_id": "langgraph-echo-basic",
+        "passed": true,
+        "result": {
+          "status": "completed",
+          "stop_reason": "subject_completed",
+          "stop_detail": "",
+          "final_answer": "echo:hello agent",
+          "evaluation": {
+            "achieved": true,
+            "confidence": 1.0,
+            "explanation": "Exact deterministic final-state comparison",
+            "evidence": [
+              "expected='echo:hello agent'",
+              "actual='echo:hello agent'",
+              "snapshots=3"
+            ]
+          },
+          "trajectory": [],
+          "avg_thought_length": 0.0
+        },
+        "trace": {
+          "schema_version": 2,
+          "trace_id": "45fa18e9-6670-4c9d-86e9-0e72754e1f80",
+          "started_at": 1785392559.6977253,
+          "events": [
+            {
+              "schema_version": 2,
+              "event_id": "be817181-f34f-4401-ac03-63ac4d067da3",
+              "trace_id": "45fa18e9-6670-4c9d-86e9-0e72754e1f80",
+              "sequence": 0,
+              "event_type": "task_started",
+              "timestamp": 1785392559.6977959,
+              "payload": {
+                "query": "  Hello Agent  ",
+                "adapter_managed": true
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "701d3bf3-06a9-4d09-80a9-19bf9ecea671",
+              "trace_id": "45fa18e9-6670-4c9d-86e9-0e72754e1f80",
+              "sequence": 1,
+              "event_type": "custom",
+              "timestamp": 1785392559.6999042,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 0,
+                "state": {
+                  "query": "  Hello Agent  "
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "859ece7a-1c6f-4eb2-aee9-ca01b0ac6519",
+              "trace_id": "45fa18e9-6670-4c9d-86e9-0e72754e1f80",
+              "sequence": 2,
+              "event_type": "custom",
+              "timestamp": 1785392559.7002623,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 1,
+                "state": {
+                  "query": "  Hello Agent  ",
+                  "normalized": "hello agent"
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "cc7bb838-fc97-4345-893e-4460d2e4e623",
+              "trace_id": "45fa18e9-6670-4c9d-86e9-0e72754e1f80",
+              "sequence": 3,
+              "event_type": "custom",
+              "timestamp": 1785392559.700516,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 2,
+                "state": {
+                  "query": "  Hello Agent  ",
+                  "normalized": "hello agent",
+                  "answer": "echo:hello agent"
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "87bcca6b-c603-4791-9bcf-b39d2e53b4e7",
+              "trace_id": "45fa18e9-6670-4c9d-86e9-0e72754e1f80",
+              "sequence": 4,
+              "event_type": "task_completed",
+              "timestamp": 1785392559.700642,
+              "payload": {
+                "result": {
+                  "status": "completed",
+                  "stop_reason": "subject_completed",
+                  "stop_detail": "",
+                  "final_answer": "echo:hello agent",
+                  "evaluation": {
+                    "achieved": true,
+                    "confidence": 1.0,
+                    "explanation": "Exact deterministic final-state comparison",
+                    "evidence": [
+                      "expected='echo:hello agent'",
+                      "actual='echo:hello agent'",
+                      "snapshots=3"
+                    ]
+                  },
+                  "trajectory": [],
+                  "avg_thought_length": 0.0
+                },
+                "adapter_managed": true
+              },
+              "metadata": {}
+            }
+          ],
+          "metadata": {
+            "scenario_id": "langgraph-echo-basic",
+            "seed": 202,
+            "tags": [
+              "pilot",
+              "external",
+              "deterministic"
+            ],
+            "subject": {
+              "subject_id": "langgraph@pypi-1.2.10",
+              "runtime": "langgraph",
+              "version": "1.2.10",
+              "revision": "pypi:1.2.10",
+              "source_url": "https://github.com/langchain-ai/langgraph",
+              "independently_developed": true,
+              "metadata": {
+                "distribution": "langgraph"
+              }
+            }
+          }
+        },
+        "execution_error": null,
+        "verdicts": [
+          {
+            "oracle_id": "goal_achievement:0",
+            "kind": "goal_achievement",
+            "passed": true,
+            "message": "Expected goal achievement True, got True",
+            "severity": "error",
+            "evidence": {
+              "expected": true,
+              "actual": true
+            }
+          },
+          {
+            "oracle_id": "run_status:1",
+            "kind": "run_status",
+            "passed": true,
+            "message": "Expected run status in ['completed'], got completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "completed"
+              ],
+              "actual": "completed"
+            }
+          },
+          {
+            "oracle_id": "stop_reason:2",
+            "kind": "stop_reason",
+            "passed": true,
+            "message": "Expected stop reason in ['subject_completed'], got subject_completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "subject_completed"
+              ],
+              "actual": "subject_completed"
+            }
+          },
+          {
+            "oracle_id": "lifecycle:3",
+            "kind": "lifecycle",
+            "passed": true,
+            "message": "Lifecycle contains 1 start event(s) and 1 end event(s)",
+            "severity": "error",
+            "evidence": {
+              "start_sequences": [
+                0
+              ],
+              "end_sequences": [
+                4
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "observation_id": "langgraph:langgraph-echo-basic:r2",
+      "cell_id": "langgraph:langgraph-echo-basic",
+      "subject": {
+        "subject_id": "langgraph@pypi-1.2.10",
+        "runtime": "langgraph",
+        "version": "1.2.10",
+        "revision": "pypi:1.2.10",
+        "source_url": "https://github.com/langchain-ai/langgraph",
+        "independently_developed": true,
+        "metadata": {
+          "distribution": "langgraph"
+        }
+      },
+      "scenario_id": "langgraph-echo-basic",
+      "repetition": 2,
+      "seed": 303,
+      "duration_ms": 2.4248740010079928,
+      "report": {
+        "schema_version": 1,
+        "scenario_id": "langgraph-echo-basic",
+        "passed": true,
+        "result": {
+          "status": "completed",
+          "stop_reason": "subject_completed",
+          "stop_detail": "",
+          "final_answer": "echo:hello agent",
+          "evaluation": {
+            "achieved": true,
+            "confidence": 1.0,
+            "explanation": "Exact deterministic final-state comparison",
+            "evidence": [
+              "expected='echo:hello agent'",
+              "actual='echo:hello agent'",
+              "snapshots=3"
+            ]
+          },
+          "trajectory": [],
+          "avg_thought_length": 0.0
+        },
+        "trace": {
+          "schema_version": 2,
+          "trace_id": "a6fa33a7-a024-4d25-b503-5b1fe2fa4790",
+          "started_at": 1785392559.700894,
+          "events": [
+            {
+              "schema_version": 2,
+              "event_id": "a9f21b10-ae03-441c-b6f4-822ef69b8ccd",
+              "trace_id": "a6fa33a7-a024-4d25-b503-5b1fe2fa4790",
+              "sequence": 0,
+              "event_type": "task_started",
+              "timestamp": 1785392559.7009614,
+              "payload": {
+                "query": "  Hello Agent  ",
+                "adapter_managed": true
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "5f776cf2-b45f-47e6-b3f5-2ef9fd47d7e5",
+              "trace_id": "a6fa33a7-a024-4d25-b503-5b1fe2fa4790",
+              "sequence": 1,
+              "event_type": "custom",
+              "timestamp": 1785392559.702507,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 0,
+                "state": {
+                  "query": "  Hello Agent  "
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "5adc6334-1e3f-449e-b2b2-e6358f6d6688",
+              "trace_id": "a6fa33a7-a024-4d25-b503-5b1fe2fa4790",
+              "sequence": 2,
+              "event_type": "custom",
+              "timestamp": 1785392559.7028904,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 1,
+                "state": {
+                  "query": "  Hello Agent  ",
+                  "normalized": "hello agent"
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "1fcea96d-386b-49f5-8d2c-08c86bc641be",
+              "trace_id": "a6fa33a7-a024-4d25-b503-5b1fe2fa4790",
+              "sequence": 3,
+              "event_type": "custom",
+              "timestamp": 1785392559.7030919,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 2,
+                "state": {
+                  "query": "  Hello Agent  ",
+                  "normalized": "hello agent",
+                  "answer": "echo:hello agent"
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "01230274-e531-4d5a-a580-858d516f0010",
+              "trace_id": "a6fa33a7-a024-4d25-b503-5b1fe2fa4790",
+              "sequence": 4,
+              "event_type": "task_completed",
+              "timestamp": 1785392559.7031906,
+              "payload": {
+                "result": {
+                  "status": "completed",
+                  "stop_reason": "subject_completed",
+                  "stop_detail": "",
+                  "final_answer": "echo:hello agent",
+                  "evaluation": {
+                    "achieved": true,
+                    "confidence": 1.0,
+                    "explanation": "Exact deterministic final-state comparison",
+                    "evidence": [
+                      "expected='echo:hello agent'",
+                      "actual='echo:hello agent'",
+                      "snapshots=3"
+                    ]
+                  },
+                  "trajectory": [],
+                  "avg_thought_length": 0.0
+                },
+                "adapter_managed": true
+              },
+              "metadata": {}
+            }
+          ],
+          "metadata": {
+            "scenario_id": "langgraph-echo-basic",
+            "seed": 303,
+            "tags": [
+              "pilot",
+              "external",
+              "deterministic"
+            ],
+            "subject": {
+              "subject_id": "langgraph@pypi-1.2.10",
+              "runtime": "langgraph",
+              "version": "1.2.10",
+              "revision": "pypi:1.2.10",
+              "source_url": "https://github.com/langchain-ai/langgraph",
+              "independently_developed": true,
+              "metadata": {
+                "distribution": "langgraph"
+              }
+            }
+          }
+        },
+        "execution_error": null,
+        "verdicts": [
+          {
+            "oracle_id": "goal_achievement:0",
+            "kind": "goal_achievement",
+            "passed": true,
+            "message": "Expected goal achievement True, got True",
+            "severity": "error",
+            "evidence": {
+              "expected": true,
+              "actual": true
+            }
+          },
+          {
+            "oracle_id": "run_status:1",
+            "kind": "run_status",
+            "passed": true,
+            "message": "Expected run status in ['completed'], got completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "completed"
+              ],
+              "actual": "completed"
+            }
+          },
+          {
+            "oracle_id": "stop_reason:2",
+            "kind": "stop_reason",
+            "passed": true,
+            "message": "Expected stop reason in ['subject_completed'], got subject_completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "subject_completed"
+              ],
+              "actual": "subject_completed"
+            }
+          },
+          {
+            "oracle_id": "lifecycle:3",
+            "kind": "lifecycle",
+            "passed": true,
+            "message": "Lifecycle contains 1 start event(s) and 1 end event(s)",
+            "severity": "error",
+            "evidence": {
+              "start_sequences": [
+                0
+              ],
+              "end_sequences": [
+                4
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "observation_id": "langgraph:langgraph-echo-unicode:r0",
+      "cell_id": "langgraph:langgraph-echo-unicode",
+      "subject": {
+        "subject_id": "langgraph@pypi-1.2.10",
+        "runtime": "langgraph",
+        "version": "1.2.10",
+        "revision": "pypi:1.2.10",
+        "source_url": "https://github.com/langchain-ai/langgraph",
+        "independently_developed": true,
+        "metadata": {
+          "distribution": "langgraph"
+        }
+      },
+      "scenario_id": "langgraph-echo-unicode",
+      "repetition": 0,
+      "seed": 101,
+      "duration_ms": 2.2977970002102666,
+      "report": {
+        "schema_version": 1,
+        "scenario_id": "langgraph-echo-unicode",
+        "passed": true,
+        "result": {
+          "status": "completed",
+          "stop_reason": "subject_completed",
+          "stop_detail": "",
+          "final_answer": "echo:agent 测试",
+          "evaluation": {
+            "achieved": true,
+            "confidence": 1.0,
+            "explanation": "Exact deterministic final-state comparison",
+            "evidence": [
+              "expected='echo:agent 测试'",
+              "actual='echo:agent 测试'",
+              "snapshots=3"
+            ]
+          },
+          "trajectory": [],
+          "avg_thought_length": 0.0
+        },
+        "trace": {
+          "schema_version": 2,
+          "trace_id": "e18deeda-8edf-406a-8bdb-1ed22e1e9971",
+          "started_at": 1785392559.7033856,
+          "events": [
+            {
+              "schema_version": 2,
+              "event_id": "b1533c28-5ae0-4353-a1e6-9167f363b26e",
+              "trace_id": "e18deeda-8edf-406a-8bdb-1ed22e1e9971",
+              "sequence": 0,
+              "event_type": "task_started",
+              "timestamp": 1785392559.703446,
+              "payload": {
+                "query": "  Agent 测试  ",
+                "adapter_managed": true
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "ca165be1-5b91-43cf-94bb-619bae010177",
+              "trace_id": "e18deeda-8edf-406a-8bdb-1ed22e1e9971",
+              "sequence": 1,
+              "event_type": "custom",
+              "timestamp": 1785392559.704767,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 0,
+                "state": {
+                  "query": "  Agent 测试  "
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "d2805c6e-451e-4b47-8e7e-c58bd5ebe7bc",
+              "trace_id": "e18deeda-8edf-406a-8bdb-1ed22e1e9971",
+              "sequence": 2,
+              "event_type": "custom",
+              "timestamp": 1785392559.7052207,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 1,
+                "state": {
+                  "query": "  Agent 测试  ",
+                  "normalized": "agent 测试"
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "87ea5646-1d0a-458f-9846-3e67f0617880",
+              "trace_id": "e18deeda-8edf-406a-8bdb-1ed22e1e9971",
+              "sequence": 3,
+              "event_type": "custom",
+              "timestamp": 1785392559.7054522,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 2,
+                "state": {
+                  "query": "  Agent 测试  ",
+                  "normalized": "agent 测试",
+                  "answer": "echo:agent 测试"
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "f2c20656-d959-4a5c-89d1-ef78100ea943",
+              "trace_id": "e18deeda-8edf-406a-8bdb-1ed22e1e9971",
+              "sequence": 4,
+              "event_type": "task_completed",
+              "timestamp": 1785392559.7055519,
+              "payload": {
+                "result": {
+                  "status": "completed",
+                  "stop_reason": "subject_completed",
+                  "stop_detail": "",
+                  "final_answer": "echo:agent 测试",
+                  "evaluation": {
+                    "achieved": true,
+                    "confidence": 1.0,
+                    "explanation": "Exact deterministic final-state comparison",
+                    "evidence": [
+                      "expected='echo:agent 测试'",
+                      "actual='echo:agent 测试'",
+                      "snapshots=3"
+                    ]
+                  },
+                  "trajectory": [],
+                  "avg_thought_length": 0.0
+                },
+                "adapter_managed": true
+              },
+              "metadata": {}
+            }
+          ],
+          "metadata": {
+            "scenario_id": "langgraph-echo-unicode",
+            "seed": 101,
+            "tags": [
+              "pilot",
+              "external",
+              "deterministic",
+              "unicode"
+            ],
+            "subject": {
+              "subject_id": "langgraph@pypi-1.2.10",
+              "runtime": "langgraph",
+              "version": "1.2.10",
+              "revision": "pypi:1.2.10",
+              "source_url": "https://github.com/langchain-ai/langgraph",
+              "independently_developed": true,
+              "metadata": {
+                "distribution": "langgraph"
+              }
+            }
+          }
+        },
+        "execution_error": null,
+        "verdicts": [
+          {
+            "oracle_id": "goal_achievement:0",
+            "kind": "goal_achievement",
+            "passed": true,
+            "message": "Expected goal achievement True, got True",
+            "severity": "error",
+            "evidence": {
+              "expected": true,
+              "actual": true
+            }
+          },
+          {
+            "oracle_id": "run_status:1",
+            "kind": "run_status",
+            "passed": true,
+            "message": "Expected run status in ['completed'], got completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "completed"
+              ],
+              "actual": "completed"
+            }
+          },
+          {
+            "oracle_id": "stop_reason:2",
+            "kind": "stop_reason",
+            "passed": true,
+            "message": "Expected stop reason in ['subject_completed'], got subject_completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "subject_completed"
+              ],
+              "actual": "subject_completed"
+            }
+          },
+          {
+            "oracle_id": "lifecycle:3",
+            "kind": "lifecycle",
+            "passed": true,
+            "message": "Lifecycle contains 1 start event(s) and 1 end event(s)",
+            "severity": "error",
+            "evidence": {
+              "start_sequences": [
+                0
+              ],
+              "end_sequences": [
+                4
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "observation_id": "langgraph:langgraph-echo-unicode:r1",
+      "cell_id": "langgraph:langgraph-echo-unicode",
+      "subject": {
+        "subject_id": "langgraph@pypi-1.2.10",
+        "runtime": "langgraph",
+        "version": "1.2.10",
+        "revision": "pypi:1.2.10",
+        "source_url": "https://github.com/langchain-ai/langgraph",
+        "independently_developed": true,
+        "metadata": {
+          "distribution": "langgraph"
+        }
+      },
+      "scenario_id": "langgraph-echo-unicode",
+      "repetition": 1,
+      "seed": 202,
+      "duration_ms": 2.2457170016423333,
+      "report": {
+        "schema_version": 1,
+        "scenario_id": "langgraph-echo-unicode",
+        "passed": true,
+        "result": {
+          "status": "completed",
+          "stop_reason": "subject_completed",
+          "stop_detail": "",
+          "final_answer": "echo:agent 测试",
+          "evaluation": {
+            "achieved": true,
+            "confidence": 1.0,
+            "explanation": "Exact deterministic final-state comparison",
+            "evidence": [
+              "expected='echo:agent 测试'",
+              "actual='echo:agent 测试'",
+              "snapshots=3"
+            ]
+          },
+          "trajectory": [],
+          "avg_thought_length": 0.0
+        },
+        "trace": {
+          "schema_version": 2,
+          "trace_id": "2ed9f58b-b69c-483d-979b-6241d4182bec",
+          "started_at": 1785392559.7057595,
+          "events": [
+            {
+              "schema_version": 2,
+              "event_id": "6edbaeca-214d-49af-9053-c1cecd48c3ad",
+              "trace_id": "2ed9f58b-b69c-483d-979b-6241d4182bec",
+              "sequence": 0,
+              "event_type": "task_started",
+              "timestamp": 1785392559.7058253,
+              "payload": {
+                "query": "  Agent 测试  ",
+                "adapter_managed": true
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "0298c0b5-e71e-44a2-ac3d-3e94b7c30008",
+              "trace_id": "2ed9f58b-b69c-483d-979b-6241d4182bec",
+              "sequence": 1,
+              "event_type": "custom",
+              "timestamp": 1785392559.7072241,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 0,
+                "state": {
+                  "query": "  Agent 测试  "
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "b27c7109-671f-434b-80e7-e7b9bd1fc229",
+              "trace_id": "2ed9f58b-b69c-483d-979b-6241d4182bec",
+              "sequence": 2,
+              "event_type": "custom",
+              "timestamp": 1785392559.707539,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 1,
+                "state": {
+                  "query": "  Agent 测试  ",
+                  "normalized": "agent 测试"
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "c93a1684-0cac-4fc2-bdc8-6df50eab5d47",
+              "trace_id": "2ed9f58b-b69c-483d-979b-6241d4182bec",
+              "sequence": 3,
+              "event_type": "custom",
+              "timestamp": 1785392559.7077382,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 2,
+                "state": {
+                  "query": "  Agent 测试  ",
+                  "normalized": "agent 测试",
+                  "answer": "echo:agent 测试"
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "ea5b4ff6-faed-47af-8f28-d44c3b82dae5",
+              "trace_id": "2ed9f58b-b69c-483d-979b-6241d4182bec",
+              "sequence": 4,
+              "event_type": "task_completed",
+              "timestamp": 1785392559.7078514,
+              "payload": {
+                "result": {
+                  "status": "completed",
+                  "stop_reason": "subject_completed",
+                  "stop_detail": "",
+                  "final_answer": "echo:agent 测试",
+                  "evaluation": {
+                    "achieved": true,
+                    "confidence": 1.0,
+                    "explanation": "Exact deterministic final-state comparison",
+                    "evidence": [
+                      "expected='echo:agent 测试'",
+                      "actual='echo:agent 测试'",
+                      "snapshots=3"
+                    ]
+                  },
+                  "trajectory": [],
+                  "avg_thought_length": 0.0
+                },
+                "adapter_managed": true
+              },
+              "metadata": {}
+            }
+          ],
+          "metadata": {
+            "scenario_id": "langgraph-echo-unicode",
+            "seed": 202,
+            "tags": [
+              "pilot",
+              "external",
+              "deterministic",
+              "unicode"
+            ],
+            "subject": {
+              "subject_id": "langgraph@pypi-1.2.10",
+              "runtime": "langgraph",
+              "version": "1.2.10",
+              "revision": "pypi:1.2.10",
+              "source_url": "https://github.com/langchain-ai/langgraph",
+              "independently_developed": true,
+              "metadata": {
+                "distribution": "langgraph"
+              }
+            }
+          }
+        },
+        "execution_error": null,
+        "verdicts": [
+          {
+            "oracle_id": "goal_achievement:0",
+            "kind": "goal_achievement",
+            "passed": true,
+            "message": "Expected goal achievement True, got True",
+            "severity": "error",
+            "evidence": {
+              "expected": true,
+              "actual": true
+            }
+          },
+          {
+            "oracle_id": "run_status:1",
+            "kind": "run_status",
+            "passed": true,
+            "message": "Expected run status in ['completed'], got completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "completed"
+              ],
+              "actual": "completed"
+            }
+          },
+          {
+            "oracle_id": "stop_reason:2",
+            "kind": "stop_reason",
+            "passed": true,
+            "message": "Expected stop reason in ['subject_completed'], got subject_completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "subject_completed"
+              ],
+              "actual": "subject_completed"
+            }
+          },
+          {
+            "oracle_id": "lifecycle:3",
+            "kind": "lifecycle",
+            "passed": true,
+            "message": "Lifecycle contains 1 start event(s) and 1 end event(s)",
+            "severity": "error",
+            "evidence": {
+              "start_sequences": [
+                0
+              ],
+              "end_sequences": [
+                4
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "observation_id": "langgraph:langgraph-echo-unicode:r2",
+      "cell_id": "langgraph:langgraph-echo-unicode",
+      "subject": {
+        "subject_id": "langgraph@pypi-1.2.10",
+        "runtime": "langgraph",
+        "version": "1.2.10",
+        "revision": "pypi:1.2.10",
+        "source_url": "https://github.com/langchain-ai/langgraph",
+        "independently_developed": true,
+        "metadata": {
+          "distribution": "langgraph"
+        }
+      },
+      "scenario_id": "langgraph-echo-unicode",
+      "repetition": 2,
+      "seed": 303,
+      "duration_ms": 2.13686800270807,
+      "report": {
+        "schema_version": 1,
+        "scenario_id": "langgraph-echo-unicode",
+        "passed": true,
+        "result": {
+          "status": "completed",
+          "stop_reason": "subject_completed",
+          "stop_detail": "",
+          "final_answer": "echo:agent 测试",
+          "evaluation": {
+            "achieved": true,
+            "confidence": 1.0,
+            "explanation": "Exact deterministic final-state comparison",
+            "evidence": [
+              "expected='echo:agent 测试'",
+              "actual='echo:agent 测试'",
+              "snapshots=3"
+            ]
+          },
+          "trajectory": [],
+          "avg_thought_length": 0.0
+        },
+        "trace": {
+          "schema_version": 2,
+          "trace_id": "05f23143-1ee3-4d4b-9d87-08d3b75f73f5",
+          "started_at": 1785392559.7080932,
+          "events": [
+            {
+              "schema_version": 2,
+              "event_id": "15515018-314c-48cb-aae8-4efb06d178c9",
+              "trace_id": "05f23143-1ee3-4d4b-9d87-08d3b75f73f5",
+              "sequence": 0,
+              "event_type": "task_started",
+              "timestamp": 1785392559.708159,
+              "payload": {
+                "query": "  Agent 测试  ",
+                "adapter_managed": true
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "b611caf4-5271-4f16-8129-faf065411578",
+              "trace_id": "05f23143-1ee3-4d4b-9d87-08d3b75f73f5",
+              "sequence": 1,
+              "event_type": "custom",
+              "timestamp": 1785392559.709432,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 0,
+                "state": {
+                  "query": "  Agent 测试  "
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "a0983119-0b63-4a7b-ab25-1681b7bcf7a1",
+              "trace_id": "05f23143-1ee3-4d4b-9d87-08d3b75f73f5",
+              "sequence": 2,
+              "event_type": "custom",
+              "timestamp": 1785392559.70976,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 1,
+                "state": {
+                  "query": "  Agent 测试  ",
+                  "normalized": "agent 测试"
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "dbed509f-0a3c-4640-b4a9-fe7957e1d7d2",
+              "trace_id": "05f23143-1ee3-4d4b-9d87-08d3b75f73f5",
+              "sequence": 3,
+              "event_type": "custom",
+              "timestamp": 1785392559.7100031,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 2,
+                "state": {
+                  "query": "  Agent 测试  ",
+                  "normalized": "agent 测试",
+                  "answer": "echo:agent 测试"
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "a0e032d1-4443-44ec-9eac-d274a893f2ff",
+              "trace_id": "05f23143-1ee3-4d4b-9d87-08d3b75f73f5",
+              "sequence": 4,
+              "event_type": "task_completed",
+              "timestamp": 1785392559.7101016,
+              "payload": {
+                "result": {
+                  "status": "completed",
+                  "stop_reason": "subject_completed",
+                  "stop_detail": "",
+                  "final_answer": "echo:agent 测试",
+                  "evaluation": {
+                    "achieved": true,
+                    "confidence": 1.0,
+                    "explanation": "Exact deterministic final-state comparison",
+                    "evidence": [
+                      "expected='echo:agent 测试'",
+                      "actual='echo:agent 测试'",
+                      "snapshots=3"
+                    ]
+                  },
+                  "trajectory": [],
+                  "avg_thought_length": 0.0
+                },
+                "adapter_managed": true
+              },
+              "metadata": {}
+            }
+          ],
+          "metadata": {
+            "scenario_id": "langgraph-echo-unicode",
+            "seed": 303,
+            "tags": [
+              "pilot",
+              "external",
+              "deterministic",
+              "unicode"
+            ],
+            "subject": {
+              "subject_id": "langgraph@pypi-1.2.10",
+              "runtime": "langgraph",
+              "version": "1.2.10",
+              "revision": "pypi:1.2.10",
+              "source_url": "https://github.com/langchain-ai/langgraph",
+              "independently_developed": true,
+              "metadata": {
+                "distribution": "langgraph"
+              }
+            }
+          }
+        },
+        "execution_error": null,
+        "verdicts": [
+          {
+            "oracle_id": "goal_achievement:0",
+            "kind": "goal_achievement",
+            "passed": true,
+            "message": "Expected goal achievement True, got True",
+            "severity": "error",
+            "evidence": {
+              "expected": true,
+              "actual": true
+            }
+          },
+          {
+            "oracle_id": "run_status:1",
+            "kind": "run_status",
+            "passed": true,
+            "message": "Expected run status in ['completed'], got completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "completed"
+              ],
+              "actual": "completed"
+            }
+          },
+          {
+            "oracle_id": "stop_reason:2",
+            "kind": "stop_reason",
+            "passed": true,
+            "message": "Expected stop reason in ['subject_completed'], got subject_completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "subject_completed"
+              ],
+              "actual": "subject_completed"
+            }
+          },
+          {
+            "oracle_id": "lifecycle:3",
+            "kind": "lifecycle",
+            "passed": true,
+            "message": "Lifecycle contains 1 start event(s) and 1 end event(s)",
+            "severity": "error",
+            "evidence": {
+              "start_sequences": [
+                0
+              ],
+              "end_sequences": [
+                4
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "subjects": [
+    {
+      "subject_id": "langgraph@pypi-1.2.10",
+      "runs": 6,
+      "passed": 6,
+      "execution_errors": 0,
+      "pass_rate": 1.0
+    }
+  ]
+}
