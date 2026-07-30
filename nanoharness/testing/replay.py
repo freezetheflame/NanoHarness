@@ -341,6 +341,7 @@ class RecordingToolRegistry(BaseToolRegistry):
                 "name": name,
                 "arguments": args,
                 "result": result,
+                "attempt_count": 1,
                 "duration_ms": (self._clock() - started_at) * 1000,
             },
         )

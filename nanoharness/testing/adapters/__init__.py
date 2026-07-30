@@ -9,6 +9,7 @@ from nanoharness.testing.adapters.base import (
 )
 from nanoharness.testing.adapters.langgraph import (
     LangGraphConfigBuilder,
+    LangGraphBuilder,
     LangGraphFactory,
     LangGraphInputBuilder,
     LangGraphResultMapper,
@@ -23,6 +24,7 @@ __all__ = [
     "SubjectAdapter",
     "SubjectIdentity",
     "LangGraphConfigBuilder",
+    "LangGraphBuilder",
     "LangGraphFactory",
     "LangGraphInputBuilder",
     "LangGraphResultMapper",

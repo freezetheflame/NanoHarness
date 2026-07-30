@@ -424,11 +424,19 @@ def _evaluate_tool_calls(spec, parameters, context, oracle_id):
         for event in context.trace.events
         if event.event_type in {TraceEventType.TOOL_EXCHANGE, TraceEventType.TOOL_ERROR}
     ]
-    counts = Counter(
-        event.payload.get("name")
-        for event in call_events
-        if event.payload.get("name") is not None
-    )
+    counts = Counter()
+    for event in call_events:
+        name = event.payload.get("name")
+        if name is None:
+            continue
+        attempt_count = event.payload.get("attempt_count", 1)
+        if (
+            isinstance(attempt_count, bool)
+            or not isinstance(attempt_count, int)
+            or attempt_count < 1
+        ):
+            attempt_count = 1
+        counts[name] += attempt_count
     failures = []
     for name in parameters.required:
         if counts[name] == 0:
@@ -480,6 +488,7 @@ def _evaluate_tool_calls(spec, parameters, context, oracle_id):
                     "sequence": event.sequence,
                     "name": event.payload.get("name"),
                     "arguments": event.payload.get("arguments"),
+                    "attempt_count": event.payload.get("attempt_count", 1),
                 }
                 for event in call_events
             ],

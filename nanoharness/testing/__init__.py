@@ -131,6 +131,7 @@ from nanoharness.testing.adapters import (
     SubjectAdapter,
     SubjectIdentity,
     LangGraphConfigBuilder,
+    LangGraphBuilder,
     LangGraphFactory,
     LangGraphInputBuilder,
     LangGraphResultMapper,
@@ -145,8 +146,13 @@ from nanoharness.testing.experiment import (
     ExperimentObservation,
     ExperimentReport,
     ExperimentRunner,
+    FaultExperimentManifest,
+    SubjectFaultAdapterFactory,
+    SubjectFaultCampaignRunner,
+    SubjectFaultExperimentReport,
     SubjectExperimentSummary,
     experiment_manifest_digest,
+    fault_experiment_manifest_digest,
 )
 
 __all__ = [
@@ -262,6 +268,7 @@ __all__ = [
     "SubjectAdapter",
     "SubjectIdentity",
     "LangGraphConfigBuilder",
+    "LangGraphBuilder",
     "LangGraphFactory",
     "LangGraphInputBuilder",
     "LangGraphResultMapper",
@@ -274,6 +281,11 @@ __all__ = [
     "ExperimentObservation",
     "ExperimentReport",
     "ExperimentRunner",
+    "FaultExperimentManifest",
+    "SubjectFaultAdapterFactory",
+    "SubjectFaultCampaignRunner",
+    "SubjectFaultExperimentReport",
     "SubjectExperimentSummary",
     "experiment_manifest_digest",
+    "fault_experiment_manifest_digest",
 ]

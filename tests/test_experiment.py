@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 import pytest
 from pydantic import ValidationError
 
+from nanoharness.components.tools.dict_registry import DictToolRegistry
 from nanoharness.core.schema import (
     EvaluationResult,
     RunResult,
@@ -15,12 +16,22 @@ from nanoharness.testing import (
     ExperimentConfigurationError,
     ExperimentManifest,
     ExperimentRunner,
+    FaultAction,
+    FaultComponent,
+    FaultExperimentManifest,
+    FaultInjectingToolRegistry,
+    FaultPlan,
+    FaultRule,
+    MutationStatus,
     OracleKind,
     OracleSpec,
+    RecordingToolRegistry,
     Scenario,
+    SubjectFaultCampaignRunner,
     SubjectIdentity,
     TraceEventType,
     experiment_manifest_digest,
+    fault_experiment_manifest_digest,
 )
 
 
@@ -263,3 +274,122 @@ def test_adapter_validates_oracles_before_external_execution():
         CallableSubjectAdapter(_identity(), executor).run(scenario)
 
     assert calls == 0
+
+
+def test_frozen_external_fault_campaign_classifies_and_scores_plans():
+    identity = _identity()
+
+    def adapter_factory(session):
+        def executor(scenario, recorder):
+            registry = DictToolRegistry()
+
+            @registry.tool
+            def echo(text: str):
+                """Echo text."""
+                return text
+
+            tools = registry
+            if session is not None:
+                tools = FaultInjectingToolRegistry(tools, session)
+            tools = RecordingToolRegistry(tools, recorder)
+            result = tools.call("echo", {"text": "hello"})
+            achieved = result == "hello"
+            return RunResult(
+                status=RunStatus.COMPLETED,
+                stop_reason=StopReason.SUBJECT_COMPLETED,
+                final_answer=str(result),
+                evaluation=EvaluationResult(
+                    achieved=achieved,
+                    confidence=1.0,
+                    explanation="exact result match",
+                ),
+            )
+
+        return CallableSubjectAdapter(identity, executor)
+
+    scenario = Scenario(
+        scenario_id="external-faults",
+        query="echo hello",
+        oracles=[
+            OracleSpec(
+                kind=OracleKind.GOAL_ACHIEVEMENT,
+                parameters={"expected": True},
+            ),
+            OracleSpec(
+                kind=OracleKind.TOOL_RESULTS,
+                parameters={"expected_last": {"echo": "hello"}},
+            ),
+        ],
+    )
+    plans = [
+        FaultPlan(
+            plan_id="stale",
+            rules=[
+                FaultRule(
+                    rule_id="stale",
+                    component=FaultComponent.TOOL,
+                    action=FaultAction.TOOL_RESULT_STALE,
+                    tool_name="echo",
+                    replacement="old",
+                )
+            ],
+        ),
+        FaultPlan(
+            plan_id="equivalent",
+            rules=[
+                FaultRule(
+                    rule_id="same",
+                    component=FaultComponent.TOOL,
+                    action=FaultAction.TOOL_RESULT_STALE,
+                    tool_name="echo",
+                    replacement="hello",
+                )
+            ],
+        ),
+        FaultPlan(
+            plan_id="not-applicable",
+            rules=[
+                FaultRule(
+                    rule_id="missing",
+                    component=FaultComponent.TOOL,
+                    action=FaultAction.TOOL_RESULT_STALE,
+                    tool_name="missing",
+                    replacement="old",
+                )
+            ],
+        ),
+    ]
+    frozen_at = datetime(2026, 7, 30, tzinfo=timezone.utc)
+    digest = fault_experiment_manifest_digest(
+        "external-fault-pilot",
+        identity,
+        scenario,
+        plans,
+        frozen_at=frozen_at,
+    )
+    manifest = FaultExperimentManifest(
+        experiment_id="external-fault-pilot",
+        subject=identity,
+        scenario=scenario,
+        plans=plans,
+        frozen_at=frozen_at,
+        manifest_digest=digest,
+    )
+
+    report = SubjectFaultCampaignRunner(adapter_factory).run(manifest)
+
+    assert [item.status for item in report.campaign.outcomes] == [
+        MutationStatus.KILLED,
+        MutationStatus.EQUIVALENT,
+        MutationStatus.NOT_APPLICABLE,
+    ]
+    assert report.campaign.killed == 1
+    assert report.campaign.mutation_score == 1.0
+    assert report.campaign.baseline.trace.metadata["execution_mode"] == (
+        "subject_baseline"
+    )
+    assert report.campaign.outcomes[0].scenario_report.trace.metadata[
+        "fault_plan_id"
+    ] == "stale"
+    restored = type(report).model_validate_json(report.model_dump_json())
+    assert restored == report

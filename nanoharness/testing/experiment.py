@@ -8,11 +8,20 @@ import time
 from collections import Counter
 from collections.abc import Callable, Sequence
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Protocol
 
 from pydantic import BaseModel, Field, model_validator
 
 from nanoharness.testing.adapters.base import SubjectAdapter, SubjectIdentity
+from nanoharness.testing.faults import (
+    SUPPORTED_FAULT_SCHEMA_VERSIONS,
+    FaultCampaignOutcome,
+    FaultCampaignReport,
+    FaultPlan,
+    FaultReport,
+    FaultSession,
+)
+from nanoharness.testing.mutation import MutationStatus
 from nanoharness.testing.scenario import Scenario, ScenarioReport
 from nanoharness.testing.trace import normalize_trace_value
 
@@ -183,6 +192,271 @@ class ExperimentConfigurationError(ValueError):
     """Raised before execution when manifest and adapters disagree."""
 
 
+class FaultExperimentManifest(BaseModel):
+    """Frozen external subject, Scenario, and executable fault plans."""
+
+    schema_version: int = Field(default=EXPERIMENT_SCHEMA_VERSION, ge=1)
+    experiment_id: str = Field(min_length=1)
+    subject: SubjectIdentity
+    scenario: Scenario
+    plans: List[FaultPlan] = Field(min_length=1)
+    frozen_at: datetime
+    manifest_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_manifest(self):
+        if self.frozen_at.utcoffset() is None:
+            raise ValueError("Fault experiment frozen_at requires a timezone offset")
+        plan_ids = [plan.plan_id for plan in self.plans]
+        if len(set(plan_ids)) != len(plan_ids):
+            raise ValueError("Fault experiment plan IDs must be unique")
+        unsupported = [
+            plan.plan_id
+            for plan in self.plans
+            if plan.schema_version not in SUPPORTED_FAULT_SCHEMA_VERSIONS
+        ]
+        if unsupported:
+            raise ValueError(f"Unsupported Fault Plan versions: {unsupported}")
+        self.metadata = normalize_trace_value(self.metadata)
+        expected = fault_experiment_manifest_digest(
+            self.experiment_id,
+            self.subject,
+            self.scenario,
+            self.plans,
+            frozen_at=self.frozen_at,
+            metadata=self.metadata,
+        )
+        if self.manifest_digest != expected:
+            raise ValueError("Fault experiment manifest_digest does not match contents")
+        return self
+
+    def assert_unchanged(self) -> None:
+        expected = fault_experiment_manifest_digest(
+            self.experiment_id,
+            self.subject,
+            self.scenario,
+            self.plans,
+            frozen_at=self.frozen_at,
+            metadata=self.metadata,
+        )
+        if self.manifest_digest != expected:
+            raise ExperimentConfigurationError(
+                f"Fault experiment {self.experiment_id!r} changed after freezing"
+            )
+
+
+class SubjectFaultExperimentReport(BaseModel):
+    """Frozen external fault Manifest and its complete Campaign evidence."""
+
+    schema_version: int = Field(default=EXPERIMENT_SCHEMA_VERSION, ge=1)
+    manifest: FaultExperimentManifest
+    started_at: datetime
+    finished_at: datetime
+    campaign: FaultCampaignReport
+
+    @model_validator(mode="after")
+    def validate_report(self):
+        if self.started_at.utcoffset() is None or self.finished_at.utcoffset() is None:
+            raise ValueError("Fault experiment timestamps require timezone offsets")
+        if self.finished_at < self.started_at:
+            raise ValueError("Fault experiment finish cannot precede start")
+        if self.campaign.scenario_id != self.manifest.scenario.scenario_id:
+            raise ValueError("Fault Campaign Scenario does not match Manifest")
+        expected_plan_ids = [plan.plan_id for plan in self.manifest.plans]
+        actual_plan_ids = [outcome.plan_id for outcome in self.campaign.outcomes]
+        if actual_plan_ids != expected_plan_ids:
+            raise ValueError("Fault Campaign outcomes do not match Manifest plan order")
+        expected_subject = self.manifest.subject.model_dump(mode="json")
+        baseline = self.campaign.baseline
+        if baseline.trace.metadata.get("subject") != expected_subject:
+            raise ValueError("Fault Campaign baseline subject provenance mismatch")
+        if baseline.trace.metadata.get("execution_mode") != "subject_baseline":
+            raise ValueError("Fault Campaign baseline execution mode is missing")
+        for outcome in self.campaign.outcomes:
+            if outcome.status in {
+                MutationStatus.KILLED,
+                MutationStatus.SURVIVED,
+                MutationStatus.NOT_APPLICABLE,
+                MutationStatus.EQUIVALENT,
+            }:
+                if outcome.scenario_report is None or outcome.fault_report is None:
+                    raise ValueError(
+                        f"Fault outcome {outcome.plan_id!r} lacks execution evidence"
+                    )
+                trace = outcome.scenario_report.trace
+                if trace.metadata.get("subject") != expected_subject:
+                    raise ValueError(
+                        f"Fault outcome {outcome.plan_id!r} subject mismatch"
+                    )
+                if trace.metadata.get("fault_plan_id") != outcome.plan_id:
+                    raise ValueError(
+                        f"Fault outcome {outcome.plan_id!r} Trace plan mismatch"
+                    )
+                if outcome.fault_report.plan_id != outcome.plan_id:
+                    raise ValueError(
+                        f"Fault outcome {outcome.plan_id!r} report plan mismatch"
+                    )
+        return self
+
+
+class SubjectFaultAdapterFactory(Protocol):
+    def __call__(self, session: Optional[FaultSession]) -> SubjectAdapter:
+        ...
+
+
+class SubjectFaultCampaignRunner:
+    """Execute a baseline and fresh external Adapter for every frozen Fault Plan."""
+
+    def __init__(
+        self,
+        adapter_factory: SubjectFaultAdapterFactory,
+        *,
+        wall_clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
+    ):
+        self._adapter_factory = adapter_factory
+        self._wall_clock = wall_clock
+
+    def run(
+        self,
+        manifest: FaultExperimentManifest,
+    ) -> SubjectFaultExperimentReport:
+        if manifest.schema_version != EXPERIMENT_SCHEMA_VERSION:
+            raise ExperimentConfigurationError(
+                f"Unsupported experiment schema version {manifest.schema_version}"
+            )
+        manifest.assert_unchanged()
+        started_at = self._wall_clock()
+        if started_at.utcoffset() is None:
+            raise ExperimentConfigurationError(
+                "Fault experiment wall clock must be timezone-aware"
+            )
+        try:
+            baseline_adapter = self._adapter_factory(None)
+        except Exception as exc:
+            raise ExperimentConfigurationError(
+                f"Could not create baseline Subject Adapter: {exc}"
+            ) from exc
+        self._validate_identity(baseline_adapter, manifest.subject)
+        baseline = ScenarioReport.model_validate(
+            baseline_adapter.run(manifest.scenario).model_dump()
+        )
+        self._validate_subject_report(
+            baseline_adapter,
+            manifest.scenario,
+            baseline,
+        )
+        baseline.trace.metadata["execution_mode"] = "subject_baseline"
+        outcomes = []
+        for plan in manifest.plans:
+            if not baseline.passed:
+                outcomes.append(
+                    FaultCampaignOutcome(
+                        plan_id=plan.plan_id,
+                        status=MutationStatus.BASELINE_FAILED,
+                        message="Baseline scenario failed; fault plan was not executed",
+                    )
+                )
+                continue
+            session = FaultSession(plan)
+            try:
+                adapter = self._adapter_factory(session)
+                self._validate_identity(adapter, manifest.subject)
+                scenario_report = ScenarioReport.model_validate(
+                    adapter.run(manifest.scenario).model_dump()
+                )
+                self._validate_subject_report(
+                    adapter,
+                    manifest.scenario,
+                    scenario_report,
+                )
+                scenario_report.trace.metadata["execution_mode"] = (
+                    "subject_fault_injected"
+                )
+                scenario_report.trace.metadata["fault_plan_id"] = plan.plan_id
+                fault_report = session.report()
+                status, message = _classify_subject_fault(
+                    scenario_report,
+                    fault_report,
+                )
+                outcomes.append(
+                    FaultCampaignOutcome(
+                        plan_id=plan.plan_id,
+                        status=status,
+                        message=message,
+                        scenario_report=scenario_report,
+                        fault_report=fault_report,
+                    )
+                )
+            except Exception as exc:
+                outcomes.append(
+                    FaultCampaignOutcome(
+                        plan_id=plan.plan_id,
+                        status=MutationStatus.ERROR,
+                        message=str(exc),
+                        error_type=type(exc).__name__,
+                    )
+                )
+        killed = sum(item.status is MutationStatus.KILLED for item in outcomes)
+        survived = sum(item.status is MutationStatus.SURVIVED for item in outcomes)
+        not_applicable = sum(
+            item.status is MutationStatus.NOT_APPLICABLE for item in outcomes
+        )
+        equivalent = sum(
+            item.status is MutationStatus.EQUIVALENT for item in outcomes
+        )
+        errors = sum(item.status is MutationStatus.ERROR for item in outcomes)
+        denominator = killed + survived
+        campaign = FaultCampaignReport(
+            scenario_id=manifest.scenario.scenario_id,
+            baseline=baseline,
+            outcomes=outcomes,
+            killed=killed,
+            survived=survived,
+            not_applicable=not_applicable,
+            equivalent=equivalent,
+            errors=errors,
+            mutation_score=killed / denominator if denominator else None,
+        )
+        finished_at = self._wall_clock()
+        if finished_at.utcoffset() is None or finished_at < started_at:
+            raise ExperimentConfigurationError(
+                "Fault experiment wall clock returned invalid finish time"
+            )
+        return SubjectFaultExperimentReport(
+            manifest=FaultExperimentManifest.model_validate(manifest.model_dump()),
+            started_at=started_at,
+            finished_at=finished_at,
+            campaign=campaign,
+        )
+
+    @staticmethod
+    def _validate_identity(
+        adapter: SubjectAdapter,
+        expected: SubjectIdentity,
+    ) -> None:
+        if adapter.identity != expected:
+            raise ExperimentConfigurationError(
+                f"Fault Adapter identity mismatch for {expected.subject_id!r}"
+            )
+
+    @staticmethod
+    def _validate_subject_report(
+        adapter: SubjectAdapter,
+        scenario: Scenario,
+        report: ScenarioReport,
+    ) -> None:
+        if report.scenario_id != scenario.scenario_id:
+            raise ExperimentConfigurationError(
+                "Fault Adapter returned a different Scenario identity"
+            )
+        expected_subject = adapter.identity.model_dump(mode="json")
+        if report.trace.metadata.get("subject") != expected_subject:
+            raise ExperimentConfigurationError(
+                "Fault Adapter Trace lacks matching subject provenance"
+            )
+
+
 class ExperimentRunner:
     """Run a frozen manifest serially and retain every raw Scenario report."""
 
@@ -330,6 +604,65 @@ def experiment_manifest_digest(
         separators=(",", ":"),
     ).encode("utf-8")
     return hashlib.sha256(canonical).hexdigest()
+
+
+def fault_experiment_manifest_digest(
+    experiment_id: str,
+    subject: SubjectIdentity,
+    scenario: Scenario,
+    plans: Sequence[FaultPlan],
+    *,
+    frozen_at: datetime,
+    metadata: Optional[Dict[str, Any]] = None,
+) -> str:
+    """Return the digest bound by an external executable-fault Manifest."""
+
+    payload = {
+        "schema_version": EXPERIMENT_SCHEMA_VERSION,
+        "experiment_id": experiment_id,
+        "subject": subject.model_dump(mode="json"),
+        "scenario": scenario.model_dump(mode="json"),
+        "plans": [plan.model_dump(mode="json") for plan in plans],
+        "frozen_at": frozen_at.isoformat(),
+        "metadata": normalize_trace_value(metadata or {}),
+    }
+    canonical = json.dumps(
+        payload,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest()
+
+
+def _classify_subject_fault(
+    report: ScenarioReport,
+    fault_report: FaultReport,
+):
+    if not fault_report.applications and report.execution_error is not None:
+        return (
+            MutationStatus.ERROR,
+            "Fault-injected execution failed before any rule applied",
+        )
+    if not fault_report.applications:
+        return (
+            MutationStatus.NOT_APPLICABLE,
+            "No configured fault rule matched during execution",
+        )
+    if not fault_report.effective_rule_ids:
+        return (
+            MutationStatus.EQUIVALENT,
+            "Fault rules matched but did not alter an observed value",
+        )
+    if report.passed:
+        return (
+            MutationStatus.SURVIVED,
+            "Effective executable faults survived all Oracles",
+        )
+    return (
+        MutationStatus.KILLED,
+        "At least one Oracle detected the executable faults",
+    )
 
 
 def _summaries(

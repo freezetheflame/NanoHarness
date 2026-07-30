@@ -37,6 +37,8 @@ from nanoharness.testing import (
     RecordingStateStore,
     RecordingToolRegistry,
     Scenario,
+    TraceRecorder,
+    TraceEventType,
 )
 
 
@@ -321,6 +323,76 @@ def test_duplicate_fault_is_reported_when_the_second_execution_fails():
         )
 
     assert session.report().effective_rule_ids == ["duplicate"]
+
+
+def test_recorder_aware_tool_fault_distinguishes_attempts_from_observation():
+    registry, calls = _registry_with_counter()
+    recorder = TraceRecorder()
+    session = FaultSession(
+        _plan(
+            _rule(
+                "duplicate",
+                FaultComponent.TOOL,
+                FaultAction.TOOL_CALL_DUPLICATE,
+                tool_name="echo",
+            ),
+            _rule(
+                "stale",
+                FaultComponent.TOOL,
+                FaultAction.TOOL_RESULT_STALE,
+                tool_name="echo",
+                replacement="old",
+            ),
+        )
+    )
+    tools = FaultInjectingToolRegistry(
+        registry,
+        session,
+        recorder=recorder,
+    )
+
+    result = tools.call("echo", {"text": "hello"})
+
+    assert result == "old"
+    assert calls == ["hello", "hello"]
+    events = recorder.snapshot().events
+    assert [event.event_type for event in events] == [
+        TraceEventType.TOOL_STARTED,
+        TraceEventType.TOOL_COMPLETED,
+        TraceEventType.TOOL_STARTED,
+        TraceEventType.TOOL_COMPLETED,
+        TraceEventType.TOOL_EXCHANGE,
+    ]
+    assert events[-1].payload["attempt_count"] == 2
+    assert events[-1].payload["result"] == "old"
+
+
+def test_recorder_aware_argument_drop_records_mutated_error_arguments():
+    registry, _ = _registry_with_counter()
+    recorder = TraceRecorder()
+    session = FaultSession(
+        _plan(
+            _rule(
+                "drop",
+                FaultComponent.TOOL,
+                FaultAction.TOOL_ARGUMENT_DROP,
+                tool_name="echo",
+                argument="text",
+            )
+        )
+    )
+
+    with pytest.raises(TypeError):
+        FaultInjectingToolRegistry(
+            registry,
+            session,
+            recorder=recorder,
+        ).call("echo", {"text": "hello"})
+
+    events = recorder.snapshot().events
+    assert events[-1].event_type is TraceEventType.TOOL_ERROR
+    assert events[-1].payload["arguments"] == {}
+    assert events[-1].payload["attempt_count"] == 1
 
 
 def test_ineffective_replacement_is_preserved_as_evidence():

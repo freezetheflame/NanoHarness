@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import threading
+import time
 from collections.abc import Callable, Sequence
 from enum import Enum
 from typing import Any, Dict, List, Optional, Set
@@ -25,6 +26,7 @@ from nanoharness.testing.runner import ScenarioRunner
 from nanoharness.testing.runtime import PermissionProtocol
 from nanoharness.testing.scenario import Scenario, ScenarioReport
 from nanoharness.testing.trace import (
+    TraceEventType,
     TraceRecorder,
     normalize_trace_value,
     redact_sensitive_fields,
@@ -234,6 +236,7 @@ class FaultCampaignOutcome(BaseModel):
     message: str
     scenario_report: Optional[ScenarioReport] = None
     fault_report: Optional[FaultReport] = None
+    error_type: Optional[str] = None
 
 
 class FaultCampaignReport(BaseModel):
@@ -249,6 +252,42 @@ class FaultCampaignReport(BaseModel):
     equivalent: int = 0
     errors: int = 0
     mutation_score: Optional[float] = None
+
+    @model_validator(mode="after")
+    def validate_accounting(self):
+        if self.baseline.scenario_id != self.scenario_id:
+            raise ValueError("Fault Campaign baseline Scenario does not match")
+        plan_ids = [outcome.plan_id for outcome in self.outcomes]
+        if len(set(plan_ids)) != len(plan_ids):
+            raise ValueError("Fault Campaign outcome plan IDs must be unique")
+        expected = {
+            "killed": sum(
+                item.status is MutationStatus.KILLED for item in self.outcomes
+            ),
+            "survived": sum(
+                item.status is MutationStatus.SURVIVED for item in self.outcomes
+            ),
+            "not_applicable": sum(
+                item.status is MutationStatus.NOT_APPLICABLE
+                for item in self.outcomes
+            ),
+            "equivalent": sum(
+                item.status is MutationStatus.EQUIVALENT for item in self.outcomes
+            ),
+            "errors": sum(
+                item.status is MutationStatus.ERROR for item in self.outcomes
+            ),
+        }
+        for field_name, value in expected.items():
+            if getattr(self, field_name) != value:
+                raise ValueError(
+                    f"Fault Campaign {field_name} does not match outcomes"
+                )
+        denominator = expected["killed"] + expected["survived"]
+        score = expected["killed"] / denominator if denominator else None
+        if self.mutation_score != score:
+            raise ValueError("Fault Campaign mutation_score does not match outcomes")
+        return self
 
 
 class FaultCampaignConfigurationError(ValueError):
@@ -449,12 +488,27 @@ class FaultInjectingLLM:
 class FaultInjectingToolRegistry(BaseToolRegistry):
     """Tool decorator that injects argument, result, duplication, and errors."""
 
-    def __init__(self, delegate: BaseToolRegistry, session: FaultSession):
+    def __init__(
+        self,
+        delegate: BaseToolRegistry,
+        session: FaultSession,
+        *,
+        recorder: Optional[TraceRecorder] = None,
+        clock: Callable[[], float] = time.perf_counter,
+    ):
         self._delegate = delegate
         self.session = session
+        self._recorder = recorder
+        self._clock = clock
 
     def get_tool_schemas(self) -> List[Dict]:
-        return self._delegate.get_tool_schemas()
+        schemas = self._delegate.get_tool_schemas()
+        if self._recorder is not None:
+            self._recorder.record(
+                TraceEventType.TOOL_SCHEMAS,
+                {"schemas": schemas},
+            )
+        return schemas
 
     def call(self, name: str, args: Dict) -> Any:
         boundary_index = self.session.next_boundary(FaultComponent.TOOL)
@@ -498,15 +552,25 @@ class FaultInjectingToolRegistry(BaseToolRegistry):
             {FaultAction.TOOL_CALL_DUPLICATE},
             tool_name=name,
         )
-        result = self._delegate.call(name, mutated_args)
+        attempt_count = 1
+        result = self._call_delegate(
+            name,
+            mutated_args,
+            attempt_index=0,
+        )
         for rule in duplicate_rules:
             self.session.record(
                 rule,
                 boundary_index,
                 tool_name=name,
-                details={"executions_attempted": 2},
+                details={"duplicate_attempt_number": attempt_count + 1},
             )
-            result = self._delegate.call(name, copy.deepcopy(mutated_args))
+            result = self._call_delegate(
+                name,
+                copy.deepcopy(mutated_args),
+                attempt_index=attempt_count,
+            )
+            attempt_count += 1
 
         for rule in self.session.select(
             FaultComponent.TOOL,
@@ -526,11 +590,67 @@ class FaultInjectingToolRegistry(BaseToolRegistry):
                     "replacement_result": result,
                 },
             )
+        if self._recorder is not None:
+            self._recorder.record(
+                TraceEventType.TOOL_EXCHANGE,
+                {
+                    "name": name,
+                    "arguments": mutated_args,
+                    "result": result,
+                    "attempt_count": attempt_count,
+                },
+            )
         return result
 
     def reset(self) -> None:
         self._delegate.reset()
         self.session.reset()
+
+    def _call_delegate(
+        self,
+        name: str,
+        arguments: Dict,
+        *,
+        attempt_index: int,
+    ) -> Any:
+        if self._recorder is None:
+            return self._delegate.call(name, arguments)
+        started_at = self._clock()
+        self._recorder.record(
+            TraceEventType.TOOL_STARTED,
+            {
+                "name": name,
+                "arguments": arguments,
+                "attempt_index": attempt_index,
+            },
+        )
+        try:
+            result = self._delegate.call(name, arguments)
+        except Exception as exc:
+            self._recorder.record(
+                TraceEventType.TOOL_ERROR,
+                {
+                    "name": name,
+                    "arguments": arguments,
+                    "attempt_index": attempt_index,
+                    "attempt_count": attempt_index + 1,
+                    "error_type": type(exc).__name__,
+                    "error_message": str(exc),
+                    "duration_ms": (self._clock() - started_at) * 1000,
+                },
+            )
+            raise
+        self._recorder.record(
+            TraceEventType.TOOL_COMPLETED,
+            {
+                "name": name,
+                "arguments": arguments,
+                "result": result,
+                "attempt_index": attempt_index,
+                "duration_ms": (self._clock() - started_at) * 1000,
+            },
+        )
+        return result
 
 
 class FaultInjectingContextManager(BaseContextManager):
