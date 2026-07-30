@@ -174,6 +174,31 @@ Trace payloads are normalized into versioned NanoHarness models. Common
 secret-bearing fields are redacted by default; applications can inject a
 stricter redactor for secrets embedded in free-form text.
 
+Model and tool boundaries can be recorded and replayed deterministically:
+
+```python
+from nanoharness.testing import (
+    RecordingLLM,
+    RecordingToolRegistry,
+    ReplayLLM,
+    ReplaySession,
+    ReplayToolRegistry,
+)
+
+# Record a live run.
+recording_llm = RecordingLLM(live_llm, recorder)
+recording_tools = RecordingToolRegistry(live_tools, recorder)
+
+# Replay it without calling either live dependency.
+session = ReplaySession(recorder.snapshot())
+replay_llm = ReplayLLM(session)
+replay_tools = ReplayToolRegistry(session)
+```
+
+Sharing one `ReplaySession` checks the global model/tool interaction order.
+Strict mode also checks messages, schemas, tool names, and arguments. Recorded
+dependency failures are reproduced as structured `RecordedExecutionError`s.
+
 ---
 
 ## Tools

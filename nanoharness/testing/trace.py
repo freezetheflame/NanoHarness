@@ -42,6 +42,11 @@ class TraceEventType(str, Enum):
     TOOL_COMPLETED = "tool_completed"
     STATE_SAVED = "state_saved"
     HOOK_FAILED = "hook_failed"
+    MODEL_EXCHANGE = "model_exchange"
+    MODEL_ERROR = "model_error"
+    TOOL_SCHEMAS = "tool_schemas"
+    TOOL_EXCHANGE = "tool_exchange"
+    TOOL_ERROR = "tool_error"
     CUSTOM = "custom"
 
 
@@ -68,7 +73,7 @@ class AgentTrace(BaseModel):
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
 
-def _normalize(value: Any) -> Any:
+def normalize_trace_value(value: Any) -> Any:
     """Convert runtime objects into JSON-compatible NanoHarness values."""
 
     if isinstance(value, BaseModel):
@@ -76,11 +81,11 @@ def _normalize(value: Any) -> Any:
     if isinstance(value, Enum):
         return value.value
     if dataclasses.is_dataclass(value) and not isinstance(value, type):
-        return _normalize(dataclasses.asdict(value))
+        return normalize_trace_value(dataclasses.asdict(value))
     if isinstance(value, Mapping):
-        return {str(key): _normalize(item) for key, item in value.items()}
+        return {str(key): normalize_trace_value(item) for key, item in value.items()}
     if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
-        return [_normalize(item) for item in value]
+        return [normalize_trace_value(item) for item in value]
     if value is None or isinstance(value, (str, int, float, bool)):
         return value
     return repr(value)
@@ -234,4 +239,4 @@ class TraceRecorder:
             self._events = []
 
     def _prepare(self, value: Any) -> Any:
-        return self._redactor(_normalize(value))
+        return self._redactor(normalize_trace_value(value))

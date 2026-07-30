@@ -172,6 +172,31 @@ trace_json = recorder.snapshot().model_dump_json(indent=2)
 Trace Payload 会被转换为带版本的 NanoHarness 模型。常见的密钥字段默认脱敏；
 如果自由文本中也可能包含密钥，应用可以注入更严格的 Redactor。
 
+模型和工具边界支持确定性录制与重放：
+
+```python
+from nanoharness.testing import (
+    RecordingLLM,
+    RecordingToolRegistry,
+    ReplayLLM,
+    ReplaySession,
+    ReplayToolRegistry,
+)
+
+# 录制一次真实运行。
+recording_llm = RecordingLLM(live_llm, recorder)
+recording_tools = RecordingToolRegistry(live_tools, recorder)
+
+# 不调用真实依赖，重放同一次运行。
+session = ReplaySession(recorder.snapshot())
+replay_llm = ReplayLLM(session)
+replay_tools = ReplayToolRegistry(session)
+```
+
+模型与工具共用一个 `ReplaySession` 时会检查全局交互顺序；严格模式还会检查
+消息、Schema、工具名和参数。录制时发生的依赖异常会被转换为结构化的
+`RecordedExecutionError` 确定性复现。
+
 ---
 
 ## 工具
