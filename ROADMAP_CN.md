@@ -1,6 +1,6 @@
 # NanoHarness 路线图
 
-中文 | [English](ROADMAP.md)
+中文 | [English](ROADMAP.md) | [Agent 测试](AGENT_TESTING_CN.md)
 
 NanoHarness 以问题驱动的组件演进，而不是简单堆积功能。内核保持精简并定义
 稳定契约；集成层负责把这些契约适配到外部开源项目。
@@ -29,6 +29,7 @@ NanoHarness 以问题驱动的组件演进，而不是简单堆积功能。内�
 | 长期记忆与单一实现耦合 | `MemoryProvider` + `MemoryPolicy` | 可替换的存储与召回策略 | Mem0、Qdrant、Chroma、自定义存储 |
 | 模型 API 需要重复编写胶水代码 | `LLMProvider` | 统一模型响应和能力描述 | LiteLLM、OpenAI、Anthropic |
 | 生产任务难以检查和分析 | `TelemetryProvider` | Trace、指标、Token 和成本 | OpenTelemetry、LangFuse |
+| Agent 故障难以复现且测试充分性未知 | `Scenario`、`TestOracle`、`ReplayProvider`、`CoverageCollector` | 可复现故障与可衡量的测试质量 | pytest、Hypothesis、Harbor、Inspect AI |
 
 ## 第一阶段——正确性与契约
 
@@ -94,6 +95,8 @@ Mem0 可以实现 Provider 契约，同时应用仍然可以替换召回和保�
 - 定义明确的沙箱、密钥、网络、权限和审计契约，而不仅依赖应用约定。
 - 增加确定性 Trace Replay，以及针对模型、工具、状态和 Hook 失败的故障
   注入测试。
+- 建立横跨各阶段的 [Agent 测试](AGENT_TESTING_CN.md) 主线，覆盖场景、
+  测试 Oracle、行为覆盖率、变异测试、差分执行和失败样例缩减。
 - 构建自动化 ETCSLV 完备度矩阵。
 - 发布权限策略、沙箱、密钥和 Prompt Injection 边界的生产指南。
 

@@ -1,6 +1,6 @@
 # NanoHarness Roadmap
 
-[中文](ROADMAP_CN.md) | English
+[中文](ROADMAP_CN.md) | English | [Agent Testing](AGENT_TESTING.md)
 
 NanoHarness evolves through problem-driven components rather than feature
 accumulation. The kernel stays small and defines stable contracts; integrations
@@ -34,6 +34,7 @@ adapt those contracts to external projects.
 | Long-term memory is coupled to one implementation | `MemoryProvider` + `MemoryPolicy` | Replaceable storage and recall strategy | Mem0, Qdrant, Chroma, custom stores |
 | Model APIs require application-specific glue | `LLMProvider` | Normalized model responses and capabilities | LiteLLM, OpenAI, Anthropic |
 | Production runs are difficult to inspect | `TelemetryProvider` | Traces, metrics, token usage, and cost | OpenTelemetry, LangFuse |
+| Agent failures are flaky and test adequacy is unknown | `Scenario`, `TestOracle`, `ReplayProvider`, `CoverageCollector` | Reproducible failures and measurable test quality | pytest, Hypothesis, Harbor, Inspect AI |
 
 ## Phase 1 — Correctness and contracts
 
@@ -116,6 +117,9 @@ Goal: make runs inspectable, measurable, and safe to operate at scale.
   instead of relying only on application conventions.
 - Add deterministic trace replay and fault-injection tests for model, tool,
   state, and hook failures.
+- Establish the cross-cutting [Agent Testing](AGENT_TESTING.md) track for
+  scenarios, test oracles, behavioral coverage, mutation testing, differential
+  execution, and failure reduction.
 - Build an automated ETCSLV completeness matrix.
 - Publish production guidance for permission policy, sandboxing, secrets, and
   prompt-injection boundaries.
