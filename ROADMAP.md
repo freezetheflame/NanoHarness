@@ -42,9 +42,15 @@ expanding its feature surface.
 
 - Make goal evaluation the authoritative success result and distinguish
   `terminated`, `achieved`, `failed`, and `cancelled`.
+- Define canonical `RunResult`, `RunStatus`, and `StopReason` models, including
+  explicit max-step, budget, error, evaluator, and user-cancellation outcomes.
 - Introduce `TaskContext` for query, run ID, metadata, and task-scoped signals.
+- Define a vendor-neutral `ToolSpec` with correct schema generation for nested
+  types and mandatory argument validation before execution.
 - Introduce `ToolExecution` so every tool call has its own result, error, and
   timing information.
+- Guarantee paired lifecycle events and component cleanup even when model,
+  state, evaluator, or hook execution fails.
 - Define explicit new-run and continuation semantics to prevent context and
   trajectory leakage between tasks.
 - Publish contract tests for evaluator, context, state, and tool components.
@@ -59,8 +65,15 @@ remain replaceable.
 - Introduce `AgentSession` as the serializable state of a run.
 - Upgrade state storage to checkpoint and restore context, trajectory, current
   step, and component state.
+- Add versioned checkpoint schemas and documented migration behavior.
 - Provide reference JSON and SQLite checkpoint stores, followed by a Redis
   adapter.
+- Introduce execution budgets for steps, duration, tokens, cost, tool calls,
+  and child-agent concurrency.
+- Classify tool side effects and support call IDs, idempotency keys, and replay
+  protection during recovery.
+- Define resource ownership, cleanup, and concurrency guarantees for shared and
+  session-scoped components.
 - Add asynchronous execution and streaming without changing synchronous
   component contracts unnecessarily.
 
@@ -77,6 +90,8 @@ single project.
   NanoHarness models.
 - Add optional extras such as `nanoharness[mem0]`, `nanoharness[litellm]`, and
   `nanoharness[redis]`.
+- Publish compatibility, semantic-versioning, and deprecation rules for core
+  protocols, serialized models, and adapters.
 
 The memory boundary intentionally separates mechanism from policy:
 
@@ -97,6 +112,10 @@ Goal: make runs inspectable, measurable, and safe to operate at scale.
 - Report token usage, latency, retries, tool failures, and estimated cost.
 - Add distributed and multi-agent orchestration after session and checkpoint
   semantics are stable.
+- Define explicit sandbox, secret, network, permission, and audit contracts
+  instead of relying only on application conventions.
+- Add deterministic trace replay and fault-injection tests for model, tool,
+  state, and hook failures.
 - Build an automated ETCSLV completeness matrix.
 - Publish production guidance for permission policy, sandboxing, secrets, and
   prompt-injection boundaries.

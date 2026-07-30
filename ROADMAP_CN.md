@@ -36,8 +36,13 @@ NanoHarness 以问题驱动的组件演进，而不是简单堆积功能。内�
 
 - 以目标评估作为权威成功结果，并区分 `terminated`、`achieved`、`failed`
   和 `cancelled`。
+- 定义统一的 `RunResult`、`RunStatus` 和 `StopReason`，明确区分步数耗尽、
+  预算耗尽、错误、评估器停止和用户取消。
 - 引入 `TaskContext`，承载 query、run ID、元数据和任务级信号。
+- 定义与厂商无关的 `ToolSpec`，正确生成嵌套类型 Schema，并在执行前强制
+  校验参数。
 - 引入 `ToolExecution`，让每次工具调用都有独立结果、错误和耗时信息。
+- 即使模型、状态、评估器或 Hook 失败，也保证生命周期事件成对执行和组件清理。
 - 定义新任务与继续任务的显式语义，防止上下文和轨迹跨任务泄漏。
 - 发布 Evaluator、Context、State 和 Tool 组件的契约测试。
 
@@ -49,7 +54,11 @@ NanoHarness 以问题驱动的组件演进，而不是简单堆积功能。内�
   取消和结果标准化。
 - 引入 `AgentSession` 作为可序列化的运行状态。
 - 将状态存储升级为 checkpoint，恢复上下文、轨迹、当前步骤和组件状态。
+- 增加带版本的 checkpoint Schema，并规定迁移行为。
 - 提供 JSON、SQLite checkpoint 参考实现，随后增加 Redis 适配器。
+- 引入步骤、时间、Token、成本、工具调用和子 Agent 并发预算。
+- 对工具副作用分类，并通过 call ID、幂等键和恢复期重放保护避免重复执行。
+- 定义共享组件和 Session 级组件的资源归属、清理及并发保证。
 - 增加异步执行和流式输出，同时尽量保持同步组件契约不变。
 
 ## 第三阶段——记忆与生态适配器
@@ -63,6 +72,7 @@ NanoHarness 以问题驱动的组件演进，而不是简单堆积功能。内�
 - 将 MCP 作为工具适配器，把 Schema 和结果转换为 NanoHarness 模型。
 - 提供 `nanoharness[mem0]`、`nanoharness[litellm]`、
   `nanoharness[redis]` 等可选依赖。
+- 发布核心协议、序列化模型和适配器的兼容性、语义化版本及弃用规则。
 
 记忆边界会明确区分机制与策略：
 
@@ -81,6 +91,9 @@ Mem0 可以实现 Provider 契约，同时应用仍然可以替换召回和保�
 - 增加 OpenTelemetry 和 LangFuse 适配器。
 - 报告 Token、耗时、重试、工具失败和预估成本。
 - 在 Session 与 checkpoint 语义稳定后增加分布式和多 Agent 编排。
+- 定义明确的沙箱、密钥、网络、权限和审计契约，而不仅依赖应用约定。
+- 增加确定性 Trace Replay，以及针对模型、工具、状态和 Hook 失败的故障
+  注入测试。
 - 构建自动化 ETCSLV 完备度矩阵。
 - 发布权限策略、沙箱、密钥和 Prompt Injection 边界的生产指南。
 
