@@ -51,6 +51,20 @@ Official sources consulted:
   tests pass. Formatting diff checks pass. Ruff was attempted but its package
   download stalled, so no Ruff result is claimed.
 
+## 2026-07-30 — Serializable scenarios and deterministic oracles
+
+- Added versioned `Scenario`, `OracleSpec`, `OracleVerdict`, and
+  `ScenarioReport` models.
+- Added deterministic built-in oracles for goal achievement, run/stop outcome,
+  lifecycle pairing, tool-call constraints, component errors, and expected
+  execution errors.
+- Added `ScenarioRunner`, which validates oracle configuration before execution,
+  creates a fresh engine through an injected factory, records lifecycle events,
+  and normalizes execution failures.
+- Added custom-oracle registration and warning-severity semantics.
+- Current verification after this increment: 117 core tests pass. The dedicated
+  pytest plugin named in the strategy is not yet implemented.
+
 ## AI assistance disclosure record
 
 Codex assisted with:

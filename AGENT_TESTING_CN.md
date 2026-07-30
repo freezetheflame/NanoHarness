@@ -116,7 +116,8 @@ TERMINATED_AS_SUCCESS     将模型停止误认为任务完成
 1. **已实现：**定义版本化 `TraceEvent` 模型和 `TraceRecorder`。
 2. **已实现：**增加模型与工具边界的确定性 Recording/Replay Adapter，并严格
    检查请求内容和跨组件调用顺序。
-3. 定义 `Scenario`、fixture、确定性 `TestOracle` 和 pytest 支持。
+3. **核心已实现：**定义可序列化 `Scenario`、确定性 `TestOracle` 和
+   `ScenarioRunner` 契约；专用 pytest fixture 与 marker 插件仍待实现。
 4. 为模型、工具、状态和 Hook 边界增加声明式故障注入。
 5. 发布第一版行为覆盖率报告。
 6. 实现首批变异算子和 Mutation Score。

@@ -103,10 +103,12 @@ Implemented evidence:
 - lifecycle `TraceRecorder` with redaction and thread-safe ordering;
 - strict recording/replay adapters for model and tool boundaries;
 - replay of recorded dependency failures without live side effects.
+- serializable scenarios, prevalidated deterministic oracles, and fresh-engine
+  scenario execution reports.
 
 Still required:
 
-- `Scenario` and deterministic `TestOracle` contracts;
+- the dedicated pytest fixture/marker plugin;
 - the real-defect corpus and mutation taxonomy protocol;
 - at least six implemented mutation operators;
 - `MutationRunner`, validity classification, and mutation score;

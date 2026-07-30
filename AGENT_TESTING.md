@@ -125,7 +125,9 @@ valid mutants. Equivalent and invalid mutants are reported separately.
 1. **Implemented:** define versioned `TraceEvent` models and a `TraceRecorder`.
 2. **Implemented:** add deterministic recording/replay adapters for LLM and
    tool boundaries, with strict request and cross-component order checking.
-3. Define `Scenario`, fixtures, deterministic `TestOracle`, and pytest support.
+3. **Core implemented:** define serializable `Scenario`, deterministic
+   `TestOracle`, and `ScenarioRunner` contracts. A dedicated pytest fixture and
+   marker plugin remains to be implemented.
 4. Add declarative fault injection for model, tool, state, and hook boundaries.
 5. Publish the first behavioral coverage report.
 6. Implement the initial mutation operators and mutation score.

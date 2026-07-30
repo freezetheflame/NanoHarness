@@ -199,6 +199,29 @@ Sharing one `ReplaySession` checks the global model/tool interaction order.
 Strict mode also checks messages, schemas, tool names, and arguments. Recorded
 dependency failures are reproduced as structured `RecordedExecutionError`s.
 
+Serializable scenarios compose deterministic oracles without adding policy to
+the engine:
+
+```python
+from nanoharness.testing import OracleKind, OracleSpec, Scenario, ScenarioRunner
+
+scenario = Scenario(
+    scenario_id="completes-once",
+    query="Complete the task",
+    oracles=[
+        OracleSpec(kind=OracleKind.GOAL_ACHIEVEMENT, parameters={"expected": True}),
+        OracleSpec(kind=OracleKind.LIFECYCLE),
+    ],
+)
+report = ScenarioRunner(engine_factory).run(scenario)
+report.raise_for_failure()
+```
+
+Built-in oracles cover goal achievement, run status, stop reason, lifecycle
+pairing, tool-call constraints, component failures, and expected execution
+errors. Oracle configuration is validated before an engine or live dependency
+is invoked.
+
 ---
 
 ## Tools

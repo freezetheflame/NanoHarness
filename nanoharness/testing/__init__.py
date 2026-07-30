@@ -23,6 +23,24 @@ from nanoharness.testing.replay import (
     UnconsumedReplayEventsError,
     UnsupportedTraceVersionError,
 )
+from nanoharness.testing.oracle import (
+    OracleConfigurationError,
+    OracleContext,
+    OracleEvaluator,
+)
+from nanoharness.testing.runner import ScenarioRunner
+from nanoharness.testing.scenario import (
+    SCENARIO_SCHEMA_VERSION,
+    ExecutionError,
+    OracleKind,
+    OracleSeverity,
+    OracleSpec,
+    OracleVerdict,
+    Scenario,
+    ScenarioAssertionError,
+    ScenarioReport,
+    UnsupportedScenarioVersionError,
+)
 
 __all__ = [
     "TRACE_SCHEMA_VERSION",
@@ -44,4 +62,18 @@ __all__ = [
     "ReplayToolRegistry",
     "UnconsumedReplayEventsError",
     "UnsupportedTraceVersionError",
+    "OracleConfigurationError",
+    "OracleContext",
+    "OracleEvaluator",
+    "ScenarioRunner",
+    "SCENARIO_SCHEMA_VERSION",
+    "ExecutionError",
+    "OracleKind",
+    "OracleSeverity",
+    "OracleSpec",
+    "OracleVerdict",
+    "Scenario",
+    "ScenarioAssertionError",
+    "ScenarioReport",
+    "UnsupportedScenarioVersionError",
 ]

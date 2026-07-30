@@ -88,10 +88,12 @@ CoverageCollector + MutationReport
 - 带脱敏和线程安全排序的生命周期 `TraceRecorder`；
 - 模型与工具边界的严格 Recording/Replay Adapter；
 - 不调用真实依赖即可复现已录制的依赖异常。
+- 可序列化 Scenario、执行前验证的确定性 Oracle，以及使用全新 Engine 的场景
+  执行报告。
 
 仍需完成：
 
-- `Scenario` 与确定性 `TestOracle` 契约；
+- 专用 pytest fixture/marker 插件；
 - 真实缺陷语料与变异分类的构建协议；
 - 至少六个 Mutation Operator；
 - `MutationRunner`、有效性分类与 Mutation Score；

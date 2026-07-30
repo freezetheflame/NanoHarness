@@ -197,6 +197,27 @@ replay_tools = ReplayToolRegistry(session)
 消息、Schema、工具名和参数。录制时发生的依赖异常会被转换为结构化的
 `RecordedExecutionError` 确定性复现。
 
+可序列化 Scenario 能组合确定性 Oracle，无需向 Engine 添加测试策略：
+
+```python
+from nanoharness.testing import OracleKind, OracleSpec, Scenario, ScenarioRunner
+
+scenario = Scenario(
+    scenario_id="completes-once",
+    query="完成任务",
+    oracles=[
+        OracleSpec(kind=OracleKind.GOAL_ACHIEVEMENT, parameters={"expected": True}),
+        OracleSpec(kind=OracleKind.LIFECYCLE),
+    ],
+)
+report = ScenarioRunner(engine_factory).run(scenario)
+report.raise_for_failure()
+```
+
+内置 Oracle 覆盖目标完成、运行状态、停止原因、生命周期配对、工具调用约束、
+组件故障和预期执行异常。所有 Oracle 配置都会在创建 Engine 或调用真实依赖前
+完成校验。
+
 ---
 
 ## 工具
