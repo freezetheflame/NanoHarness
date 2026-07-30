@@ -122,7 +122,7 @@ valid mutants. Equivalent and invalid mutants are reported separately.
 
 ## Delivery sequence
 
-1. Define versioned `TraceEvent` models and a `TraceRecorder`.
+1. **Implemented:** define versioned `TraceEvent` models and a `TraceRecorder`.
 2. Add deterministic `ReplayLLM` and `ReplayToolRegistry` implementations.
 3. Define `Scenario`, fixtures, deterministic `TestOracle`, and pytest support.
 4. Add declarative fault injection for model, tool, state, and hook boundaries.

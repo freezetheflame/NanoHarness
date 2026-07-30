@@ -92,13 +92,14 @@ nanoharness/
     state/               #   S: JsonStateStore
     hooks/               #   L: SimpleHookManager
     evaluator/           #   V: TraceEvaluator（含 should_stop + evaluate_success）
+  testing/               # Trace 记录与后续 Replay/测试组件
   utils/                 # get_logger, count_tokens
 configs/
   prompts.yaml           # Prompt 模板
   scripts/               # Shell 脚本工具（自动发现，27 个）
 examples/
   coding_agent/          # 完整 Coding Agent 参考（434 个测试）
-tests/                   # 80 个内核测试
+tests/                   # 内核契约测试
 ```
 
 ---
@@ -156,6 +157,20 @@ NanoEngine.run(query)
 `exhausted`），`RunResult.evaluation.achieved` 则是唯一权威的成功结论。
 因此 Agent 停止不再自动等同于完成用户目标。迁移期间仍保留
 `report["summary"]` 与 `report["trajectory"]` 的旧式访问方式。
+
+无需修改 Engine 即可采集生命周期 Trace：
+
+```python
+from nanoharness.testing import TraceRecorder
+
+recorder = TraceRecorder()
+recorder.attach(hooks)
+result = engine.run("完成任务")
+trace_json = recorder.snapshot().model_dump_json(indent=2)
+```
+
+Trace Payload 会被转换为带版本的 NanoHarness 模型。常见的密钥字段默认脱敏；
+如果自由文本中也可能包含密钥，应用可以注入更严格的 Redactor。
 
 ---
 

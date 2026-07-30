@@ -92,13 +92,14 @@ nanoharness/
     state/               #   S: JsonStateStore
     hooks/               #   L: SimpleHookManager
     evaluator/           #   V: TraceEvaluator (with should_stop + evaluate_success)
+  testing/               # Trace recording and future replay/testing components
   utils/                 # get_logger, count_tokens
 configs/
   prompts.yaml           # Prompt templates
   scripts/               # Shell-script tools (auto-discovered, 27 tools)
 examples/
   coding_agent/          # Full-featured coding agent reference (434 tests)
-tests/                   # 80 kernel tests
+tests/                   # Kernel contract tests
 ```
 
 ---
@@ -157,6 +158,21 @@ No memory, no prompt rendering, no permission logic inside the engine. All of th
 verdict. Stopping is therefore not automatically treated as completing the
 user's goal. Legacy `report["summary"]` and `report["trajectory"]` access is
 kept during migration.
+
+Lifecycle traces can be collected without changing the engine:
+
+```python
+from nanoharness.testing import TraceRecorder
+
+recorder = TraceRecorder()
+recorder.attach(hooks)
+result = engine.run("Complete the task")
+trace_json = recorder.snapshot().model_dump_json(indent=2)
+```
+
+Trace payloads are normalized into versioned NanoHarness models. Common
+secret-bearing fields are redacted by default; applications can inject a
+stricter redactor for secrets embedded in free-form text.
 
 ---
 
