@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import copy
+import time
 from collections.abc import Callable, Sequence
 from importlib import import_module, metadata
 from typing import Any, Optional, Protocol
@@ -25,6 +27,12 @@ from nanoharness.testing.benchmarks.base import (
     BenchmarkManifest,
     BenchmarkSourceIdentity,
     canonical_value_digest,
+)
+from nanoharness.testing.faults import (
+    FaultAction,
+    FaultComponent,
+    FaultSession,
+    InjectedFaultError,
 )
 from nanoharness.testing.scenario import (
     OracleKind,
@@ -56,6 +64,41 @@ class AgentDojoRuntimeFactory(Protocol):
         ...
 
 
+class AgentDojoFaultAdapterFactory:
+    """Create fresh scorer-bound Adapters for external Fault Campaign cells."""
+
+    def __init__(
+        self,
+        identity: SubjectIdentity,
+        benchmark_manifest: BenchmarkManifest,
+        pipeline_factory: AgentDojoPipelineFactory,
+        *,
+        max_attempts: int = 3,
+    ):
+        benchmark_manifest.assert_unchanged()
+        self._identity = SubjectIdentity.model_validate(identity.model_dump())
+        self._manifest = BenchmarkManifest.model_validate(
+            benchmark_manifest.model_dump()
+        )
+        self._pipeline_factory = pipeline_factory
+        self._max_attempts = max_attempts
+
+    def __call__(
+        self,
+        session: Optional[FaultSession],
+    ) -> "AgentDojoSubjectAdapter":
+        return AgentDojoSubjectAdapter.from_installed(
+            self._identity,
+            self._manifest,
+            self._pipeline_factory,
+            max_attempts=self._max_attempts,
+            fault_session=session,
+        )
+
+    def scenario_for(self, source_task_id: str) -> Scenario:
+        return self(None).scenario_for(source_task_id)
+
+
 class AgentDojoSubjectAdapter:
     """Execute converted user tasks with their original AgentDojo utility.
 
@@ -77,6 +120,7 @@ class AgentDojoSubjectAdapter:
         *,
         installed_source: Optional[BenchmarkSourceIdentity] = None,
         max_attempts: int = 3,
+        fault_session: Optional[FaultSession] = None,
     ):
         if identity.runtime.casefold() != "agentdojo":
             raise ValueError("AgentDojo subject identity runtime must be 'agentdojo'")
@@ -101,6 +145,7 @@ class AgentDojoSubjectAdapter:
         self._abort_error_type = abort_error_type
         self._text_extractor = text_extractor
         self._max_attempts = max_attempts
+        self._fault_session = fault_session
         self._records = {
             record.source_task_id: record for record in self._manifest.tasks
         }
@@ -118,6 +163,7 @@ class AgentDojoSubjectAdapter:
         pipeline_factory: AgentDojoPipelineFactory,
         *,
         max_attempts: int = 3,
+        fault_session: Optional[FaultSession] = None,
     ) -> "AgentDojoSubjectAdapter":
         try:
             installed_version = metadata.version(AGENTDOJO_DISTRIBUTION)
@@ -139,6 +185,11 @@ class AgentDojoSubjectAdapter:
 
         def runtime_factory(tools, recorder):
             class RecordingFunctionsRuntime(runtime_class):
+                def __init__(self, functions):
+                    super().__init__(functions)
+                    self._nanoharness_depth = 0
+                    self._nanoharness_deliveries = []
+
                 def run_function(
                     self,
                     env,
@@ -146,10 +197,153 @@ class AgentDojoSubjectAdapter:
                     kwargs,
                     raise_on_error=False,
                 ):
+                    outer_call = self._nanoharness_depth == 0
+                    self._nanoharness_depth += 1
+                    boundary_index = (
+                        fault_session.next_boundary(FaultComponent.TOOL)
+                        if fault_session is not None
+                        else None
+                    )
+                    if fault_session is not None:
+                        error_rules = fault_session.select(
+                            FaultComponent.TOOL,
+                            {FaultAction.RAISE_ERROR},
+                            tool_name=function,
+                        )
+                        if error_rules:
+                            rule = error_rules[0]
+                            fault_session.record(
+                                rule,
+                                boundary_index,
+                                tool_name=function,
+                            )
+                            for suppressed in error_rules[1:]:
+                                fault_session.record(
+                                    suppressed,
+                                    boundary_index,
+                                    tool_name=function,
+                                    effective=False,
+                                    details={"suppressed_by": rule.rule_id},
+                                )
+                            self._nanoharness_depth -= 1
+                            raise InjectedFaultError(rule.rule_id, rule.message)
+
+                    mutated_kwargs = copy.deepcopy(kwargs)
+                    if fault_session is not None:
+                        for rule in fault_session.select(
+                            FaultComponent.TOOL,
+                            {FaultAction.TOOL_ARGUMENT_DROP},
+                            tool_name=function,
+                        ):
+                            effective = rule.argument in mutated_kwargs
+                            if effective:
+                                del mutated_kwargs[str(rule.argument)]
+                            fault_session.record(
+                                rule,
+                                boundary_index,
+                                tool_name=function,
+                                effective=effective,
+                                details={"dropped_argument": rule.argument},
+                            )
+                        duplicate_rules = fault_session.select(
+                            FaultComponent.TOOL,
+                            {FaultAction.TOOL_CALL_DUPLICATE},
+                            tool_name=function,
+                        )
+                    else:
+                        duplicate_rules = []
+                    arguments = normalize_trace_value(mutated_kwargs)
+                    attempt_count = 0
+                    try:
+                        result, error = self._run_instrumented_attempt(
+                            recorder,
+                            env,
+                            function,
+                            mutated_kwargs,
+                            raise_on_error,
+                            attempt_index=attempt_count,
+                        )
+                        attempt_count += 1
+                        for rule in duplicate_rules:
+                            fault_session.record(
+                                rule,
+                                boundary_index,
+                                tool_name=function,
+                                details={
+                                    "duplicate_attempt_number": attempt_count + 1
+                                },
+                            )
+                            result, error = self._run_instrumented_attempt(
+                                recorder,
+                                env,
+                                function,
+                                copy.deepcopy(mutated_kwargs),
+                                raise_on_error,
+                                attempt_index=attempt_count,
+                            )
+                            attempt_count += 1
+                        if fault_session is not None:
+                            for rule in fault_session.select(
+                                FaultComponent.TOOL,
+                                {FaultAction.TOOL_RESULT_STALE},
+                                tool_name=function,
+                            ):
+                                original_result = result
+                                effective = normalize_trace_value(result) != rule.replacement
+                                result = copy.deepcopy(rule.replacement)
+                                fault_session.record(
+                                    rule,
+                                    boundary_index,
+                                    tool_name=function,
+                                    effective=effective,
+                                    details={
+                                        "original_result": original_result,
+                                        "replacement_result": result,
+                                    },
+                                )
+                    except Exception as exc:
+                        if outer_call:
+                            self._nanoharness_deliveries.append(
+                                {
+                                    "name": function,
+                                    "arguments": arguments,
+                                    "attempt_count": max(attempt_count, 1),
+                                    "error": str(exc),
+                                }
+                            )
+                        raise
+                    finally:
+                        self._nanoharness_depth -= 1
+                    if outer_call:
+                        self._nanoharness_deliveries.append(
+                            {
+                                "name": function,
+                                "arguments": arguments,
+                                "attempt_count": attempt_count,
+                                "error": error,
+                            }
+                        )
+                    return result, error
+
+                def _run_instrumented_attempt(
+                    self,
+                    recorder,
+                    env,
+                    function,
+                    kwargs,
+                    raise_on_error,
+                    *,
+                    attempt_index,
+                ):
                     arguments = normalize_trace_value(kwargs)
+                    started_at = time.perf_counter()
                     recorder.record(
                         TraceEventType.TOOL_STARTED,
-                        {"name": function, "arguments": arguments},
+                        {
+                            "name": function,
+                            "arguments": arguments,
+                            "attempt_index": attempt_index,
+                        },
                     )
                     try:
                         result, error = super().run_function(
@@ -164,9 +358,13 @@ class AgentDojoSubjectAdapter:
                             {
                                 "name": function,
                                 "arguments": arguments,
+                                "attempt_index": attempt_index,
+                                "attempt_count": attempt_index + 1,
                                 "error_type": type(exc).__name__,
-                                "message": str(exc),
-                                "attempt_count": 1,
+                                "error_message": str(exc),
+                                "duration_ms": (
+                                    time.perf_counter() - started_at
+                                ) * 1000,
                             },
                         )
                         raise
@@ -182,10 +380,20 @@ class AgentDojoSubjectAdapter:
                             "arguments": arguments,
                             "result": result,
                             "error": error,
-                            "attempt_count": 1,
+                            "attempt_index": attempt_index,
+                            "attempt_count": attempt_index + 1,
+                            "duration_ms": (
+                                time.perf_counter() - started_at
+                            ) * 1000,
                         },
                     )
                     return result, error
+
+                def pop_nanoharness_delivery(self, name):
+                    for index, delivery in enumerate(self._nanoharness_deliveries):
+                        if delivery["name"] == name:
+                            return self._nanoharness_deliveries.pop(index)
+                    return None
 
             return RecordingFunctionsRuntime(tools)
 
@@ -208,6 +416,7 @@ class AgentDojoSubjectAdapter:
             type_module.get_text_content_as_str,
             installed_source=installed_source,
             max_attempts=max_attempts,
+            fault_session=fault_session,
         )
 
     @property
@@ -288,6 +497,17 @@ class AgentDojoSubjectAdapter:
                 "benchmark": benchmark,
                 "benchmark_manifest_digest": self._manifest.manifest_digest,
                 "seed_controlled_sources": [],
+                "fault_capabilities": [
+                    "tool.raise_error",
+                    "tool.argument_drop",
+                    "tool.result_stale",
+                    "tool.call_duplicate",
+                ],
+                "fault_plan_id": (
+                    self._fault_session.plan.plan_id
+                    if self._fault_session is not None
+                    else None
+                ),
             }
         )
 
@@ -347,7 +567,12 @@ class AgentDojoSubjectAdapter:
             except self._abort_error_type as exc:
                 task_environment = exc.task_environment
                 messages = exc.messages
-            self._record_messages(messages, recorder, attempt=attempts)
+            self._record_messages(
+                messages,
+                recorder,
+                attempt=attempts,
+                runtime=runtime,
+            )
             model_output = self._model_output(messages)
             if model_output is not None:
                 break
@@ -422,6 +647,7 @@ class AgentDojoSubjectAdapter:
         recorder: TraceRecorder,
         *,
         attempt: int,
+        runtime: Any,
     ) -> None:
         prefix = []
         for index, message in enumerate(messages):
@@ -447,6 +673,17 @@ class AgentDojoSubjectAdapter:
                 content = message.get("content")
                 delivered = self._text_extractor(content) if content is not None else ""
                 error = message.get("error")
+                delivery_reader = getattr(
+                    runtime,
+                    "pop_nanoharness_delivery",
+                    None,
+                )
+                delivery = delivery_reader(name) if callable(delivery_reader) else None
+                if delivery is not None:
+                    arguments = delivery["arguments"]
+                    attempt_count = delivery["attempt_count"]
+                else:
+                    attempt_count = 1
                 payload = {
                     "adapter": "agentdojo",
                     "attempt": attempt,
@@ -455,7 +692,7 @@ class AgentDojoSubjectAdapter:
                     "arguments": arguments,
                     "result": delivered,
                     "error": error,
-                    "attempt_count": 1,
+                    "attempt_count": attempt_count,
                     "delivery_source": "agentdojo_message",
                 }
                 if error is None:

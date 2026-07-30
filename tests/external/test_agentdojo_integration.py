@@ -14,13 +14,22 @@ from nanoharness.testing import (  # noqa: E402
     AGENTDOJO_PACKAGE_VERSION,
     AGENTDOJO_REVISION,
     AgentDojoBenchmarkAdapter,
+    AgentDojoFaultAdapterFactory,
     AgentDojoSubjectAdapter,
     BenchmarkConfigurationError,
     BenchmarkManifest,
     ExperimentManifest,
     ExperimentReport,
+    FaultAction,
+    FaultComponent,
+    FaultExperimentManifest,
+    FaultPlan,
+    FaultRule,
+    MutationStatus,
+    SubjectFaultCampaignRunner,
     SubjectIdentity,
     TraceEventType,
+    fault_experiment_manifest_digest,
 )
 
 
@@ -189,3 +198,117 @@ def test_archived_agentdojo_scorer_bridge_preserves_original_utility_evidence():
     assert hashlib.sha256(report_raw).hexdigest() == (
         "6a2e9fe14941ae7cdd87a6e67f06db0428525469da612f6027897a05de2424ab"
     )
+
+
+def test_real_agentdojo_original_utility_classifies_native_tool_faults():
+    root = (
+        Path(__file__).parents[2]
+        / "research"
+        / "pilots"
+        / "agentdojo_offline_conversion"
+        / "raw"
+    )
+    benchmark = BenchmarkManifest.model_validate_json(
+        (root / "banking_manifest.json").read_text()
+    )
+    identity = SubjectIdentity(
+        subject_id="agentdojo-ground-truth-banking@0.1.35",
+        runtime="agentdojo",
+        version="0.1.35",
+        revision=benchmark.source.revision,
+        source_url=benchmark.source.source_url,
+        independently_developed=True,
+        metadata={"pipeline": "GroundTruthPipeline", "suite": "banking"},
+    )
+    factory = AgentDojoFaultAdapterFactory(
+        identity,
+        benchmark,
+        lambda scenario, task: GroundTruthPipeline(task),
+    )
+    plans = [
+        FaultPlan(
+            plan_id="drop-recurring",
+            rules=[
+                FaultRule(
+                    rule_id="drop-recurring-argument",
+                    component=FaultComponent.TOOL,
+                    action=FaultAction.TOOL_ARGUMENT_DROP,
+                    tool_name="schedule_transaction",
+                    argument="recurring",
+                )
+            ],
+        ),
+        FaultPlan(
+            plan_id="stale-transaction-query",
+            rules=[
+                FaultRule(
+                    rule_id="stale-transactions",
+                    component=FaultComponent.TOOL,
+                    action=FaultAction.TOOL_RESULT_STALE,
+                    tool_name="get_most_recent_transactions",
+                    replacement=[],
+                )
+            ],
+        ),
+        FaultPlan(
+            plan_id="duplicate-schedule",
+            rules=[
+                FaultRule(
+                    rule_id="duplicate-schedule-call",
+                    component=FaultComponent.TOOL,
+                    action=FaultAction.TOOL_CALL_DUPLICATE,
+                    tool_name="schedule_transaction",
+                )
+            ],
+        ),
+    ]
+    scenario = factory.scenario_for("user_task_6")
+    frozen_at = datetime(2026, 7, 30, 12, 0, tzinfo=timezone.utc)
+    experiment_id = "agentdojo-native-tool-fault-test"
+    digest = fault_experiment_manifest_digest(
+        experiment_id,
+        identity,
+        scenario,
+        plans,
+        frozen_at=frozen_at,
+    )
+    manifest = FaultExperimentManifest(
+        experiment_id=experiment_id,
+        subject=identity,
+        scenario=scenario,
+        plans=plans,
+        frozen_at=frozen_at,
+        manifest_digest=digest,
+    )
+
+    report = SubjectFaultCampaignRunner(factory).run(manifest)
+
+    assert report.campaign.baseline.passed is True
+    assert [outcome.status for outcome in report.campaign.outcomes] == [
+        MutationStatus.KILLED,
+        MutationStatus.SURVIVED,
+        MutationStatus.SURVIVED,
+    ]
+    assert report.campaign.killed == 1
+    assert report.campaign.survived == 2
+    assert report.campaign.mutation_score == pytest.approx(1 / 3)
+    assert all(
+        outcome.fault_report.effective_rule_ids
+        for outcome in report.campaign.outcomes
+    )
+    stale = report.campaign.outcomes[1].scenario_report
+    stale_exchange = next(
+        event
+        for event in stale.trace.events
+        if event.event_type is TraceEventType.TOOL_EXCHANGE
+        and event.payload.get("name") == "get_most_recent_transactions"
+    )
+    assert stale_exchange.payload["result"] == "[]"
+    duplicate = report.campaign.outcomes[2].scenario_report
+    duplicate_exchange = next(
+        event
+        for event in duplicate.trace.events
+        if event.event_type is TraceEventType.TOOL_EXCHANGE
+        and event.payload.get("name") == "schedule_transaction"
+    )
+    assert duplicate_exchange.payload["attempt_count"] == 2
