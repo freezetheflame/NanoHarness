@@ -131,6 +131,11 @@ Implemented evidence:
 - a frozen executable LangGraph Tool-Fault Pilot in which deterministic Oracles
   kill stale-result, duplicate-call, and required-argument-drop Mutants, with
   distinct underlying-attempt and delivered-Observation evidence.
+- a pinned `agentdojo==0.1.35` Benchmark converter with immutable package/commit
+  provenance, digest-bound task-selection manifests, pre-environment digests,
+  non-normative reference calls, and original scorer provenance; a four-task
+  real-package Pilot validates conversion while explicitly leaving Oracles
+  unbound.
 
 Still required:
 
@@ -140,7 +145,8 @@ Still required:
 - branch-aware replay or sandbox subjects for control-flow-changing faults;
 - validation of boundary faults on external runtimes and recovery scenarios;
 - frozen subject-specific coverage models and empirical experiment reporting;
-- paper-scale LangGraph tool/fault scenarios and an external Benchmark source;
+- paper-scale LangGraph tool/fault scenarios and scorer-bound external
+  Benchmark cells;
 - confirmatory manifests, raw data, and cluster-aware analysis scripts.
 
 ## Empirical design
@@ -174,6 +180,13 @@ the external Adapter. The second Pilot adds a deterministic tool and three
 executable faults, all killed by composed Oracles. Both remain handcrafted,
 small, model-free integration checks without a Benchmark dataset or held-out
 Mutants; they do not satisfy the paper's external-validity gate.
+
+The current `agentdojo==0.1.35` Pilot reads four real `v1.2.2` user tasks from
+Workspace and Banking and freezes their loss-aware Scenario conversions. It is
+an external Benchmark source and provenance check, but it does not execute an
+AgentDojo pipeline, invoke a live model, or bind the stateful utility scorer.
+Its reference calls are not exact-plan Oracles. It therefore closes the data
+ingestion gap, not the paper-scale external-validation gate.
 
 ### Defects and mutants
 

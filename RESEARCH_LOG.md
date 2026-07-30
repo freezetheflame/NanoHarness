@@ -204,6 +204,29 @@ Official sources consulted:
   installed LangGraph integrations and archived Artifact audits) and 36 targeted
   Coding Agent regression tests pass.
 
+## 2026-07-30 — Pinned AgentDojo Benchmark conversion pilot
+
+- Added a Benchmark-specific layer separate from Runtime `SubjectAdapter`s,
+  with immutable source provenance, explicit task selection, digest-bound
+  Manifests, pre-environment digests, reference calls, and scorer provenance.
+- Pinned `agentdojo==0.1.35`, Benchmark `v1.2.2`, and upstream Git revision
+  `a75aba7631d3ca5fb7ab938965c97ead2f9ff84b`.
+- Converted four real development tasks from Workspace and Banking. Frozen
+  Manifest digests are
+  `f092448d01872a1de988cd06e45bdc3338a809b3f54a45e68073f9f1d1dbd4d4`
+  and `848204a82685fb695a8bf05b83ce2d3e97844b112e77379d7908b5414785f1b7`.
+- The converter labels ground-truth calls as non-normative reference plans and
+  leaves Scenario Oracles explicitly unbound because AgentDojo utility scorers
+  require their native pre/post environments. This prevents conversion from
+  silently changing success semantics.
+- Claim limitation: the Pilot invokes no live model, executes no AgentDojo
+  pipeline, computes no utility/security or mutation score, and is not a
+  reproduction of AgentDojo results. It validates external data ingestion and
+  artifact integrity only; scorer-bound execution and held-out paper-scale
+  selection remain required.
+- Current verification after this increment: 230 non-AgentDojo tests and 2
+  real-package AgentDojo integration/artifact tests pass.
+
 ## AI assistance disclosure record
 
 Codex assisted with:

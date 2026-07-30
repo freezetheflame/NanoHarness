@@ -284,6 +284,19 @@ Echo Pilot 不是论文级证据。
 的单一 Observation。归档 Plumbing Run 杀死了三个 Mutant，但该手工样本不是论文
 Mutation Score。
 
+外部 Benchmark 接入与 Subject 执行保持分离。锁定的 AgentDojo Converter 会冻结
+Package/Commit Provenance、显式 Task ID、Environment Digest、Reference Call 与
+原始 Scorer Provenance：
+
+```bash
+uv pip install --python .venv/bin/python -e '.[agentdojo-research]'
+.venv/bin/python research/pilots/agentdojo_offline_conversion/run.py \
+  --output-dir /tmp/agentdojo-conversion
+```
+
+转换后的 Reference Call 不是规范性唯一答案，Oracle 也保持未绑定；将这些 Scenario
+用于实验前请先阅读 Pilot README 的主张边界。
+
 ---
 
 ## 工具

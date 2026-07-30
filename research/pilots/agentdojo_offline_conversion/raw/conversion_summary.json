@@ -1,0 +1,43 @@
+{
+  "artifact_kind": "offline_benchmark_conversion_pilot",
+  "benchmark_version": "v1.2.2",
+  "executes_agentdojo_runtime": false,
+  "frozen_at": "2026-07-30T08:00:00+00:00",
+  "live_model": false,
+  "mutation_experiment": false,
+  "reproduces_agentdojo_results": false,
+  "source": {
+    "benchmark_id": "agentdojo@pypi-0.1.35",
+    "distribution": "agentdojo",
+    "license": "MIT",
+    "metadata": {
+      "package_index": "PyPI",
+      "revision_kind": "git_commit"
+    },
+    "package_version": "0.1.35",
+    "revision": "a75aba7631d3ca5fb7ab938965c97ead2f9ff84b",
+    "source_url": "https://github.com/ethz-spylab/agentdojo"
+  },
+  "suites": {
+    "banking": {
+      "manifest_digest": "848204a82685fb695a8bf05b83ce2d3e97844b112e77379d7908b5414785f1b7",
+      "oracle_binding": "unbound",
+      "reference_tool_call_count": 3,
+      "task_count": 2,
+      "task_ids": [
+        "user_task_1",
+        "user_task_6"
+      ]
+    },
+    "workspace": {
+      "manifest_digest": "f092448d01872a1de988cd06e45bdc3338a809b3f54a45e68073f9f1d1dbd4d4",
+      "oracle_binding": "unbound",
+      "reference_tool_call_count": 2,
+      "task_count": 2,
+      "task_ids": [
+        "user_task_0",
+        "user_task_16"
+      ]
+    }
+  }
+}

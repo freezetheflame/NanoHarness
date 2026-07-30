@@ -39,6 +39,17 @@ At least one pinned real dependency must execute in CI or a separately recorded
 integration job. The current LangGraph pilot satisfies this plumbing check but
 is deliberately too small to count as paper-scale external validation.
 
+External Benchmark ingestion is distinct from subject execution. A frozen
+Benchmark Manifest must bind package version, immutable source Revision,
+Benchmark version, suite, explicit task IDs, conversion metadata, and the
+converted Scenarios. Reference plans remain non-normative unless the source
+Benchmark defines them as the unique success condition. If the original scorer
+depends on Runtime-specific pre/post environments, an offline conversion must
+retain scorer provenance and mark Oracle binding as absent; it cannot report
+task success until a Runtime bridge preserves those state semantics and invokes
+the original scorer. The AgentDojo conversion Pilot is such an ingestion check,
+not a result reproduction.
+
 Executable external Fault Campaigns use a separate digest-bound Manifest that
 includes the exact Fault Plans. A fresh Adapter/graph is constructed for the
 baseline and every Plan. For tools, underlying attempt events and the final

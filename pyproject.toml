@@ -25,6 +25,9 @@ dev = [
 research = [
     "langgraph==1.2.10",
 ]
+agentdojo-research = [
+    "agentdojo==0.1.35",
+]
 
 [tool.setuptools.packages.find]
 include = ["nanoharness*"]

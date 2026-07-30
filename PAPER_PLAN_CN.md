@@ -113,6 +113,10 @@ FaultInjecting Model / Tool / Context / State / Hook / Permission 边界
 - 冻结可执行 LangGraph Tool-Fault Pilot：确定性 Oracle 杀死 Stale-result、
   Duplicate-call 和 Required-argument-drop Mutant，并分别保留底层 Attempt 和交付
   Observation 证据。
+- 锁定 `agentdojo==0.1.35` 的 Benchmark Converter：保存不可变 Package/Commit
+  Provenance、Digest 绑定 Task Selection Manifest、Pre-environment Digest、非规范性
+  Reference Call 和原始 Scorer Provenance；四任务真实包 Pilot 验证转换，并显式保持
+  Oracle 未绑定。
 
 仍需完成：
 
@@ -122,7 +126,7 @@ FaultInjecting Model / Tool / Context / State / Hook / Permission 边界
 - 用于控制流变异的 branch-aware Replay 或 Sandbox 实验对象；
 - 在外部 Runtime 和 Recovery Scenario 上验证边界 Fault；
 - 实验对象专属冻结 Coverage Model 与实证实验报告；
-- 论文级 LangGraph Tool/Fault Scenario 和外部 Benchmark 来源；
+- 论文级 LangGraph Tool/Fault Scenario 和已绑定原始 Scorer 的外部 Benchmark Cell；
 - Confirmatory Manifest、原始数据和 Cluster-aware 分析脚本。
 
 ## 实验设计
@@ -151,6 +155,12 @@ Oracle。它直接衡量 Oracle 能否发现可观测数据损坏，同时排除
 第二个 Pilot 增加确定性 Tool 和三个可执行 Fault，并由组合 Oracle 全部杀死。
 两者仍是手工构造、小规模、无 Model 的 Integration Check，没有 Benchmark Dataset
 或留出 Mutant，尚未满足论文的外部有效性门槛。
+
+当前 `agentdojo==0.1.35` Pilot 从 Workspace 与 Banking 读取四个真实 `v1.2.2`
+User Task，并冻结保留语义边界的 Scenario 转换。它验证了外部 Benchmark 数据源与
+Provenance，但没有执行 AgentDojo Pipeline、调用 Live Model 或绑定其有状态 Utility
+Scorer；Reference Call 也不是 Exact-plan Oracle。因此它补齐的是数据接入缺口，而非
+论文级外部有效性门槛。
 
 ### 缺陷与 Mutant
 

@@ -31,6 +31,14 @@ Seed 是执行 Metadata，不是确定性证明。允许重复相同 Seed 来测
 必须在 CI 或单独记录的 Integration Job 中执行。当前 LangGraph Pilot 满足 Plumbing Check，
 但刻意保持小规模，不能当作论文级外部验证。
 
+外部 Benchmark 接入与 Subject 执行是两个不同阶段。冻结 Benchmark Manifest 必须绑定
+Package Version、不可变 Source Revision、Benchmark Version、Suite、显式 Task ID、转换
+Metadata 与转换后的 Scenario。除非源 Benchmark 将 Reference Plan 定义为唯一成功条件，
+否则它只能是非规范性参考。若原始 Scorer 依赖 Runtime-specific Pre/Post Environment，
+离线转换必须保留 Scorer Provenance 并标记 Oracle 未绑定；在 Runtime Bridge 保留这些
+State 语义并调用原始 Scorer 前，不得报告 Task Success。AgentDojo 转换 Pilot 属于此类
+数据接入检查，不是结果复现。
+
 可执行外部 Fault Campaign 使用独立 Digest-bound Manifest，其中包含完整 Fault Plan。
 Baseline 和每个 Plan 都创建全新 Adapter/Graph。对 Tool 而言，底层 Attempt Event 与
 最终交付 Observation 分离，避免 Argument Mutation、Duplicate Execution 或 Stale Result

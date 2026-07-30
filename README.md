@@ -297,6 +297,19 @@ duplicate underlying executions distinct from the single Observation delivered
 to graph state. All three are killed in the archived plumbing run, but the
 handcrafted sample is not a paper Mutation Score.
 
+External Benchmark ingestion is kept separate from subject execution. The
+pinned AgentDojo converter freezes package/commit provenance, explicit task
+IDs, environment digests, reference calls, and original scorer provenance:
+
+```bash
+uv pip install --python .venv/bin/python -e '.[agentdojo-research]'
+.venv/bin/python research/pilots/agentdojo_offline_conversion/run.py \
+  --output-dir /tmp/agentdojo-conversion
+```
+
+Converted reference calls are non-normative and their Oracles remain unbound;
+see the Pilot README before using these Scenarios in an experiment.
+
 ---
 
 ## Tools
