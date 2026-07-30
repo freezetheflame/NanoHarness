@@ -2,12 +2,14 @@
 
 from nanoharness.testing.trace import (
     TRACE_SCHEMA_VERSION,
+    SUPPORTED_TRACE_SCHEMA_VERSIONS,
     AgentTrace,
     TraceEvent,
     TraceEventType,
     TraceRecorder,
     normalize_trace_value,
     redact_sensitive_fields,
+    upgrade_trace,
 )
 from nanoharness.testing.replay import (
     InvalidTraceError,
@@ -60,6 +62,7 @@ from nanoharness.testing.mutation import (
 )
 from nanoharness.testing.faults import (
     FAULT_SCHEMA_VERSION,
+    SUPPORTED_FAULT_SCHEMA_VERSIONS,
     FaultAction,
     FaultApplication,
     FaultCampaignConfigurationError,
@@ -69,6 +72,10 @@ from nanoharness.testing.faults import (
     FaultComponent,
     FaultEngineFactory,
     FaultInjectingLLM,
+    FaultInjectingContextManager,
+    FaultInjectingHookManager,
+    FaultInjectingPermissionManager,
+    FaultInjectingStateStore,
     FaultInjectingToolRegistry,
     FaultPlan,
     FaultReport,
@@ -94,6 +101,7 @@ from nanoharness.testing.defects import (
 )
 from nanoharness.testing.coverage import (
     COVERAGE_SCHEMA_VERSION,
+    SUPPORTED_COVERAGE_SCHEMA_VERSIONS,
     ArgumentMatcher,
     CoverageCollector,
     CoverageConfigurationError,
@@ -109,15 +117,24 @@ from nanoharness.testing.coverage import (
     CoverageTargetResult,
     coverage_target_digest,
 )
+from nanoharness.testing.runtime import (
+    PermissionProtocol,
+    RecordingContextManager,
+    RecordingHookManager,
+    RecordingPermissionManager,
+    RecordingStateStore,
+)
 
 __all__ = [
     "TRACE_SCHEMA_VERSION",
+    "SUPPORTED_TRACE_SCHEMA_VERSIONS",
     "AgentTrace",
     "TraceEvent",
     "TraceEventType",
     "TraceRecorder",
     "normalize_trace_value",
     "redact_sensitive_fields",
+    "upgrade_trace",
     "RecordedExecutionError",
     "InvalidTraceError",
     "RecordingLLM",
@@ -160,6 +177,7 @@ __all__ = [
     "TerminatedAsSuccessOperator",
     "ToolArgumentDropOperator",
     "FAULT_SCHEMA_VERSION",
+    "SUPPORTED_FAULT_SCHEMA_VERSIONS",
     "FaultAction",
     "FaultApplication",
     "FaultCampaignConfigurationError",
@@ -169,6 +187,10 @@ __all__ = [
     "FaultComponent",
     "FaultEngineFactory",
     "FaultInjectingLLM",
+    "FaultInjectingContextManager",
+    "FaultInjectingHookManager",
+    "FaultInjectingPermissionManager",
+    "FaultInjectingStateStore",
     "FaultInjectingToolRegistry",
     "FaultPlan",
     "FaultReport",
@@ -190,6 +212,7 @@ __all__ = [
     "DefectStatus",
     "EvidenceKind",
     "COVERAGE_SCHEMA_VERSION",
+    "SUPPORTED_COVERAGE_SCHEMA_VERSIONS",
     "ArgumentMatcher",
     "CoverageCollector",
     "CoverageConfigurationError",
@@ -204,4 +227,9 @@ __all__ = [
     "CoverageTarget",
     "CoverageTargetResult",
     "coverage_target_digest",
+    "PermissionProtocol",
+    "RecordingContextManager",
+    "RecordingHookManager",
+    "RecordingPermissionManager",
+    "RecordingStateStore",
 ]

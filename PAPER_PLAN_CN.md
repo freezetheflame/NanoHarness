@@ -82,7 +82,7 @@ CoverageCollector + MutationReport
 
 FaultCampaignRunner ---- 版本化 FaultPlan / FaultSession
        |
-FaultInjectingLLM / FaultInjectingToolRegistry
+FaultInjecting Model / Tool / Context / State / Hook / Permission 边界
        |
 全新的确定性 Fixture 或 Sandbox 执行
 ```
@@ -99,7 +99,10 @@ FaultInjectingLLM / FaultInjectingToolRegistry
 - 包含七个初始算子、显式结果分类和正确 Mutation Score 分母的 Trace-level
   Mutation Campaign。
 - 具有确定性 occurrence 匹配、全新 Engine 隔离、运行时应用证据和
-  Oracle killed/survived 分类的可执行 Model/Tool Fault Campaign。
+  Oracle killed/survived 分类的可执行 Model、Tool、Context、State、Hook
+  和 Permission Fault Campaign。
+- Context Message/Snapshot、State Save/Load、Hook Stage 和 Permission Decision
+  的统一记录，以及 State 与 Permission-enforcement Oracle。
 - 版本化真实缺陷语料 Schema、证据与裁决约束、Derivation/留出 Validation
   隔离、一致性统计、Readiness Gate、分析 CLI 和显式未验证的 Seed Candidate。
 - 显式 Universe 的行为覆盖模型，包含预声明 Target、Tool Argument 等价类、
@@ -110,8 +113,8 @@ FaultInjectingLLM / FaultInjectingToolRegistry
 - 专用 pytest fixture/marker 插件；
 - 系统缺陷检索、独立人类 Coding 与语料冻结；
 - 对初始 Mutation Operator 的真实缺陷验证；
-- Context、State、Permission 和 Hook 边界的可执行注入；
 - 用于控制流变异的 branch-aware Replay 或 Sandbox 实验对象；
+- 在外部 Runtime 和 Recovery Scenario 上验证边界 Fault；
 - 实验对象专属冻结 Coverage Model 与实证实验报告；
 - NanoHarness 之外的 Adapter 或实验对象。
 
@@ -122,8 +125,9 @@ FaultInjectingLLM / FaultInjectingToolRegistry
 已实现的第一层修改脱离真实依赖的 Report 与统一 Trace，再重新执行确定性
 Oracle。它直接衡量 Oracle 能否发现可观测数据损坏，同时排除模型采样和外部
 副作用；不能将其描述为执行了所有变异后的 Agent 行为。改变工具选择、分支、
-重试或环境状态的 Mutant，需要由确定性 Fixture 或 Sandbox 支撑的第二层可执行
-变异。实验必须分别报告这两层结果。
+重试或环境状态的 Mutant，需要由确定性 Fixture 或 Sandbox 支撑的可执行层。
+该层现已覆盖六类组件边界，但控制流分歧后尚不能自动重新接入 Baseline Replay。
+实验必须分别报告 Trace-level 和 Executable 结果。
 
 ### 实验对象
 

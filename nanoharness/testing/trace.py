@@ -15,7 +15,8 @@ from pydantic import BaseModel, Field
 from nanoharness.core.base import BaseHookManager, HookStage
 
 
-TRACE_SCHEMA_VERSION = 1
+TRACE_SCHEMA_VERSION = 2
+SUPPORTED_TRACE_SCHEMA_VERSIONS = frozenset({1, TRACE_SCHEMA_VERSION})
 REDACTED = "[REDACTED]"
 
 _DEFAULT_SENSITIVE_FIELDS = frozenset(
@@ -40,8 +41,17 @@ class TraceEventType(str, Enum):
     TASK_COMPLETED = "task_completed"
     TOOL_STARTED = "tool_started"
     TOOL_COMPLETED = "tool_completed"
+    CONTEXT_MESSAGE_ADDED = "context_message_added"
+    CONTEXT_SNAPSHOT = "context_snapshot"
+    CONTEXT_ERROR = "context_error"
     STATE_SAVED = "state_saved"
+    STATE_LOADED = "state_loaded"
+    STATE_ERROR = "state_error"
+    HOOK_STARTED = "hook_started"
+    HOOK_COMPLETED = "hook_completed"
     HOOK_FAILED = "hook_failed"
+    PERMISSION_DECISION = "permission_decision"
+    PERMISSION_ERROR = "permission_error"
     MODEL_EXCHANGE = "model_exchange"
     MODEL_ERROR = "model_error"
     TOOL_SCHEMAS = "tool_schemas"
@@ -71,6 +81,26 @@ class AgentTrace(BaseModel):
     started_at: float = Field(ge=0)
     events: List[TraceEvent] = Field(default_factory=list)
     metadata: Dict[str, Any] = Field(default_factory=dict)
+
+
+def upgrade_trace(trace: AgentTrace) -> AgentTrace:
+    """Return a detached current-version Trace, migrating supported versions."""
+
+    detached = AgentTrace.model_validate(trace.model_dump())
+    if detached.schema_version not in SUPPORTED_TRACE_SCHEMA_VERSIONS:
+        raise ValueError(
+            f"Trace schema version {detached.schema_version} is unsupported"
+        )
+    if detached.schema_version == 1:
+        detached.schema_version = TRACE_SCHEMA_VERSION
+        for event in detached.events:
+            if event.schema_version != 1:
+                raise ValueError(
+                    f"Legacy Trace event {event.event_id!r} has inconsistent "
+                    f"schema version {event.schema_version}"
+                )
+            event.schema_version = TRACE_SCHEMA_VERSION
+    return detached
 
 
 def normalize_trace_value(value: Any) -> Any:
@@ -117,7 +147,10 @@ def redact_sensitive_fields(
             for key, item in value.items()
         }
     if isinstance(value, list):
-        return [redact_sensitive_fields(item, sensitive_fields=set(fields)) for item in value]
+        return [
+            redact_sensitive_fields(item, sensitive_fields=set(fields))
+            for item in value
+        ]
     return value
 
 

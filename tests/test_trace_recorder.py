@@ -10,6 +10,7 @@ from nanoharness.components.tools.dict_registry import DictToolRegistry
 from nanoharness.core.engine import NanoEngine
 from nanoharness.core.schema import LLMResponse, ToolCall
 from nanoharness.testing import (
+    TRACE_SCHEMA_VERSION,
     AgentTrace,
     TraceEventType,
     TraceRecorder,
@@ -46,7 +47,7 @@ class TestTraceRecorder:
         encoded = recorder.snapshot().model_dump_json()
         restored = AgentTrace.model_validate_json(encoded)
 
-        assert json.loads(encoded)["schema_version"] == 1
+        assert json.loads(encoded)["schema_version"] == TRACE_SCHEMA_VERSION
         assert restored == recorder.snapshot()
 
     def test_redacts_nested_sensitive_fields(self):

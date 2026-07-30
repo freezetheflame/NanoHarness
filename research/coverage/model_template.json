@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "model_id": "agent-behavior-template-v0",
   "status": "template",
   "targets": [
@@ -61,6 +61,61 @@
       "parameters": {"component": "hook"}
     },
     {
+      "target_id": "error.context",
+      "kind": "component_error",
+      "parameters": {"component": "context"}
+    },
+    {
+      "target_id": "error.state",
+      "kind": "component_error",
+      "parameters": {"component": "state"}
+    },
+    {
+      "target_id": "error.permission",
+      "kind": "component_error",
+      "parameters": {"component": "permission"}
+    },
+    {
+      "target_id": "context.user",
+      "kind": "context_message",
+      "parameters": {"role": "user"}
+    },
+    {
+      "target_id": "context.assistant",
+      "kind": "context_message",
+      "parameters": {"role": "assistant"}
+    },
+    {
+      "target_id": "context.tool",
+      "kind": "context_message",
+      "parameters": {"role": "tool"}
+    },
+    {
+      "target_id": "state.current-step-saved",
+      "kind": "state_value",
+      "parameters": {"operation": "saved", "key": "current_step", "matcher": "present"}
+    },
+    {
+      "target_id": "hook.task-start-completed",
+      "kind": "hook_stage",
+      "parameters": {"stage": "on_task_start", "outcome": "completed"}
+    },
+    {
+      "target_id": "hook.task-end-completed",
+      "kind": "hook_stage",
+      "parameters": {"stage": "on_task_end", "outcome": "completed"}
+    },
+    {
+      "target_id": "permission.allowed",
+      "kind": "permission_decision",
+      "parameters": {"allowed": true}
+    },
+    {
+      "target_id": "permission.denied",
+      "kind": "permission_decision",
+      "parameters": {"allowed": false}
+    },
+    {
       "target_id": "fault.model-response-drop",
       "kind": "fault_action",
       "parameters": {"component": "model", "action": "model_response_drop", "effective": true}
@@ -84,6 +139,31 @@
       "target_id": "fault.tool-call-duplicate",
       "kind": "fault_action",
       "parameters": {"component": "tool", "action": "tool_call_duplicate", "effective": true}
+    },
+    {
+      "target_id": "fault.context-message-drop",
+      "kind": "fault_action",
+      "parameters": {"component": "context", "action": "context_message_drop", "effective": true}
+    },
+    {
+      "target_id": "fault.checkpoint-corrupt",
+      "kind": "fault_action",
+      "parameters": {"component": "state", "action": "checkpoint_corrupt", "effective": true}
+    },
+    {
+      "target_id": "fault.state-save-drop",
+      "kind": "fault_action",
+      "parameters": {"component": "state", "action": "state_save_drop", "effective": true}
+    },
+    {
+      "target_id": "fault.hook-skip",
+      "kind": "fault_action",
+      "parameters": {"component": "hook", "action": "hook_skip", "effective": true}
+    },
+    {
+      "target_id": "fault.permission-bypass",
+      "kind": "fault_action",
+      "parameters": {"component": "permission", "action": "permission_bypass", "effective": true}
     }
   ],
   "metadata": {

@@ -97,7 +97,7 @@ CoverageCollector + MutationReport
 
 FaultCampaignRunner ---- versioned FaultPlan / FaultSession
        |
-FaultInjectingLLM / FaultInjectingToolRegistry
+FaultInjecting model / tool / Context / state / hook / permission boundaries
        |
 fresh deterministic fixture or sandbox execution
 ```
@@ -113,9 +113,12 @@ Implemented evidence:
   scenario execution reports.
 - trace-level mutation campaigns with seven initial operators, explicit outcome
   classification, and correctly scoped mutation score.
-- executable model/tool fault campaigns with deterministic occurrence matching,
-  fresh-engine isolation, runtime application evidence, and Oracle-based
-  killed/survived classification.
+- executable model, tool, Context, state, hook, and permission fault campaigns
+  with deterministic occurrence matching, fresh-engine isolation, runtime
+  application evidence, and Oracle-based killed/survived classification.
+- normalized recording for Context messages/snapshots, state saves/loads, hook
+  stages, and permission decisions, plus state and permission-enforcement
+  Oracles.
 - a versioned real-defect corpus schema, evidence and adjudication constraints,
   derivation/held-out-validation separation, agreement statistics, readiness
   gates, analysis CLI, and an explicitly unverified seed candidate.
@@ -128,8 +131,8 @@ Still required:
 - the dedicated pytest fixture/marker plugin;
 - systematic defect retrieval, independent human coding, and corpus freeze;
 - real-defect validation for the initial mutation operators;
-- executable injection at Context, state, permission, and hook boundaries;
 - branch-aware replay or sandbox subjects for control-flow-changing faults;
+- validation of boundary faults on external runtimes and recovery scenarios;
 - frozen subject-specific coverage models and empirical experiment reporting;
 - adapters or subjects beyond NanoHarness itself.
 
@@ -142,8 +145,10 @@ reevaluates deterministic oracles. This directly measures whether an oracle can
 detect observable corruption while eliminating model sampling and external
 side effects. It must not be described as executing every mutated agent
 behavior. Mutants that change tool choice, branching, retries, or environment
-state require a second executable layer backed by deterministic fixtures or a
-sandbox. The evaluation must report the two layers separately.
+state require the executable layer backed by deterministic fixtures or a
+sandbox. That layer now exists for six component boundaries, but it cannot
+automatically rejoin a baseline Replay after mutated control flow diverges.
+The evaluation must report trace-level and executable results separately.
 
 ### Subjects
 

@@ -10,12 +10,19 @@ from typing import Any, Dict, List, Optional, Set
 
 from pydantic import BaseModel, Field, model_validator
 
-from nanoharness.core.base import BaseToolRegistry, LLMProtocol
+from nanoharness.core.base import (
+    BaseContextManager,
+    BaseHookManager,
+    BaseStateStore,
+    BaseToolRegistry,
+    LLMProtocol,
+)
 from nanoharness.core.engine import NanoEngine
-from nanoharness.core.schema import LLMResponse
+from nanoharness.core.schema import AgentMessage, LLMResponse
 from nanoharness.testing.mutation import MutationStatus
 from nanoharness.testing.oracle import OracleEvaluator
 from nanoharness.testing.runner import ScenarioRunner
+from nanoharness.testing.runtime import PermissionProtocol
 from nanoharness.testing.scenario import Scenario, ScenarioReport
 from nanoharness.testing.trace import (
     TraceRecorder,
@@ -24,7 +31,8 @@ from nanoharness.testing.trace import (
 )
 
 
-FAULT_SCHEMA_VERSION = 1
+FAULT_SCHEMA_VERSION = 2
+SUPPORTED_FAULT_SCHEMA_VERSIONS = frozenset({1, FAULT_SCHEMA_VERSION})
 
 
 class FaultComponent(str, Enum):
@@ -32,6 +40,10 @@ class FaultComponent(str, Enum):
 
     MODEL = "model"
     TOOL = "tool"
+    CONTEXT = "context"
+    STATE = "state"
+    HOOK = "hook"
+    PERMISSION = "permission"
 
 
 class FaultAction(str, Enum):
@@ -43,6 +55,11 @@ class FaultAction(str, Enum):
     TOOL_ARGUMENT_DROP = "tool_argument_drop"
     TOOL_RESULT_STALE = "tool_result_stale"
     TOOL_CALL_DUPLICATE = "tool_call_duplicate"
+    CONTEXT_MESSAGE_DROP = "context_message_drop"
+    CHECKPOINT_CORRUPT = "checkpoint_corrupt"
+    STATE_SAVE_DROP = "state_save_drop"
+    HOOK_SKIP = "hook_skip"
+    PERMISSION_BYPASS = "permission_bypass"
 
 
 class FaultRule(BaseModel):
@@ -56,6 +73,9 @@ class FaultRule(BaseModel):
     argument: Optional[str] = None
     replacement: Any = None
     replacement_tool_name: Optional[str] = None
+    message_role: Optional[str] = None
+    state_key: Optional[str] = None
+    hook_stage: Optional[str] = None
     message: str = "injected component failure"
     enabled: bool = True
 
@@ -71,10 +91,22 @@ class FaultRule(BaseModel):
             FaultAction.TOOL_RESULT_STALE,
             FaultAction.TOOL_CALL_DUPLICATE,
         }
+        boundary_actions = {
+            FaultAction.CONTEXT_MESSAGE_DROP: FaultComponent.CONTEXT,
+            FaultAction.CHECKPOINT_CORRUPT: FaultComponent.STATE,
+            FaultAction.STATE_SAVE_DROP: FaultComponent.STATE,
+            FaultAction.HOOK_SKIP: FaultComponent.HOOK,
+            FaultAction.PERMISSION_BYPASS: FaultComponent.PERMISSION,
+        }
         if self.action in model_actions and self.component is not FaultComponent.MODEL:
             raise ValueError(f"{self.action.value} requires the model component")
         if self.action in tool_actions and self.component is not FaultComponent.TOOL:
             raise ValueError(f"{self.action.value} requires the tool component")
+        expected_component = boundary_actions.get(self.action)
+        if expected_component is not None and self.component is not expected_component:
+            raise ValueError(
+                f"{self.action.value} requires the {expected_component.value} component"
+            )
         if self.action is FaultAction.TOOL_NAME_SWAP and not self.replacement_tool_name:
             raise ValueError("tool_name_swap requires replacement_tool_name")
         if self.action is FaultAction.TOOL_ARGUMENT_DROP:
@@ -82,6 +114,51 @@ class FaultRule(BaseModel):
                 raise ValueError("tool_argument_drop requires tool_name")
             if not self.argument:
                 raise ValueError("tool_argument_drop requires argument")
+        if self.action is FaultAction.CHECKPOINT_CORRUPT and not self.state_key:
+            raise ValueError("checkpoint_corrupt requires state_key")
+        if self.action is FaultAction.HOOK_SKIP and not self.hook_stage:
+            raise ValueError("hook_skip requires hook_stage")
+        for field_name in ("message_role", "state_key", "hook_stage"):
+            value = getattr(self, field_name)
+            if value is not None and not value:
+                raise ValueError(f"{field_name} must be a non-empty string")
+        selector_fields = {
+            "tool_name": self.tool_name,
+            "argument": self.argument,
+            "replacement_tool_name": self.replacement_tool_name,
+            "message_role": self.message_role,
+            "state_key": self.state_key,
+            "hook_stage": self.hook_stage,
+        }
+        allowed_selectors = {
+            FaultAction.MODEL_RESPONSE_DROP: set(),
+            FaultAction.TOOL_NAME_SWAP: {"tool_name", "replacement_tool_name"},
+            FaultAction.TOOL_ARGUMENT_DROP: {"tool_name", "argument"},
+            FaultAction.TOOL_RESULT_STALE: {"tool_name"},
+            FaultAction.TOOL_CALL_DUPLICATE: {"tool_name"},
+            FaultAction.CONTEXT_MESSAGE_DROP: {"message_role"},
+            FaultAction.CHECKPOINT_CORRUPT: {"state_key"},
+            FaultAction.STATE_SAVE_DROP: {"state_key"},
+            FaultAction.HOOK_SKIP: {"hook_stage"},
+            FaultAction.PERMISSION_BYPASS: {"tool_name"},
+            FaultAction.RAISE_ERROR: {
+                FaultComponent.MODEL: set(),
+                FaultComponent.TOOL: {"tool_name"},
+                FaultComponent.CONTEXT: {"message_role"},
+                FaultComponent.STATE: {"state_key"},
+                FaultComponent.HOOK: {"hook_stage"},
+                FaultComponent.PERMISSION: {"tool_name"},
+            }[self.component],
+        }[self.action]
+        unrelated = sorted(
+            name
+            for name, value in selector_fields.items()
+            if value is not None and name not in allowed_selectors
+        )
+        if unrelated:
+            raise ValueError(
+                f"{self.action.value} has unrelated selectors: {unrelated}"
+            )
         return self
 
 
@@ -112,6 +189,9 @@ class FaultApplication(BaseModel):
     action: FaultAction
     boundary_index: int = Field(ge=0)
     tool_name: Optional[str] = None
+    message_role: Optional[str] = None
+    state_key: Optional[str] = None
+    hook_stage: Optional[str] = None
     effective: bool = True
     details: Dict[str, Any] = Field(default_factory=dict)
 
@@ -188,16 +268,16 @@ class FaultSession:
     """Thread-safe rule matcher and evidence collector for one execution."""
 
     def __init__(self, plan: FaultPlan):
-        if plan.schema_version != FAULT_SCHEMA_VERSION:
+        if plan.schema_version not in SUPPORTED_FAULT_SCHEMA_VERSIONS:
             raise ValueError(
                 f"Fault schema version {plan.schema_version} is unsupported; "
-                f"expected {FAULT_SCHEMA_VERSION}"
+                f"supported versions are {sorted(SUPPORTED_FAULT_SCHEMA_VERSIONS)}"
             )
         self.plan = FaultPlan.model_validate(plan.model_dump())
+        self.plan.schema_version = FAULT_SCHEMA_VERSION
         self._matches = {rule.rule_id: 0 for rule in self.plan.rules}
         self._boundary_counts = {
-            FaultComponent.MODEL: 0,
-            FaultComponent.TOOL: 0,
+            component: 0 for component in FaultComponent
         }
         self._applications: List[FaultApplication] = []
         self._lock = threading.RLock()
@@ -214,6 +294,9 @@ class FaultSession:
         actions: Set[FaultAction],
         *,
         tool_name: Optional[str] = None,
+        message_role: Optional[str] = None,
+        state_keys: Optional[Set[str]] = None,
+        hook_stage: Optional[str] = None,
     ) -> List[FaultRule]:
         """Select rules for this matching opportunity and advance their cursors."""
 
@@ -225,6 +308,14 @@ class FaultSession:
                 if rule.action not in actions:
                     continue
                 if rule.tool_name is not None and rule.tool_name != tool_name:
+                    continue
+                if rule.message_role is not None and rule.message_role != message_role:
+                    continue
+                if rule.state_key is not None and (
+                    state_keys is None or rule.state_key not in state_keys
+                ):
+                    continue
+                if rule.hook_stage is not None and rule.hook_stage != hook_stage:
                     continue
                 match_index = self._matches[rule.rule_id]
                 self._matches[rule.rule_id] += 1
@@ -238,6 +329,9 @@ class FaultSession:
         boundary_index: int,
         *,
         tool_name: Optional[str] = None,
+        message_role: Optional[str] = None,
+        state_key: Optional[str] = None,
+        hook_stage: Optional[str] = None,
         effective: bool = True,
         details: Optional[Dict[str, Any]] = None,
     ) -> None:
@@ -247,7 +341,12 @@ class FaultSession:
             component=rule.component,
             action=rule.action,
             boundary_index=boundary_index,
-            tool_name=tool_name,
+            tool_name=tool_name if tool_name is not None else rule.tool_name,
+            message_role=(
+                message_role if message_role is not None else rule.message_role
+            ),
+            state_key=state_key if state_key is not None else rule.state_key,
+            hook_stage=hook_stage if hook_stage is not None else rule.hook_stage,
             effective=effective,
             details=redact_sensitive_fields(normalize_trace_value(details or {})),
         )
@@ -272,8 +371,7 @@ class FaultSession:
         with self._lock:
             self._matches = {rule.rule_id: 0 for rule in self.plan.rules}
             self._boundary_counts = {
-                FaultComponent.MODEL: 0,
-                FaultComponent.TOOL: 0,
+                component: 0 for component in FaultComponent
             }
             self._applications = []
 
@@ -435,6 +533,230 @@ class FaultInjectingToolRegistry(BaseToolRegistry):
         self.session.reset()
 
 
+class FaultInjectingContextManager(BaseContextManager):
+    """Context decorator supporting dropped messages and injected errors."""
+
+    def __init__(self, delegate: BaseContextManager, session: FaultSession):
+        self._delegate = delegate
+        self.session = session
+
+    def add_message(self, msg: AgentMessage):
+        boundary_index = self.session.next_boundary(FaultComponent.CONTEXT)
+        role = msg.role
+        error_rules = self.session.select(
+            FaultComponent.CONTEXT,
+            {FaultAction.RAISE_ERROR},
+            message_role=role,
+        )
+        _raise_selected_faults(
+            self.session,
+            error_rules,
+            boundary_index,
+            message_role=role,
+        )
+        drop_rules = self.session.select(
+            FaultComponent.CONTEXT,
+            {FaultAction.CONTEXT_MESSAGE_DROP},
+            message_role=role,
+        )
+        if drop_rules:
+            for rule in drop_rules:
+                self.session.record(
+                    rule,
+                    boundary_index,
+                    message_role=role,
+                    details={"dropped_role": role},
+                )
+            return None
+        return self._delegate.add_message(msg)
+
+    def get_full_context(self):
+        boundary_index = self.session.next_boundary(FaultComponent.CONTEXT)
+        error_rules = self.session.select(
+            FaultComponent.CONTEXT,
+            {FaultAction.RAISE_ERROR},
+        )
+        _raise_selected_faults(self.session, error_rules, boundary_index)
+        return self._delegate.get_full_context()
+
+    def reset(self):
+        self._delegate.reset()
+        self.session.reset()
+
+
+class FaultInjectingStateStore(BaseStateStore):
+    """State decorator supporting dropped and corrupted checkpoint writes."""
+
+    def __init__(self, delegate: BaseStateStore, session: FaultSession):
+        self._delegate = delegate
+        self.session = session
+
+    def save_state(self, state: Dict):
+        boundary_index = self.session.next_boundary(FaultComponent.STATE)
+        state_keys = {key for key in state if isinstance(key, str)}
+        error_rules = self.session.select(
+            FaultComponent.STATE,
+            {FaultAction.RAISE_ERROR},
+            state_keys=state_keys,
+        )
+        _raise_selected_faults(self.session, error_rules, boundary_index)
+        drop_rules = self.session.select(
+            FaultComponent.STATE,
+            {FaultAction.STATE_SAVE_DROP},
+            state_keys=state_keys,
+        )
+        if drop_rules:
+            for rule in drop_rules:
+                self.session.record(
+                    rule,
+                    boundary_index,
+                    state_key=rule.state_key,
+                    details={"dropped_save": True},
+                )
+            return None
+        mutated = copy.deepcopy(state)
+        for rule in self.session.select(
+            FaultComponent.STATE,
+            {FaultAction.CHECKPOINT_CORRUPT},
+            state_keys=state_keys,
+        ):
+            original = mutated.get(str(rule.state_key))
+            mutated[str(rule.state_key)] = copy.deepcopy(rule.replacement)
+            self.session.record(
+                rule,
+                boundary_index,
+                state_key=rule.state_key,
+                effective=original != rule.replacement,
+                details={
+                    "original_value": original,
+                    "replacement_value": rule.replacement,
+                },
+            )
+        return self._delegate.save_state(mutated)
+
+    def load_state(self) -> Dict:
+        boundary_index = self.session.next_boundary(FaultComponent.STATE)
+        error_rules = self.session.select(
+            FaultComponent.STATE,
+            {FaultAction.RAISE_ERROR},
+        )
+        _raise_selected_faults(self.session, error_rules, boundary_index)
+        return self._delegate.load_state()
+
+    def reset(self):
+        self._delegate.reset()
+        self.session.reset()
+
+
+class FaultInjectingHookManager(BaseHookManager):
+    """Hook decorator supporting deterministic lifecycle-stage skipping."""
+
+    def __init__(self, delegate: BaseHookManager, session: FaultSession):
+        self._delegate = delegate
+        self.session = session
+
+    def register(self, stage: str, hook):
+        return self._delegate.register(stage, hook)
+
+    def trigger(self, stage: str, data: Any):
+        stage_value = str(getattr(stage, "value", stage))
+        boundary_index = self.session.next_boundary(FaultComponent.HOOK)
+        error_rules = self.session.select(
+            FaultComponent.HOOK,
+            {FaultAction.RAISE_ERROR},
+            hook_stage=stage_value,
+        )
+        _raise_selected_faults(
+            self.session,
+            error_rules,
+            boundary_index,
+            hook_stage=stage_value,
+        )
+        skip_rules = self.session.select(
+            FaultComponent.HOOK,
+            {FaultAction.HOOK_SKIP},
+            hook_stage=stage_value,
+        )
+        if skip_rules:
+            for rule in skip_rules:
+                self.session.record(
+                    rule,
+                    boundary_index,
+                    hook_stage=stage_value,
+                    details={"skipped_stage": stage_value},
+                )
+            return None
+        return self._delegate.trigger(stage, data)
+
+    def reset(self):
+        self._delegate.reset()
+        self.session.reset()
+
+
+class FaultInjectingPermissionManager:
+    """Permission decorator supporting denied-call bypass and errors."""
+
+    def __init__(self, delegate: PermissionProtocol, session: FaultSession):
+        self._delegate = delegate
+        self.session = session
+
+    def enforce(self, tool_name: str, args: Dict) -> Optional[str]:
+        boundary_index = self.session.next_boundary(FaultComponent.PERMISSION)
+        error_rules = self.session.select(
+            FaultComponent.PERMISSION,
+            {FaultAction.RAISE_ERROR},
+            tool_name=tool_name,
+        )
+        _raise_selected_faults(
+            self.session,
+            error_rules,
+            boundary_index,
+            tool_name=tool_name,
+        )
+        denial = self._delegate.enforce(tool_name, args)
+        for rule in self.session.select(
+            FaultComponent.PERMISSION,
+            {FaultAction.PERMISSION_BYPASS},
+            tool_name=tool_name,
+        ):
+            self.session.record(
+                rule,
+                boundary_index,
+                tool_name=tool_name,
+                effective=denial is not None,
+                details={"original_denial": denial},
+            )
+            denial = None
+        return denial
+
+    def reset(self):
+        reset = getattr(self._delegate, "reset", None)
+        if reset is not None:
+            reset()
+        self.session.reset()
+
+
+def _raise_selected_faults(
+    session: FaultSession,
+    rules: Sequence[FaultRule],
+    boundary_index: int,
+    **selectors: Any,
+) -> None:
+    if not rules:
+        return
+    selected = rules[0]
+    session.record(selected, boundary_index, **selectors)
+    for suppressed in rules[1:]:
+        session.record(
+            suppressed,
+            boundary_index,
+            effective=False,
+            details={"suppressed_by": selected.rule_id},
+            **selectors,
+        )
+    raise InjectedFaultError(selected.rule_id, selected.message)
+
+
 FaultEngineFactory = Callable[
     [Scenario, TraceRecorder, Optional[FaultSession]],
     NanoEngine,
@@ -445,8 +767,10 @@ class FaultCampaignRunner:
     """Executes fresh baseline and fault-injected scenarios against Oracles.
 
     The engine factory receives ``None`` for the baseline and a fresh
-    ``FaultSession`` for each plan. It must place fault decorators inside
-    recording decorators when the normalized trace should contain mutated I/O.
+    ``FaultSession`` for each plan. Place model/tool result-transforming faults
+    inside recording decorators. Place Context/state/hook/permission
+    suppression decorators outside recording so skipped calls are not falsely
+    recorded as completed operations.
     """
 
     def __init__(
@@ -568,7 +892,7 @@ class FaultCampaignRunner:
         unsupported = sorted(
             plan.plan_id
             for plan in plans
-            if plan.schema_version != FAULT_SCHEMA_VERSION
+            if plan.schema_version not in SUPPORTED_FAULT_SCHEMA_VERSIONS
         )
         if unsupported:
             raise FaultCampaignConfigurationError(

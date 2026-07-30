@@ -245,12 +245,17 @@ explicit outcomes and are excluded rather than silently counted as survived
 mutants.
 
 For faults that must affect real control flow, `FaultPlan` rules can be applied
-at live or deterministic-fixture model/tool boundaries with
-`FaultInjectingLLM` and `FaultInjectingToolRegistry`. `FaultCampaignRunner`
+at live or deterministic-fixture model, tool, Context, state, hook, and
+permission boundaries. `FaultCampaignRunner`
 runs a clean baseline plus a fresh engine for every plan, records exactly which
 rules triggered and whether they changed a value, then classifies the execution
-through the same Scenario Oracles. Place the fault decorators inside the
-recording decorators so the resulting Trace contains the injected behavior.
+through the same Scenario Oracles. Place model/tool result-transforming faults
+inside their recording decorators. Place Context/state/hook/permission
+suppression faults outside recording so skipped operations are not falsely
+recorded as completed.
+Corresponding recording decorators expose normalized Context, state, hook, and
+permission events. Trace schema v2 carries these events; deterministic replay
+migrates legacy v1 model/tool traces without mutating their source objects.
 
 Real-defect evidence is kept in a versioned `DefectCorpus` rather than informal
 notes. The [corpus protocol](REAL_DEFECT_PROTOCOL.md) separates operator

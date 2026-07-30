@@ -29,6 +29,7 @@ from nanoharness.testing import (
     ScenarioReport,
     TraceEvent,
     TraceEventType,
+    TRACE_SCHEMA_VERSION,
     coverage_target_digest,
 )
 
@@ -255,7 +256,7 @@ def test_collector_rejects_duplicate_or_unsupported_trace_evidence():
         CoverageCollector().collect(_model(), [report, report])
 
     data = report.model_dump()
-    data["trace"]["schema_version"] = 2
+    data["trace"]["schema_version"] = TRACE_SCHEMA_VERSION + 1
     unsupported = ScenarioReport.model_validate(data)
     with pytest.raises(CoverageConfigurationError, match="unsupported schema"):
         CoverageCollector().collect(_model(), [unsupported])
@@ -288,6 +289,19 @@ def test_empty_target_universe_has_no_invented_ratio():
     assert coverage.total_targets == 0
     assert coverage.coverage_ratio is None
     assert coverage.dimensions == []
+
+
+def test_legacy_v1_coverage_model_remains_readable():
+    model = CoverageModel(
+        schema_version=1,
+        model_id="legacy",
+        targets=[_target("echo", CoverageKind.TOOL_CALL, tool_name="echo")],
+    )
+
+    coverage = CoverageCollector().collect(model, [_report()])
+
+    assert coverage.coverage_ratio == 1.0
+    assert coverage.model.schema_version == 1
 
 
 @pytest.mark.parametrize(
@@ -384,7 +398,7 @@ def test_repository_coverage_template_is_valid_but_explicitly_not_frozen():
 
     model = CoverageModel.model_validate_json(path.read_text())
 
-    assert len(model.targets) == 16
+    assert len(model.targets) == 32
     assert model.status is CoverageModelStatus.TEMPLATE
 
 
@@ -494,3 +508,69 @@ def test_execution_error_target_can_match_type_or_any_error():
     coverage = CoverageCollector().collect(model, [report])
 
     assert [result.covered for result in coverage.target_results] == [True, True, False]
+
+
+def test_runtime_boundary_targets_cover_context_state_hook_and_permission():
+    report = _report()
+    sequence = report.trace.events[-1].sequence + 1
+    report.trace.events.extend([
+        _event(
+            report.trace.trace_id,
+            sequence,
+            TraceEventType.CONTEXT_MESSAGE_ADDED,
+            {"message": {"role": "user", "content": "hello"}},
+        ),
+        _event(
+            report.trace.trace_id,
+            sequence + 1,
+            TraceEventType.STATE_SAVED,
+            {"state": {"current_step": 2}},
+        ),
+        _event(
+            report.trace.trace_id,
+            sequence + 2,
+            TraceEventType.HOOK_COMPLETED,
+            {"stage": "on_task_end"},
+        ),
+        _event(
+            report.trace.trace_id,
+            sequence + 3,
+            TraceEventType.PERMISSION_DECISION,
+            {"tool_name": "delete", "allowed": False},
+        ),
+    ])
+    model = CoverageModel(
+        model_id="runtime-boundaries",
+        targets=[
+            _target(
+                "context.user",
+                CoverageKind.CONTEXT_MESSAGE,
+                role="user",
+            ),
+            _target(
+                "state.step.two",
+                CoverageKind.STATE_VALUE,
+                operation="saved",
+                key="current_step",
+                matcher="equals",
+                value=2,
+            ),
+            _target(
+                "hook.task-end",
+                CoverageKind.HOOK_STAGE,
+                stage="on_task_end",
+                outcome="completed",
+            ),
+            _target(
+                "permission.delete.denied",
+                CoverageKind.PERMISSION_DECISION,
+                tool_name="delete",
+                allowed=False,
+            ),
+        ],
+    )
+
+    coverage = CoverageCollector().collect(model, [report])
+
+    assert coverage.coverage_ratio == 1.0
+    assert all(result.hit_count == 1 for result in coverage.target_results)

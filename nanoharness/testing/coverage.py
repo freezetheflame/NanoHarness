@@ -18,6 +18,7 @@ from nanoharness.testing.faults import FaultAction, FaultComponent, FaultReport
 from nanoharness.testing.scenario import ScenarioReport
 from nanoharness.testing.trace import (
     TRACE_SCHEMA_VERSION,
+    SUPPORTED_TRACE_SCHEMA_VERSIONS,
     TraceEvent,
     TraceEventType,
     normalize_trace_value,
@@ -25,7 +26,8 @@ from nanoharness.testing.trace import (
 )
 
 
-COVERAGE_SCHEMA_VERSION = 1
+COVERAGE_SCHEMA_VERSION = 2
+SUPPORTED_COVERAGE_SCHEMA_VERSIONS = frozenset({1, COVERAGE_SCHEMA_VERSION})
 
 
 class CoverageKind(str, Enum):
@@ -33,6 +35,10 @@ class CoverageKind(str, Enum):
 
     TOOL_CALL = "tool_call"
     TOOL_ARGUMENT = "tool_argument"
+    CONTEXT_MESSAGE = "context_message"
+    STATE_VALUE = "state_value"
+    HOOK_STAGE = "hook_stage"
+    PERMISSION_DECISION = "permission_decision"
     RUN_STATUS = "run_status"
     STOP_REASON = "stop_reason"
     LIFECYCLE_EVENT = "lifecycle_event"
@@ -246,10 +252,11 @@ class CoverageCollector:
         *,
         require_frozen: bool = False,
     ) -> CoverageReport:
-        if model.schema_version != COVERAGE_SCHEMA_VERSION:
+        if model.schema_version not in SUPPORTED_COVERAGE_SCHEMA_VERSIONS:
             raise ValueError(
                 f"Coverage schema version {model.schema_version} is unsupported; "
-                f"expected {COVERAGE_SCHEMA_VERSION}"
+                "supported versions are "
+                f"{sorted(SUPPORTED_COVERAGE_SCHEMA_VERSIONS)}"
             )
         if require_frozen:
             model.assert_frozen()
@@ -368,6 +375,73 @@ class CoverageCollector:
                     "matcher": parameters["matcher"],
                 },
             )
+        if target.kind is CoverageKind.CONTEXT_MESSAGE:
+            return self._events(
+                report,
+                (
+                    event
+                    for event in report.trace.events
+                    if event.event_type is TraceEventType.CONTEXT_MESSAGE_ADDED
+                    and _context_message_role(event) == parameters["role"]
+                ),
+                details=parameters,
+            )
+        if target.kind is CoverageKind.STATE_VALUE:
+            event_type = {
+                "saved": TraceEventType.STATE_SAVED,
+                "loaded": TraceEventType.STATE_LOADED,
+            }[parameters["operation"]]
+            matches = []
+            matcher_parameters = _state_matcher_parameters(parameters)
+            for event in report.trace.events:
+                if event.event_type is not event_type:
+                    continue
+                state = event.payload.get("state") or {}
+                if isinstance(state, dict) and _argument_matches(
+                    state,
+                    matcher_parameters,
+                ):
+                    matches.append(event)
+            return self._events(
+                report,
+                matches,
+                details={
+                    "operation": parameters["operation"],
+                    "key": parameters["key"],
+                    "matcher": parameters["matcher"],
+                },
+            )
+        if target.kind is CoverageKind.HOOK_STAGE:
+            event_type = {
+                "started": TraceEventType.HOOK_STARTED,
+                "completed": TraceEventType.HOOK_COMPLETED,
+                "failed": TraceEventType.HOOK_FAILED,
+            }[parameters["outcome"]]
+            return self._events(
+                report,
+                (
+                    event
+                    for event in report.trace.events
+                    if event.event_type is event_type
+                    and event.payload.get("stage") == parameters["stage"]
+                ),
+                details=parameters,
+            )
+        if target.kind is CoverageKind.PERMISSION_DECISION:
+            return self._events(
+                report,
+                (
+                    event
+                    for event in report.trace.events
+                    if event.event_type is TraceEventType.PERMISSION_DECISION
+                    and event.payload.get("allowed") is parameters["allowed"]
+                    and (
+                        "tool_name" not in parameters
+                        or event.payload.get("tool_name") == parameters["tool_name"]
+                    )
+                ),
+                details=parameters,
+            )
         if target.kind is CoverageKind.RUN_STATUS:
             matched = (
                 report.result is not None
@@ -402,7 +476,10 @@ class CoverageCollector:
             event_types = {
                 "model": TraceEventType.MODEL_ERROR,
                 "tool": TraceEventType.TOOL_ERROR,
+                "context": TraceEventType.CONTEXT_ERROR,
+                "state": TraceEventType.STATE_ERROR,
                 "hook": TraceEventType.HOOK_FAILED,
+                "permission": TraceEventType.PERMISSION_ERROR,
             }
             return self._events(
                 report,
@@ -545,6 +622,10 @@ def _validate_target_parameters(kind: CoverageKind, parameters: Dict[str, Any]) 
     required_by_kind = {
         CoverageKind.TOOL_CALL: {"tool_name"},
         CoverageKind.TOOL_ARGUMENT: {"tool_name", "argument", "matcher"},
+        CoverageKind.CONTEXT_MESSAGE: {"role"},
+        CoverageKind.STATE_VALUE: {"operation", "key", "matcher"},
+        CoverageKind.HOOK_STAGE: {"stage", "outcome"},
+        CoverageKind.PERMISSION_DECISION: {"allowed"},
         CoverageKind.RUN_STATUS: {"status"},
         CoverageKind.STOP_REASON: {"reason"},
         CoverageKind.LIFECYCLE_EVENT: {"event_type"},
@@ -571,6 +652,20 @@ def _validate_target_parameters(kind: CoverageKind, parameters: Dict[str, Any]) 
             "maximum",
             "pattern",
         },
+        CoverageKind.CONTEXT_MESSAGE: {"role"},
+        CoverageKind.STATE_VALUE: {
+            "operation",
+            "key",
+            "matcher",
+            "value",
+            "values",
+            "value_type",
+            "minimum",
+            "maximum",
+            "pattern",
+        },
+        CoverageKind.HOOK_STAGE: {"stage", "outcome"},
+        CoverageKind.PERMISSION_DECISION: {"tool_name", "allowed"},
         CoverageKind.RUN_STATUS: {"status"},
         CoverageKind.STOP_REASON: {"reason"},
         CoverageKind.LIFECYCLE_EVENT: {"event_type"},
@@ -599,10 +694,29 @@ def _validate_target_parameters(kind: CoverageKind, parameters: Dict[str, Any]) 
         )
     if kind is CoverageKind.TOOL_ARGUMENT:
         _validate_argument_parameters(parameters)
+    if kind is CoverageKind.STATE_VALUE:
+        _validate_argument_parameters(_state_matcher_parameters(parameters))
     if kind in {CoverageKind.TOOL_CALL, CoverageKind.TOOL_ARGUMENT}:
         _require_nonempty_string(parameters, "tool_name", kind)
     if kind is CoverageKind.TOOL_ARGUMENT:
         _require_nonempty_string(parameters, "argument", kind)
+    if kind is CoverageKind.CONTEXT_MESSAGE:
+        _require_nonempty_string(parameters, "role", kind)
+    if kind is CoverageKind.STATE_VALUE:
+        _require_nonempty_string(parameters, "key", kind)
+        if parameters["operation"] not in {"saved", "loaded"}:
+            raise ValueError("state_value operation must be saved or loaded")
+    if kind is CoverageKind.HOOK_STAGE:
+        _require_nonempty_string(parameters, "stage", kind)
+        if parameters["outcome"] not in {"started", "completed", "failed"}:
+            raise ValueError(
+                "hook_stage outcome must be started, completed, or failed"
+            )
+    if kind is CoverageKind.PERMISSION_DECISION:
+        if not isinstance(parameters["allowed"], bool):
+            raise ValueError("permission_decision allowed must be boolean")
+        if "tool_name" in parameters:
+            _require_nonempty_string(parameters, "tool_name", kind)
     if kind is CoverageKind.RUN_STATUS:
         RunStatus(parameters["status"])
     if kind is CoverageKind.STOP_REASON:
@@ -610,8 +724,19 @@ def _validate_target_parameters(kind: CoverageKind, parameters: Dict[str, Any]) 
     if kind is CoverageKind.LIFECYCLE_EVENT:
         TraceEventType(parameters["event_type"])
     if kind is CoverageKind.COMPONENT_ERROR:
-        if parameters["component"] not in {"model", "tool", "hook"}:
-            raise ValueError("component_error component must be model, tool, or hook")
+        allowed_components = {
+            "model",
+            "tool",
+            "context",
+            "state",
+            "hook",
+            "permission",
+        }
+        if parameters["component"] not in allowed_components:
+            raise ValueError(
+                "component_error component must be one of "
+                f"{sorted(allowed_components)}"
+            )
     if kind is CoverageKind.EXECUTION_ERROR and "error_type" in parameters:
         _require_nonempty_string(parameters, "error_type", kind)
     if kind is CoverageKind.ORACLE_OUTCOME:
@@ -732,6 +857,23 @@ def _argument_matches(arguments: Dict[str, Any], parameters: Dict[str, Any]) -> 
     raise ValueError(f"Unsupported tool-argument matcher: {matcher.value}")
 
 
+def _state_matcher_parameters(parameters: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "tool_name": "state",
+        "argument": parameters["key"],
+        **{
+            key: value
+            for key, value in parameters.items()
+            if key not in {"operation", "key"}
+        },
+    }
+
+
+def _context_message_role(event: TraceEvent) -> Optional[str]:
+    message = event.payload.get("message")
+    return message.get("role") if isinstance(message, dict) else None
+
+
 def _matches_json_type(value: Any, value_type: str) -> bool:
     if value_type == "null":
         return value is None
@@ -782,7 +924,7 @@ def _require_nonempty_string(
 
 def _validate_trace(report: ScenarioReport) -> None:
     trace = report.trace
-    if trace.schema_version != TRACE_SCHEMA_VERSION:
+    if trace.schema_version not in SUPPORTED_TRACE_SCHEMA_VERSIONS:
         raise CoverageConfigurationError(
             f"Trace {trace.trace_id!r} uses unsupported schema version "
             f"{trace.schema_version}"
@@ -790,10 +932,10 @@ def _validate_trace(report: ScenarioReport) -> None:
     event_ids = set()
     previous_sequence = -1
     for event in trace.events:
-        if event.schema_version != TRACE_SCHEMA_VERSION:
+        if event.schema_version != trace.schema_version:
             raise CoverageConfigurationError(
-                f"Event {event.event_id!r} uses unsupported schema version "
-                f"{event.schema_version}"
+                f"Event {event.event_id!r} schema version {event.schema_version} "
+                f"does not match Trace version {trace.schema_version}"
             )
         if event.trace_id != trace.trace_id:
             raise CoverageConfigurationError(

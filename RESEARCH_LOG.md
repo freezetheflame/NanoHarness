@@ -135,6 +135,27 @@ Official sources consulted:
 - Current verification after this increment: 181 core tests and 36 targeted
   Coding Agent regression tests pass.
 
+## 2026-07-30 — Runtime-boundary recording and executable faults
+
+- Added normalized Context message/snapshot, state save/load, hook-stage, and
+  permission-decision recording decorators, including boundary error events.
+- Added executable Context-message drop, checkpoint corruption, state-save
+  drop, hook skip, and permission-bypass actions to the shared deterministic
+  `FaultSession` model.
+- Added deterministic state-value and permission-enforcement Oracles. The latter
+  detects a tool execution whose nearest preceding decision for that tool was a
+  denial.
+- Extended behavioral coverage to Context roles, state value classes, hook
+  outcomes, permission decisions, and the new fault actions.
+- Bumped Trace, Fault, and Coverage schemas for the expanded vocabularies.
+  Trace and Fault v1 inputs have explicit detached upgrades; Coverage v1 models
+  remain readable. Unsupported or internally inconsistent versions are rejected.
+- Executable Campaign tests demonstrate Oracle kills for live Context drop,
+  hook skip, checkpoint corruption, and permission bypass. Branch-aware replay
+  after a control-flow divergence remains unimplemented.
+- Current verification after this increment: 207 core tests and 36 targeted
+  Coding Agent regression tests pass.
+
 ## AI assistance disclosure record
 
 Codex assisted with:

@@ -31,6 +31,7 @@ nanoharness/testing/
   oracle.py         # 确定性、基于模型与 LLM 辅助的 Oracle
   trace.py          # 统一的版本化事件与 Trace 序列化
   replay.py         # 重放模型、工具、时间、重试与策略决策
+  runtime.py        # Context/State/Hook/Permission 边界记录
   faults.py         # 声明式故障计划与注入 Hook
   defects.py        # 真实缺陷语料、证据、Coding 与审计门槛
   coverage.py       # 行为覆盖率收集与报告
@@ -124,9 +125,9 @@ TERMINATED_AS_SUCCESS     将模型停止误认为任务完成
    检查请求内容和跨组件调用顺序。
 3. **核心已实现：**定义可序列化 `Scenario`、确定性 `TestOracle` 和
    `ScenarioRunner` 契约；专用 pytest fixture 与 marker 插件仍待实现。
-4. **Model/Tool 基础已实现：**增加版本化声明式 Fault Plan、确定性
-   occurrence 匹配、运行时证据和可执行 Oracle Campaign；State、
-   Context、Permission 和 Hook 边界仍待完成。
+4. **边界基础已实现：**增加 Model、Tool、Context、State、Hook 和
+   Permission 的记录与可执行 Fault 装饰器，支持确定性 occurrence 匹配、
+   Provenance 和 Oracle Campaign；Branch-aware Replay 与外部 Sandbox 验证仍待完成。
 5. **Coverage 基础已实现：**增加显式版本化 Target Universe、Tool
    Argument 等价类、跨运行证据聚合、分维度报告和可选 Gate；实验对象
    专属冻结模型和实证验证仍待完成。

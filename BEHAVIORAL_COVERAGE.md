@@ -31,6 +31,8 @@ The first collector supports evidence that current stable contracts expose:
 - tool calls;
 - tool-argument equivalence classes (`present`, `missing`, `equals`, `one_of`,
   JSON `type`, numeric `range`, and `regex`);
+- Context message roles, state save/load value classes, hook-stage outcomes,
+  and permission allow/deny decisions;
 - `RunStatus` and `StopReason`;
 - lifecycle event types;
 - model, tool, and hook error events;
@@ -39,7 +41,7 @@ The first collector supports evidence that current stable contracts expose:
 - injected fault actions and whether the associated Scenario passed;
 - declared Trace metadata such as baseline/fault-injected execution mode.
 
-State transitions, permission decisions, checkpoint/recovery paths, retry/time
+Full state-machine transitions, checkpoint restore/recovery paths, retry/time
 events, and untrusted-source-to-sensitive-sink flows are not yet covered because
 NanoHarness does not expose stable normalized events for all of them. They must
 be added as runtime contracts before those dimensions can enter a denominator.

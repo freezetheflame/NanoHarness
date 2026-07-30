@@ -34,6 +34,7 @@ nanoharness/testing/
   oracle.py         # deterministic, model-based, and LLM-assisted oracles
   trace.py          # canonical versioned events and trace serialization
   replay.py         # replay model, tools, time, retries, and policy decisions
+  runtime.py        # Context/state/hook/permission boundary recording
   faults.py         # declarative fault schedules and injection hooks
   defects.py        # real-defect corpus, evidence, coding, and audit gates
   coverage.py       # behavioral coverage collection and reports
@@ -136,9 +137,10 @@ separate future layer.
 3. **Core implemented:** define serializable `Scenario`, deterministic
    `TestOracle`, and `ScenarioRunner` contracts. A dedicated pytest fixture and
    marker plugin remains to be implemented.
-4. **Model/tool foundation implemented:** add versioned declarative fault plans,
-   deterministic occurrence matching, runtime evidence, and executable Oracle
-   campaigns. State, Context, permission, and hook boundaries remain.
+4. **Boundary foundation implemented:** add recording and executable fault
+   decorators for model, tool, Context, state, hook, and permission boundaries,
+   with deterministic occurrence matching, provenance, and Oracle campaigns.
+   Branch-aware replay and external sandbox validation remain.
 5. **Coverage foundation implemented:** add explicit versioned target universes,
    tool-argument equivalence classes, cross-run evidence aggregation,
    per-dimension reports, and opt-in gates. Subject-specific frozen models and

@@ -17,6 +17,7 @@ from nanoharness.testing.trace import (
     TraceRecorder,
     normalize_trace_value,
     redact_sensitive_fields,
+    upgrade_trace,
 )
 
 
@@ -78,10 +79,15 @@ class RecordedExecutionError(ReplayError):
 
 def _detached_trace(trace: Union[AgentTrace, Dict[str, Any], str]) -> AgentTrace:
     if isinstance(trace, AgentTrace):
-        return AgentTrace.model_validate(trace.model_dump())
-    if isinstance(trace, str):
-        return AgentTrace.model_validate_json(trace)
-    return AgentTrace.model_validate(trace)
+        detached = AgentTrace.model_validate(trace.model_dump())
+    elif isinstance(trace, str):
+        detached = AgentTrace.model_validate_json(trace)
+    else:
+        detached = AgentTrace.model_validate(trace)
+    try:
+        return upgrade_trace(detached)
+    except ValueError as exc:
+        raise UnsupportedTraceVersionError(str(exc)) from exc
 
 
 def _prepare(value: Any, redactor: Callable[[Any], Any]) -> Any:
@@ -101,7 +107,9 @@ class ReplaySession:
         self._validate_trace(detached)
         self.trace_id = detached.trace_id
         self._events = [
-            event for event in detached.events if event.event_type in _REPLAY_EVENT_TYPES
+            event
+            for event in detached.events
+            if event.event_type in _REPLAY_EVENT_TYPES
         ]
         self._index = 0
         self._lock = threading.RLock()

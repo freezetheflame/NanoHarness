@@ -27,6 +27,8 @@ Template、Draft 和冻结后被修改的 Target。
 - Tool Call；
 - Tool Argument 等价类（`present`、`missing`、`equals`、`one_of`、JSON
   `type`、数值 `range` 和 `regex`）；
+- Context Message Role、State Save/Load Value Class、Hook Stage Outcome 和
+  Permission Allow/Deny Decision；
 - `RunStatus` 和 `StopReason`；
 - Lifecycle Event Type；
 - Model、Tool 和 Hook Error Event；
@@ -35,7 +37,7 @@ Template、Draft 和冻结后被修改的 Target。
 - 已注入 Fault Action 以及对应 Scenario 是否通过；
 - 已声明 Trace Metadata，例如 Baseline/Fault-injected 模式。
 
-State Transition、Permission Decision、Checkpoint/Recovery Path、Retry/Time Event
+State Machine 的完整 Transition、Checkpoint Restore/Recovery Path、Retry/Time Event
 和 Untrusted-source-to-sensitive-sink Flow 仍未覆盖，因为 NanoHarness 尚未对它们全部
 提供稳定统一 Event。在这些维度进入分母前，必须先增加 Runtime Contract。没有
 Target 不代表该行为已被测试。

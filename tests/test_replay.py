@@ -22,6 +22,7 @@ from nanoharness.testing import (
     ReplayToolRegistry,
     TraceEventType,
     TraceRecorder,
+    TRACE_SCHEMA_VERSION,
     UnconsumedReplayEventsError,
     UnsupportedTraceVersionError,
 )
@@ -233,13 +234,30 @@ class TestReplayFailures:
 class TestReplayTraceIntegrity:
     def test_rejects_unsupported_trace_version(self):
         trace = AgentTrace(
-            schema_version=2,
+            schema_version=TRACE_SCHEMA_VERSION + 1,
             trace_id="future",
             started_at=0,
         )
 
-        with pytest.raises(UnsupportedTraceVersionError, match="version 2"):
+        with pytest.raises(
+            UnsupportedTraceVersionError,
+            match=f"version {TRACE_SCHEMA_VERSION + 1}",
+        ):
             ReplaySession(trace)
+
+    def test_legacy_v1_trace_is_migrated_without_mutating_source(self, mock_llm):
+        recorder = TraceRecorder(trace_id="legacy")
+        RecordingLLM(mock_llm([LLMResponse(content="old")]), recorder).chat([])
+        data = recorder.snapshot().model_dump()
+        data["schema_version"] = 1
+        for event in data["events"]:
+            event["schema_version"] = 1
+        legacy = AgentTrace.model_validate(data)
+
+        replay = ReplayLLM(legacy)
+
+        assert replay.chat([]).content == "old"
+        assert legacy.schema_version == 1
 
     @pytest.mark.parametrize(
         "mutation, message",

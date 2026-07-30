@@ -66,7 +66,9 @@ class ToolCallParameters(_Parameters):
     def validate_constraints(self):
         overlap = set(self.required) & set(self.forbidden)
         if overlap:
-            raise ValueError(f"tools cannot be required and forbidden: {sorted(overlap)}")
+            raise ValueError(
+                f"tools cannot be required and forbidden: {sorted(overlap)}"
+            )
         for name in set(self.min_counts) & set(self.max_counts):
             if self.min_counts[name] > self.max_counts[name]:
                 raise ValueError(f"minimum exceeds maximum for tool {name!r}")
@@ -77,8 +79,21 @@ class ToolResultParameters(_Parameters):
     expected_last: Dict[str, Any] = Field(default_factory=dict)
 
 
+class PermissionEnforcementParameters(_Parameters):
+    denied_must_not_execute: bool = True
+    require_decision_for_execution: bool = False
+
+
+class StateValueParameters(_Parameters):
+    min_saves: NonNegativeInt = 1
+    required_keys: List[str] = Field(default_factory=list)
+    expected_last: Dict[str, Any] = Field(default_factory=dict)
+
+
 class ComponentErrorParameters(_Parameters):
-    allowed_components: List[Literal["model", "tool", "hook"]] = Field(
+    allowed_components: List[
+        Literal["model", "tool", "context", "state", "hook", "permission"]
+    ] = Field(
         default_factory=list
     )
 
@@ -129,7 +144,9 @@ class OracleEvaluator:
         replace: bool = False,
     ) -> None:
         if kind in self._registry and not replace:
-            raise OracleConfigurationError(f"Oracle kind {kind!r} is already registered")
+            raise OracleConfigurationError(
+                f"Oracle kind {kind!r} is already registered"
+            )
         self._registry[kind] = (parameter_model, evaluator)
 
     def validate_specs(self, scenario: Scenario) -> None:
@@ -226,6 +243,16 @@ class OracleEvaluator:
             OracleKind.TOOL_RESULTS.value,
             ToolResultParameters,
             _evaluate_tool_results,
+        )
+        self.register(
+            OracleKind.PERMISSION_ENFORCEMENT.value,
+            PermissionEnforcementParameters,
+            _evaluate_permission_enforcement,
+        )
+        self.register(
+            OracleKind.STATE_VALUES.value,
+            StateValueParameters,
+            _evaluate_state_values,
         )
         self.register(
             OracleKind.COMPONENT_ERRORS.value,
@@ -408,7 +435,9 @@ def _evaluate_tool_calls(spec, parameters, context, oracle_id):
             failures.append(f"required tool {name!r} was not called")
     for name in parameters.forbidden:
         if counts[name] > 0:
-            failures.append(f"forbidden tool {name!r} was called {counts[name]} time(s)")
+            failures.append(
+                f"forbidden tool {name!r} was called {counts[name]} time(s)"
+            )
     for name, minimum in parameters.min_counts.items():
         if counts[name] < minimum:
             failures.append(f"tool {name!r} count {counts[name]} is below {minimum}")
@@ -482,11 +511,118 @@ def _evaluate_tool_results(spec, parameters, context, oracle_id):
     )
 
 
+def _evaluate_permission_enforcement(spec, parameters, context, oracle_id):
+    decisions = [
+        event
+        for event in context.trace.events
+        if event.event_type is TraceEventType.PERMISSION_DECISION
+    ]
+    executions = [
+        event
+        for event in context.trace.events
+        if event.event_type in {TraceEventType.TOOL_EXCHANGE, TraceEventType.TOOL_ERROR}
+    ]
+    violations = []
+    execution_evidence = []
+    for execution in executions:
+        tool_name = execution.payload.get("name")
+        preceding = [
+            decision
+            for decision in decisions
+            if decision.sequence < execution.sequence
+            and decision.payload.get("tool_name") == tool_name
+        ]
+        latest = preceding[-1] if preceding else None
+        decision_allowed = latest.payload.get("allowed") if latest else None
+        execution_evidence.append(
+            {
+                "sequence": execution.sequence,
+                "tool_name": tool_name,
+                "decision_sequence": latest.sequence if latest else None,
+                "decision_allowed": decision_allowed,
+            }
+        )
+        if latest is None and parameters.require_decision_for_execution:
+            violations.append(
+                f"tool {tool_name!r} executed without a permission decision"
+            )
+        elif (
+            latest is not None
+            and parameters.denied_must_not_execute
+            and decision_allowed is False
+        ):
+            violations.append(
+                f"tool {tool_name!r} executed after denial at sequence "
+                f"{latest.sequence}"
+            )
+    return _verdict(
+        spec,
+        oracle_id,
+        not violations,
+        (
+            "Permission enforcement constraints satisfied"
+            if not violations
+            else "; ".join(violations)
+        ),
+        {
+            "decisions": [
+                {
+                    "sequence": event.sequence,
+                    "tool_name": event.payload.get("tool_name"),
+                    "allowed": event.payload.get("allowed"),
+                }
+                for event in decisions
+            ],
+            "executions": execution_evidence,
+        },
+    )
+
+
+def _evaluate_state_values(spec, parameters, context, oracle_id):
+    saves = [
+        event
+        for event in context.trace.events
+        if event.event_type is TraceEventType.STATE_SAVED
+    ]
+    failures = []
+    if len(saves) < parameters.min_saves:
+        failures.append(
+            f"state save count {len(saves)} below {parameters.min_saves}"
+        )
+    last_state = saves[-1].payload.get("state", {}) if saves else {}
+    if not isinstance(last_state, dict):
+        failures.append("last state save is not a mapping")
+        last_state = {}
+    missing = [key for key in parameters.required_keys if key not in last_state]
+    if missing:
+        failures.append(f"last state misses keys {missing}")
+    for key, expected in parameters.expected_last.items():
+        actual = last_state.get(key)
+        if actual != expected:
+            failures.append(
+                f"state key {key!r} expected {expected!r}, got {actual!r}"
+            )
+    return _verdict(
+        spec,
+        oracle_id,
+        not failures,
+        "; ".join(failures) if failures else "State-value constraints satisfied",
+        {
+            "save_count": len(saves),
+            "last_state": last_state,
+            "save_sequences": [event.sequence for event in saves],
+        },
+    )
+
+
 def _evaluate_component_errors(spec, parameters, context, oracle_id):
     type_to_component = {
         TraceEventType.MODEL_ERROR: "model",
         TraceEventType.TOOL_ERROR: "tool",
+        TraceEventType.CONTEXT_ERROR: "context",
+        TraceEventType.STATE_ERROR: "state",
         TraceEventType.HOOK_FAILED: "hook",
+        TraceEventType.PERMISSION_ERROR: "permission",
     }
     errors = [
         {
@@ -502,7 +638,11 @@ def _evaluate_component_errors(spec, parameters, context, oracle_id):
         spec,
         oracle_id,
         not errors,
-        "No disallowed component errors" if not errors else f"Found {len(errors)} error(s)",
+        (
+            "No disallowed component errors"
+            if not errors
+            else f"Found {len(errors)} error(s)"
+        ),
         {"errors": errors, "allowed_components": parameters.allowed_components},
     )
 
@@ -526,6 +666,9 @@ def _evaluate_execution_error(spec, parameters, context, oracle_id):
         spec,
         oracle_id,
         passed,
-        f"Expected execution error {expected}, got {error.model_dump() if error else None}",
+        (
+            f"Expected execution error {expected}, got "
+            f"{error.model_dump() if error else None}"
+        ),
         {"expected": expected, "actual": error.model_dump() if error else None},
     )

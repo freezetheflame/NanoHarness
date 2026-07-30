@@ -3,20 +3,25 @@ from typing import Any, Dict, List, Optional
 import pytest
 from pydantic import ValidationError
 
-from nanoharness.components.tools.dict_registry import DictToolRegistry
 from nanoharness.components.context.simple_context import SimpleContextManager
 from nanoharness.components.evaluator.trace_evaluator import TraceEvaluator
 from nanoharness.components.hooks.simple_hooks import SimpleHookManager
 from nanoharness.components.state.json_store import JsonStateStore
+from nanoharness.components.tools.dict_registry import DictToolRegistry
+from nanoharness.core.base import BaseStateStore, HookStage
 from nanoharness.core.engine import NanoEngine
-from nanoharness.core.schema import LLMResponse, ToolCall
+from nanoharness.core.schema import AgentMessage, LLMResponse, ToolCall
 from nanoharness.testing import (
     FAULT_SCHEMA_VERSION,
     FaultAction,
     FaultCampaignConfigurationError,
     FaultCampaignRunner,
     FaultComponent,
+    FaultInjectingContextManager,
+    FaultInjectingHookManager,
     FaultInjectingLLM,
+    FaultInjectingPermissionManager,
+    FaultInjectingStateStore,
     FaultInjectingToolRegistry,
     FaultPlan,
     FaultRule,
@@ -26,6 +31,10 @@ from nanoharness.testing import (
     OracleKind,
     OracleSpec,
     RecordingLLM,
+    RecordingContextManager,
+    RecordingHookManager,
+    RecordingPermissionManager,
+    RecordingStateStore,
     RecordingToolRegistry,
     Scenario,
 )
@@ -71,6 +80,22 @@ def test_fault_plan_round_trips_and_rejects_duplicate_rule_ids():
     assert plan.schema_version == FAULT_SCHEMA_VERSION
     with pytest.raises(ValidationError, match="Duplicate fault rule IDs"):
         _plan(rule, rule)
+
+
+def test_legacy_v1_fault_plan_is_upgraded_in_detached_session():
+    plan = _plan(
+        _rule(
+            "legacy-drop",
+            FaultComponent.MODEL,
+            FaultAction.MODEL_RESPONSE_DROP,
+        )
+    )
+    plan.schema_version = 1
+
+    session = FaultSession(plan)
+
+    assert session.plan.schema_version == FAULT_SCHEMA_VERSION
+    assert plan.schema_version == 1
 
 
 def test_fault_plan_normalizes_non_json_replacement_values():
@@ -358,6 +383,181 @@ def test_shared_session_produces_one_ordered_report_and_can_reset():
     assert session.report().applications == []
 
 
+class MemoryStateStore(BaseStateStore):
+    def __init__(self):
+        self.value = {}
+        self.save_count = 0
+
+    def save_state(self, state):
+        self.value = dict(state)
+        self.save_count += 1
+
+    def load_state(self):
+        return dict(self.value)
+
+    def reset(self):
+        self.value = {}
+
+
+class Permission:
+    def __init__(self, denial):
+        self.denial = denial
+
+    def enforce(self, tool_name, args):
+        return self.denial
+
+
+def test_context_message_drop_is_role_scoped_and_executable():
+    context = SimpleContextManager()
+    session = FaultSession(
+        _plan(
+            _rule(
+                "drop-user",
+                FaultComponent.CONTEXT,
+                FaultAction.CONTEXT_MESSAGE_DROP,
+                message_role="user",
+            )
+        )
+    )
+    injected = FaultInjectingContextManager(context, session)
+
+    injected.add_message(AgentMessage(role="system", content="keep"))
+    injected.add_message(AgentMessage(role="user", content="drop"))
+
+    assert [message["content"] for message in injected.get_full_context()] == ["keep"]
+    application = session.report().applications[0]
+    assert application.message_role == "user"
+
+
+def test_checkpoint_corruption_does_not_alias_caller_state():
+    state = MemoryStateStore()
+    session = FaultSession(
+        _plan(
+            _rule(
+                "corrupt-step",
+                FaultComponent.STATE,
+                FaultAction.CHECKPOINT_CORRUPT,
+                state_key="current_step",
+                replacement=99,
+            )
+        )
+    )
+    original = {"current_step": 1, "status": "ok"}
+
+    FaultInjectingStateStore(state, session).save_state(original)
+
+    assert original["current_step"] == 1
+    assert state.value["current_step"] == 99
+    assert session.report().applications[0].state_key == "current_step"
+
+
+def test_state_save_drop_skips_delegate():
+    state = MemoryStateStore()
+    session = FaultSession(
+        _plan(
+            _rule(
+                "drop-save",
+                FaultComponent.STATE,
+                FaultAction.STATE_SAVE_DROP,
+            )
+        )
+    )
+
+    FaultInjectingStateStore(state, session).save_state({"step": 1})
+
+    assert state.save_count == 0
+    assert session.report().effective_rule_ids == ["drop-save"]
+
+
+def test_hook_skip_prevents_registered_callback():
+    called = []
+    hooks = SimpleHookManager()
+    hooks.register(HookStage.ON_TASK_END, lambda data: called.append(data))
+    session = FaultSession(
+        _plan(
+            _rule(
+                "skip-end",
+                FaultComponent.HOOK,
+                FaultAction.HOOK_SKIP,
+                hook_stage=HookStage.ON_TASK_END.value,
+            )
+        )
+    )
+
+    FaultInjectingHookManager(hooks, session).trigger(HookStage.ON_TASK_END, "done")
+
+    assert called == []
+    assert session.report().applications[0].hook_stage == "on_task_end"
+
+
+@pytest.mark.parametrize(
+    "denial, effective",
+    [("denied", True), (None, False)],
+)
+def test_permission_bypass_reports_whether_a_denial_changed(denial, effective):
+    session = FaultSession(
+        _plan(
+            _rule(
+                "bypass",
+                FaultComponent.PERMISSION,
+                FaultAction.PERMISSION_BYPASS,
+                tool_name="write",
+            )
+        )
+    )
+
+    result = FaultInjectingPermissionManager(
+        Permission(denial), session
+    ).enforce("write", {})
+
+    assert result is None
+    assert session.report().applications[0].effective is effective
+
+
+@pytest.mark.parametrize(
+    "component, action, kwargs, message",
+    [
+        (
+            FaultComponent.TOOL,
+            FaultAction.CONTEXT_MESSAGE_DROP,
+            {},
+            "requires the context component",
+        ),
+        (
+            FaultComponent.STATE,
+            FaultAction.CHECKPOINT_CORRUPT,
+            {},
+            "requires state_key",
+        ),
+        (
+            FaultComponent.HOOK,
+            FaultAction.HOOK_SKIP,
+            {},
+            "requires hook_stage",
+        ),
+        (
+            FaultComponent.CONTEXT,
+            FaultAction.CONTEXT_MESSAGE_DROP,
+            {"tool_name": "echo"},
+            "unrelated selectors",
+        ),
+    ],
+)
+def test_runtime_fault_rules_validate_boundary_contracts(
+    component,
+    action,
+    kwargs,
+    message,
+):
+    with pytest.raises(ValidationError, match=message):
+        FaultRule(
+            rule_id="invalid-runtime",
+            component=component,
+            action=action,
+            **kwargs,
+        )
+
+
 class TestFaultCampaign:
     @staticmethod
     def engine_factory(scenario, recorder, session):
@@ -522,3 +722,173 @@ class TestFaultCampaign:
         assert campaign.errors == 1
         assert campaign.not_applicable == 0
         assert campaign.mutation_score is None
+
+    def test_permission_bypass_is_killed_by_execution_order_oracle(self):
+        def factory(scenario, recorder, session):
+            registry, _ = _registry_with_counter()
+            permissions = RecordingPermissionManager(
+                Permission("denied by policy"),
+                recorder,
+            )
+            if session is not None:
+                permissions = FaultInjectingPermissionManager(permissions, session)
+            return NanoEngine(
+                llm_client=RecordingLLM(
+                    StaticLLM([
+                        LLMResponse(
+                            content="echo",
+                            tool_calls=[
+                                ToolCall(name="echo", arguments={"text": "hello"})
+                            ],
+                        ),
+                        LLMResponse(content="done"),
+                    ]),
+                    recorder,
+                ),
+                tools=RecordingToolRegistry(registry, recorder),
+                context=SimpleContextManager(),
+                state=JsonStateStore("/tmp/fault-permission.json"),
+                hooks=SimpleHookManager(),
+                evaluator=TraceEvaluator(),
+                permissions=permissions,
+            )
+
+        scenario = Scenario(
+            scenario_id="permission-bypass",
+            query="echo hello",
+            oracles=[OracleSpec(kind=OracleKind.PERMISSION_ENFORCEMENT)],
+        )
+        plan = FaultPlan(
+            plan_id="bypass",
+            rules=[
+                _rule(
+                    "bypass-echo",
+                    FaultComponent.PERMISSION,
+                    FaultAction.PERMISSION_BYPASS,
+                    tool_name="echo",
+                )
+            ],
+        )
+
+        campaign = FaultCampaignRunner(factory).run(scenario, [plan])
+
+        assert campaign.baseline.passed is True
+        assert campaign.outcomes[0].status is MutationStatus.KILLED
+        assert campaign.outcomes[0].fault_report.effective_rule_ids == [
+            "bypass-echo"
+        ]
+
+    def test_context_and_hook_control_flow_faults_are_executed(self):
+        def factory(scenario, recorder, session):
+            context = RecordingContextManager(SimpleContextManager(), recorder)
+            hooks = RecordingHookManager(SimpleHookManager(), recorder)
+            if session is not None:
+                context = FaultInjectingContextManager(context, session)
+                hooks = FaultInjectingHookManager(hooks, session)
+            return NanoEngine(
+                llm_client=RecordingLLM(
+                    StaticLLM([LLMResponse(content="done")]),
+                    recorder,
+                ),
+                tools=RecordingToolRegistry(DictToolRegistry(), recorder),
+                context=context,
+                state=JsonStateStore("/tmp/fault-context-hook.json"),
+                hooks=hooks,
+                evaluator=TraceEvaluator(),
+            )
+
+        context_scenario = Scenario(
+            scenario_id="context-drop-live",
+            query="retain this goal",
+            oracles=[OracleSpec(kind=OracleKind.MODEL_MESSAGES)],
+        )
+        context_plan = FaultPlan(
+            plan_id="drop-context",
+            rules=[
+                _rule(
+                    "drop-user",
+                    FaultComponent.CONTEXT,
+                    FaultAction.CONTEXT_MESSAGE_DROP,
+                    message_role="user",
+                )
+            ],
+        )
+        hook_scenario = Scenario(
+            scenario_id="hook-skip-live",
+            query="finish",
+            oracles=[OracleSpec(kind=OracleKind.LIFECYCLE)],
+        )
+        hook_plan = FaultPlan(
+            plan_id="skip-hook",
+            rules=[
+                _rule(
+                    "skip-task-end",
+                    FaultComponent.HOOK,
+                    FaultAction.HOOK_SKIP,
+                    hook_stage=HookStage.ON_TASK_END.value,
+                )
+            ],
+        )
+
+        context_campaign = FaultCampaignRunner(factory).run(
+            context_scenario,
+            [context_plan],
+        )
+        hook_campaign = FaultCampaignRunner(factory).run(
+            hook_scenario,
+            [hook_plan],
+        )
+
+        assert context_campaign.outcomes[0].status is MutationStatus.KILLED
+        assert hook_campaign.outcomes[0].status is MutationStatus.KILLED
+
+    def test_checkpoint_corruption_is_killed_by_state_oracle(self):
+        def factory(scenario, recorder, session):
+            state = RecordingStateStore(MemoryStateStore(), recorder)
+            if session is not None:
+                state = FaultInjectingStateStore(state, session)
+            return NanoEngine(
+                llm_client=RecordingLLM(
+                    StaticLLM([LLMResponse(content="done")]),
+                    recorder,
+                ),
+                tools=RecordingToolRegistry(DictToolRegistry(), recorder),
+                context=SimpleContextManager(),
+                state=state,
+                hooks=SimpleHookManager(),
+                evaluator=TraceEvaluator(),
+            )
+
+        scenario = Scenario(
+            scenario_id="checkpoint-corruption",
+            query="finish",
+            oracles=[
+                OracleSpec(
+                    kind=OracleKind.STATE_VALUES,
+                    parameters={
+                        "required_keys": ["current_step", "status"],
+                        "expected_last": {
+                            "current_step": 0,
+                            "status": "terminated",
+                        },
+                    },
+                )
+            ],
+        )
+        plan = FaultPlan(
+            plan_id="corrupt-checkpoint",
+            rules=[
+                _rule(
+                    "corrupt-step",
+                    FaultComponent.STATE,
+                    FaultAction.CHECKPOINT_CORRUPT,
+                    state_key="current_step",
+                    replacement=99,
+                )
+            ],
+        )
+
+        campaign = FaultCampaignRunner(factory).run(scenario, [plan])
+
+        assert campaign.baseline.passed is True
+        assert campaign.outcomes[0].status is MutationStatus.KILLED
