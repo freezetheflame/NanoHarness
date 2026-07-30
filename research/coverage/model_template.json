@@ -24,6 +24,11 @@
       "parameters": {"reason": "model_terminated"}
     },
     {
+      "target_id": "stop.subject-completed",
+      "kind": "stop_reason",
+      "parameters": {"reason": "subject_completed"}
+    },
+    {
       "target_id": "stop.evaluator",
       "kind": "stop_reason",
       "parameters": {"reason": "evaluator_stopped"}

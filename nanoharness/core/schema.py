@@ -63,6 +63,7 @@ class StopReason(str, Enum):
     """Canonical reason why the engine stopped executing steps."""
 
     MODEL_TERMINATED = "model_terminated"
+    SUBJECT_COMPLETED = "subject_completed"
     EVALUATOR_STOPPED = "evaluator_stopped"
     MAX_STEPS = "max_steps"
     ERROR = "error"

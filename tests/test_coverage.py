@@ -398,7 +398,7 @@ def test_repository_coverage_template_is_valid_but_explicitly_not_frozen():
 
     model = CoverageModel.model_validate_json(path.read_text())
 
-    assert len(model.targets) == 32
+    assert len(model.targets) == 33
     assert model.status is CoverageModelStatus.TEMPLATE
 
 
