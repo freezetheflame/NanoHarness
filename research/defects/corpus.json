@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "corpus_id": "nanoharness-agent-defects-v0",
+  "protocol_version": "1.0-draft",
+  "operator_catalog": [
+    "model_response_drop",
+    "tool_name_swap",
+    "tool_argument_drop",
+    "tool_result_stale",
+    "tool_call_duplicate",
+    "context_message_drop",
+    "hook_skip",
+    "permission_bypass",
+    "checkpoint_corrupt",
+    "evaluator_flip",
+    "terminated_as_success"
+  ],
+  "annotator_ids": [],
+  "records": [
+    {
+      "defect_id": "NH-CANDIDATE-001",
+      "title": "Termination and task achievement were not represented independently",
+      "source_repository": "freezetheflame/NanoHarness",
+      "summary": "The legacy run report inferred success from a terminated step and did not expose a canonical execution outcome independent of evaluator achievement.",
+      "status": "candidate",
+      "partition": "derivation",
+      "boundaries": ["evaluator", "control_flow"],
+      "symptoms": [
+        "A model-terminated run could be reported successful even when a goal-aware evaluator rejected the task outcome."
+      ],
+      "trigger": "The model stops producing tool calls before the user goal is achieved.",
+      "root_cause": "Legacy result construction conflated loop termination with task achievement.",
+      "impact": "Task-success metrics and downstream tests could accept an unsuccessful run.",
+      "evidence": [
+        {
+          "evidence_id": "NH-CANDIDATE-001-fix",
+          "kind": "fixing_change",
+          "locator": "git:d41eb3c0b1bb56090680d0e6296ffbe63e7ab9c4",
+          "repository": "freezetheflame/NanoHarness",
+          "revision": "d41eb3c0b1bb56090680d0e6296ffbe63e7ab9c4",
+          "path": "nanoharness/core/engine.py"
+        },
+        {
+          "evidence_id": "NH-CANDIDATE-001-test",
+          "kind": "regression_test",
+          "locator": "tests/test_engine.py::TestEngineFinalEvaluation::test_evaluation_is_the_only_success_verdict",
+          "repository": "freezetheflame/NanoHarness",
+          "revision": "d41eb3c0b1bb56090680d0e6296ffbe63e7ab9c4",
+          "path": "tests/test_engine.py",
+          "test_id": "TestEngineFinalEvaluation::test_evaluation_is_the_only_success_verdict"
+        }
+      ],
+      "operator_ids": ["evaluator_flip", "terminated_as_success"],
+      "annotations": [],
+      "decision_rationale": "",
+      "exclusion_reason": "",
+      "metadata": {
+        "provenance_note": "Seed candidate derived from local Git history. It must not be counted as a verified real defect until independent human coding and adjudication are complete."
+      }
+    }
+  ],
+  "frozen_at": null,
+  "metadata": {
+    "status": "draft",
+    "claim_warning": "Candidate records are pipeline inputs, not empirical evidence."
+  }
+}

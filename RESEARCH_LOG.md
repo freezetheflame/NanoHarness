@@ -99,6 +99,24 @@ Official sources consulted:
   fixtures or sandboxed live dependencies. Context, state, permission, hook,
   and branch-aware replay injection remain future work.
 
+## 2026-07-30 — Real-defect corpus protocol foundation
+
+- Added a bilingual protocol with explicit sampling, inclusion/exclusion,
+  evidence, deduplication, independent coding, adjudication, and reproducibility
+  requirements.
+- Separated operator-derivation defects from held-out validation defects to
+  prevent circular RQ1 evidence.
+- Added versioned `DefectCorpus`, `DefectRecord`, evidence, annotation, and
+  partition models with validation for verified and frozen records.
+- Added deterministic summaries, Cohen's kappa for inclusion decisions, Jaccard
+  agreement for multi-label coding, validation mapping rate, and preregistered
+  readiness gates.
+- Added a JSON analysis CLI and a machine-readable seed corpus. The single seed
+  record is explicitly `candidate`; it is not claimed or counted as a verified
+  real defect before independent human coding and adjudication.
+- Current verification after this increment: 162 core tests and 36 targeted
+  Coding Agent regression tests pass.
+
 ## AI assistance disclosure record
 
 Codex assisted with:

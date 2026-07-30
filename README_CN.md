@@ -245,6 +245,17 @@ Engine，记录规则是否触发以及是否真正改了值，再使用同一�
 Oracle 分类。Fault 装饰器应放在 Recording 装饰器内层，使 Trace 记录注入
 后的行为。
 
+真实缺陷证据使用版本化 `DefectCorpus` 管理，而不是零散笔记。
+[语料协议](REAL_DEFECT_PROTOCOL_CN.md) 将 Operator Derivation 与留出 Validation
+隔离，保留独立 Coder Annotation，并定义证据和冻结门槛。查看当前草案语料：
+
+```bash
+.venv/bin/python -m nanoharness.testing.defect_cli \
+  research/defects/corpus.json
+```
+
+Candidate 记录不作为已验证缺陷计数。
+
 ---
 
 ## 工具

@@ -32,6 +32,7 @@ nanoharness/testing/
   trace.py          # 统一的版本化事件与 Trace 序列化
   replay.py         # 重放模型、工具、时间、重试与策略决策
   faults.py         # 声明式故障计划与注入 Hook
+  defects.py        # 真实缺陷语料、证据、Coding 与审计门槛
   coverage.py       # 行为覆盖率收集与报告
   mutation.py       # Agent 专属变异算子与 Mutation Score
   differential.py   # 受控 A/B 执行与 Trace 对比
@@ -129,8 +130,11 @@ TERMINATED_AS_SUCCESS     将模型停止误认为任务完成
 5. 发布第一版行为覆盖率报告。
 6. **Trace-level 基础已实现：**七个初始算子、`MutationRunner`、结果分类与
    Mutation Score；真实缺陷验证和可执行控制流 Mutant 仍待完成。
-7. 增加差分执行与自动失败样例缩减。
-8. 通过 Adapter 接入外部环境和 Scorer。
+7. **语料协议基础已实现：**增加版本化 Defect/Evidence 模型、防泄漏
+   Derivation/Validation 分区、双 Coder 一致性、Readiness Gate 和机器可读
+   草案语料；系统收集和人类 Coding 仍待完成。
+8. 增加差分执行与自动失败样例缩减。
+9. 通过 Adapter 接入外部环境和 Scorer。
 
 每一步都需要自己的契约测试。除非缺失的运行时事件或模型本身就是需要引入的
 契约，否则测试组件不应要求修改 `NanoEngine`。

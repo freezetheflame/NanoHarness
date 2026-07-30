@@ -35,6 +35,7 @@ nanoharness/testing/
   trace.py          # canonical versioned events and trace serialization
   replay.py         # replay model, tools, time, retries, and policy decisions
   faults.py         # declarative fault schedules and injection hooks
+  defects.py        # real-defect corpus, evidence, coding, and audit gates
   coverage.py       # behavioral coverage collection and reports
   mutation.py       # agent-specific mutation operators and mutation score
   differential.py   # controlled A/B execution and trace comparison
@@ -142,8 +143,12 @@ separate future layer.
 6. **Trace-level foundation implemented:** seven initial operators,
    `MutationRunner`, outcome classification, and mutation score. Real-defect
    validation and executable control-flow mutants remain required.
-7. Add differential execution and automatic failure reduction.
-8. Integrate external environments and scorers through adapters.
+7. **Corpus protocol foundation implemented:** add versioned defect/evidence
+   models, leakage-resistant derivation/validation partitions, two-coder
+   agreement, readiness gates, and a machine-readable draft corpus. Systematic
+   collection and human coding remain required.
+8. Add differential execution and automatic failure reduction.
+9. Integrate external environments and scorers through adapters.
 
 Each step includes its own contract suite. Testing components must not require
 changes to `NanoEngine` unless a missing runtime event or model is itself the

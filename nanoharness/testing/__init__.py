@@ -76,6 +76,22 @@ from nanoharness.testing.faults import (
     FaultSession,
     InjectedFaultError,
 )
+from nanoharness.testing.defects import (
+    DEFECT_CORPUS_SCHEMA_VERSION,
+    AgreementSummary,
+    AnnotationDecision,
+    CorpusPartition,
+    CorpusReadinessReport,
+    DefectAnnotation,
+    DefectBoundary,
+    DefectCorpus,
+    DefectCorpusAnalyzer,
+    DefectCorpusSummary,
+    DefectEvidence,
+    DefectRecord,
+    DefectStatus,
+    EvidenceKind,
+)
 
 __all__ = [
     "TRACE_SCHEMA_VERSION",
@@ -142,4 +158,18 @@ __all__ = [
     "FaultRule",
     "FaultSession",
     "InjectedFaultError",
+    "DEFECT_CORPUS_SCHEMA_VERSION",
+    "AgreementSummary",
+    "AnnotationDecision",
+    "CorpusPartition",
+    "CorpusReadinessReport",
+    "DefectAnnotation",
+    "DefectBoundary",
+    "DefectCorpus",
+    "DefectCorpusAnalyzer",
+    "DefectCorpusSummary",
+    "DefectEvidence",
+    "DefectRecord",
+    "DefectStatus",
+    "EvidenceKind",
 ]

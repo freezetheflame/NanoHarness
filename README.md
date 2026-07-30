@@ -252,6 +252,18 @@ rules triggered and whether they changed a value, then classifies the execution
 through the same Scenario Oracles. Place the fault decorators inside the
 recording decorators so the resulting Trace contains the injected behavior.
 
+Real-defect evidence is kept in a versioned `DefectCorpus` rather than informal
+notes. The [corpus protocol](REAL_DEFECT_PROTOCOL.md) separates operator
+derivation from held-out validation, retains independent coder annotations, and
+defines evidence and freeze gates. Inspect the current draft corpus with:
+
+```bash
+.venv/bin/python -m nanoharness.testing.defect_cli \
+  research/defects/corpus.json
+```
+
+Candidate records are not counted as verified defects.
+
 ---
 
 ## Tools

@@ -100,11 +100,13 @@ FaultInjectingLLM / FaultInjectingToolRegistry
   Mutation Campaign。
 - 具有确定性 occurrence 匹配、全新 Engine 隔离、运行时应用证据和
   Oracle killed/survived 分类的可执行 Model/Tool Fault Campaign。
+- 版本化真实缺陷语料 Schema、证据与裁决约束、Derivation/留出 Validation
+  隔离、一致性统计、Readiness Gate、分析 CLI 和显式未验证的 Seed Candidate。
 
 仍需完成：
 
 - 专用 pytest fixture/marker 插件；
-- 真实缺陷语料与变异分类的构建协议；
+- 系统缺陷检索、独立人类 Coding 与语料冻结；
 - 对初始 Mutation Operator 的真实缺陷验证；
 - Context、State、Permission 和 Hook 边界的可执行注入；
 - 用于控制流变异的 branch-aware Replay 或 Sandbox 实验对象；

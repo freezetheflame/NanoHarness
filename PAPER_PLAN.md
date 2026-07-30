@@ -116,11 +116,14 @@ Implemented evidence:
 - executable model/tool fault campaigns with deterministic occurrence matching,
   fresh-engine isolation, runtime application evidence, and Oracle-based
   killed/survived classification.
+- a versioned real-defect corpus schema, evidence and adjudication constraints,
+  derivation/held-out-validation separation, agreement statistics, readiness
+  gates, analysis CLI, and an explicitly unverified seed candidate.
 
 Still required:
 
 - the dedicated pytest fixture/marker plugin;
-- the real-defect corpus and mutation taxonomy protocol;
+- systematic defect retrieval, independent human coding, and corpus freeze;
 - real-defect validation for the initial mutation operators;
 - executable injection at Context, state, permission, and hook boundaries;
 - branch-aware replay or sandbox subjects for control-flow-changing faults;
