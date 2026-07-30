@@ -27,6 +27,7 @@ from nanoharness.testing import (  # noqa: E402
     FaultRule,
     MutationStatus,
     SubjectFaultCampaignRunner,
+    SubjectFaultExperimentReport,
     SubjectIdentity,
     TraceEventType,
     fault_experiment_manifest_digest,
@@ -312,3 +313,60 @@ def test_real_agentdojo_original_utility_classifies_native_tool_faults():
         and event.payload.get("name") == "schedule_transaction"
     )
     assert duplicate_exchange.payload["attempt_count"] == 2
+
+
+def test_archived_agentdojo_native_fault_pilot_has_state_and_delivery_evidence():
+    root = (
+        Path(__file__).parents[2]
+        / "research"
+        / "pilots"
+        / "agentdojo_native_tool_faults"
+    )
+    manifest_raw = (root / "manifest.json").read_bytes()
+    report_raw = (root / "raw" / "fault_campaign.json").read_bytes()
+    manifest = FaultExperimentManifest.model_validate_json(manifest_raw)
+    report = SubjectFaultExperimentReport.model_validate_json(report_raw)
+
+    assert report.manifest == manifest
+    assert manifest.manifest_digest == (
+        "96b83e8a481303b3073dcaee58d47783f2cce7fd7b4758c10633118033cd2922"
+    )
+    assert report.campaign.baseline.passed is True
+    assert [outcome.status for outcome in report.campaign.outcomes] == [
+        MutationStatus.KILLED,
+        MutationStatus.SURVIVED,
+        MutationStatus.SURVIVED,
+    ]
+    assert report.campaign.mutation_score == pytest.approx(1 / 3)
+
+    stale = report.campaign.outcomes[1].scenario_report
+    stale_exchange = next(
+        event
+        for event in stale.trace.events
+        if event.event_type is TraceEventType.TOOL_EXCHANGE
+        and event.payload.get("name") == "get_most_recent_transactions"
+    )
+    assert stale_exchange.payload["result"] == "[]"
+    duplicate = report.campaign.outcomes[2].scenario_report
+    duplicate_exchange = next(
+        event
+        for event in duplicate.trace.events
+        if event.event_type is TraceEventType.TOOL_EXCHANGE
+        and event.payload.get("name") == "schedule_transaction"
+    )
+    assert duplicate_exchange.payload["attempt_count"] == 2
+
+    def post_digest(scenario_report):
+        return next(
+            event.payload["post_environment_digest"]
+            for event in scenario_report.trace.events
+            if event.payload.get("adapter_event") == "utility_scored"
+        )
+
+    assert post_digest(duplicate) != post_digest(report.campaign.baseline)
+    assert hashlib.sha256(manifest_raw).hexdigest() == (
+        "f7bed55386abc5eed545613dca300bf64a10ce7e1326df7f04d2a9091c3013a9"
+    )
+    assert hashlib.sha256(report_raw).hexdigest() == (
+        "17f85f45d4f3ddbf53e5c2b54de1d44cbd2b237279bd192806b822566ba9776c"
+    )
