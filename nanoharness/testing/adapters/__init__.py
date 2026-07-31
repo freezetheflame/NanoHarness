@@ -23,6 +23,12 @@ from nanoharness.testing.adapters.agentdojo import (
     AgentDojoRuntimeFactory,
     AgentDojoSubjectAdapter,
 )
+from nanoharness.testing.adapters.tau2 import (
+    TAU2_NATIVE_BINDING,
+    Tau2SimulationFactory,
+    Tau2SubjectAdapter,
+    Tau2UnavailableError,
+)
 
 __all__ = [
     "CallableSubjectAdapter",
@@ -42,4 +48,8 @@ __all__ = [
     "AgentDojoPipelineFactory",
     "AgentDojoRuntimeFactory",
     "AgentDojoSubjectAdapter",
+    "TAU2_NATIVE_BINDING",
+    "Tau2SimulationFactory",
+    "Tau2SubjectAdapter",
+    "Tau2UnavailableError",
 ]

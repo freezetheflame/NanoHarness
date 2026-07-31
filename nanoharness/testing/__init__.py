@@ -142,6 +142,10 @@ from nanoharness.testing.adapters import (
     AgentDojoPipelineFactory,
     AgentDojoRuntimeFactory,
     AgentDojoSubjectAdapter,
+    TAU2_NATIVE_BINDING,
+    Tau2SimulationFactory,
+    Tau2SubjectAdapter,
+    Tau2UnavailableError,
 )
 from nanoharness.testing.experiment import (
     EXPERIMENT_SCHEMA_VERSION,
@@ -324,6 +328,10 @@ __all__ = [
     "AgentDojoPipelineFactory",
     "AgentDojoRuntimeFactory",
     "AgentDojoSubjectAdapter",
+    "TAU2_NATIVE_BINDING",
+    "Tau2SimulationFactory",
+    "Tau2SubjectAdapter",
+    "Tau2UnavailableError",
     "EXPERIMENT_SCHEMA_VERSION",
     "ExperimentCell",
     "ExperimentConfigurationError",

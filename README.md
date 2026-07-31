@@ -316,9 +316,12 @@ provenance, and retains the complete simulated-user fixture, split membership,
 upstream issue status, reward basis, natural-language assertions, reference
 actions, and domain-state/policy digests. `T0-DB` and `T0-native-full` are named
 separately, and a reference action list is never converted into an exact-call
-Oracle. Native execution and grading require a separate Python 3.12 environment
-for the pinned `tau2==1.0.1`; the core NanoHarness environment remains usable
-on Python 3.10 and 3.11.
+Oracle. `Tau2SubjectAdapter` binds a native half-duplex `SimulationRun` to the
+original deterministic DB evaluator, task-derived state deltas, and semantic
+side-effect ledgers. Native execution and grading require a separate Python
+3.12 environment containing the pinned Git revision; the core NanoHarness
+environment remains usable on Python 3.10 and 3.11. See
+`research/pilots/tau2_native_bridge/` for the claim-bounded Pilot runner.
 
 The companion `agentdojo_scorer_bridge/` Pilot derives explicitly bound
 execution Scenarios and invokes the original utility over native AgentDojo

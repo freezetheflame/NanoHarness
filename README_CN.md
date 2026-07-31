@@ -297,6 +297,12 @@ uv pip install --python .venv/bin/python -e '.[agentdojo-research]'
 转换后的 Reference Call 不是规范性唯一答案，Oracle 也保持未绑定；将这些 Scenario
 用于实验前请先阅读 Pilot README 的主张边界。
 
+tau2 Converter 同样保持离线，不导入 Benchmark 包，并固定 `tasks.json`、源码版本、
+任务 Fixture、Reward Basis 与 Domain 状态摘要。`Tau2SubjectAdapter` 可在隔离的
+Python 3.12 环境中，将原生 half-duplex `SimulationRun` 绑定到原始确定性 DB
+Evaluator、任务派生的状态增量和语义副作用账本，同时不把 Reference Actions 当成
+唯一正确调用序列。可复现入口与主张边界见 `research/pilots/tau2_native_bridge/`。
+
 配套的 `agentdojo_scorer_bridge/` Pilot 会派生显式绑定的执行 Scenario，并让原始
 Utility 在 AgentDojo 原生 Pre/Post Environment 上评分。确定性 GroundTruthPipeline
 结果只验证 Bridge，不是 Agent 性能结果。
