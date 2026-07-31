@@ -90,6 +90,20 @@ class StateValueParameters(_Parameters):
     expected_last: Dict[str, Any] = Field(default_factory=dict)
 
 
+class StateDeltaParameters(_Parameters):
+    scope: str = Field(min_length=1)
+    expected_changes: Dict[str, Any] = Field(default_factory=dict)
+    allow_unexpected_changes: bool = False
+
+
+class SideEffectParameters(_Parameters):
+    expected_attempts: Dict[str, NonNegativeInt] = Field(default_factory=dict)
+    expected_commits: Dict[str, NonNegativeInt] = Field(default_factory=dict)
+    expected_attributes: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
+    allow_unexpected_effects: bool = False
+    require_unique_attempt_ids: bool = True
+
+
 class ComponentErrorParameters(_Parameters):
     allowed_components: List[
         Literal["model", "tool", "context", "state", "hook", "permission"]
@@ -253,6 +267,16 @@ class OracleEvaluator:
             OracleKind.STATE_VALUES.value,
             StateValueParameters,
             _evaluate_state_values,
+        )
+        self.register(
+            OracleKind.STATE_DELTA.value,
+            StateDeltaParameters,
+            _evaluate_state_delta,
+        )
+        self.register(
+            OracleKind.SIDE_EFFECTS.value,
+            SideEffectParameters,
+            _evaluate_side_effects,
         )
         self.register(
             OracleKind.COMPONENT_ERRORS.value,
@@ -620,6 +644,151 @@ def _evaluate_state_values(spec, parameters, context, oracle_id):
             "save_count": len(saves),
             "last_state": last_state,
             "save_sequences": [event.sequence for event in saves],
+        },
+    )
+
+
+def _evaluate_state_delta(spec, parameters, context, oracle_id):
+    deltas = [
+        event
+        for event in context.trace.events
+        if event.event_type is TraceEventType.ENVIRONMENT_DELTA
+        and event.payload.get("scope") == parameters.scope
+    ]
+    failures = []
+    if len(deltas) != 1:
+        failures.append(
+            f"expected one environment delta for {parameters.scope!r}, "
+            f"got {len(deltas)}"
+        )
+    changes = deltas[0].payload.get("changes", {}) if len(deltas) == 1 else {}
+    if not isinstance(changes, dict):
+        failures.append("environment delta changes are not a mapping")
+        changes = {}
+    for path, expected in parameters.expected_changes.items():
+        if path not in changes:
+            failures.append(f"expected state change {path!r} is missing")
+        elif changes[path] != expected:
+            failures.append(
+                f"state change {path!r} expected {expected!r}, "
+                f"got {changes[path]!r}"
+            )
+    unexpected = sorted(set(changes) - set(parameters.expected_changes))
+    if unexpected and not parameters.allow_unexpected_changes:
+        failures.append(f"unexpected state changes {unexpected}")
+    return _verdict(
+        spec,
+        oracle_id,
+        not failures,
+        "; ".join(failures) if failures else "State-delta constraints satisfied",
+        {
+            "scope": parameters.scope,
+            "changes": changes,
+            "unexpected_changes": unexpected,
+            "delta_sequences": [event.sequence for event in deltas],
+        },
+    )
+
+
+def _evaluate_side_effects(spec, parameters, context, oracle_id):
+    events = [
+        event
+        for event in context.trace.events
+        if event.event_type is TraceEventType.SIDE_EFFECT
+    ]
+    attempt_counts = Counter()
+    commit_counts = Counter()
+    attempt_ids = Counter()
+    malformed = []
+    ledger = []
+    for event in events:
+        effect_id = event.payload.get("effect_id")
+        attempt_id = event.payload.get("attempt_id")
+        outcome = event.payload.get("outcome")
+        attributes = event.payload.get("attributes", {})
+        if (
+            not isinstance(effect_id, str)
+            or not effect_id
+            or not isinstance(attempt_id, str)
+            or not attempt_id
+            or outcome not in {"committed", "rejected", "failed"}
+            or not isinstance(attributes, dict)
+        ):
+            malformed.append(event.sequence)
+            continue
+        attempt_counts[effect_id] += 1
+        attempt_ids[attempt_id] += 1
+        if outcome == "committed":
+            commit_counts[effect_id] += 1
+        ledger.append(
+            {
+                "sequence": event.sequence,
+                "effect_id": effect_id,
+                "attempt_id": attempt_id,
+                "outcome": outcome,
+                "attributes": attributes,
+            }
+        )
+
+    failures = []
+    if malformed:
+        failures.append(f"malformed side-effect events at sequences {malformed}")
+    duplicate_attempt_ids = sorted(
+        attempt_id for attempt_id, count in attempt_ids.items() if count > 1
+    )
+    if duplicate_attempt_ids and parameters.require_unique_attempt_ids:
+        failures.append(f"duplicate side-effect attempt IDs {duplicate_attempt_ids}")
+    for effect_id, expected in parameters.expected_attempts.items():
+        actual = attempt_counts[effect_id]
+        if actual != expected:
+            failures.append(
+                f"side effect {effect_id!r} expected {expected} attempt(s), "
+                f"got {actual}"
+            )
+    for effect_id, expected in parameters.expected_commits.items():
+        actual = commit_counts[effect_id]
+        if actual != expected:
+            failures.append(
+                f"side effect {effect_id!r} expected {expected} commit(s), "
+                f"got {actual}"
+            )
+    for effect_id, expected in parameters.expected_attributes.items():
+        matching = [item for item in ledger if item["effect_id"] == effect_id]
+        if not matching:
+            failures.append(
+                f"side effect {effect_id!r} has no attempts for attribute validation"
+            )
+        for item in matching:
+            mismatches = {
+                key: {"expected": value, "actual": item["attributes"].get(key)}
+                for key, value in expected.items()
+                if item["attributes"].get(key) != value
+            }
+            if mismatches:
+                failures.append(
+                    f"side effect {effect_id!r} attempt {item['attempt_id']!r} "
+                    f"has attribute mismatches {mismatches}"
+                )
+    expected_ids = (
+        set(parameters.expected_attempts)
+        | set(parameters.expected_commits)
+        | set(parameters.expected_attributes)
+    )
+    actual_ids = set(attempt_counts)
+    unexpected = sorted(actual_ids - expected_ids)
+    if unexpected and not parameters.allow_unexpected_effects:
+        failures.append(f"unexpected side effects {unexpected}")
+    return _verdict(
+        spec,
+        oracle_id,
+        not failures,
+        "; ".join(failures) if failures else "Side-effect constraints satisfied",
+        {
+            "attempt_counts": dict(attempt_counts),
+            "commit_counts": dict(commit_counts),
+            "duplicate_attempt_ids": duplicate_attempt_ids,
+            "unexpected_effects": unexpected,
+            "ledger": ledger,
         },
     )
 

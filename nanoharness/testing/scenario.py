@@ -23,6 +23,8 @@ class OracleKind(str, Enum):
     TOOL_CALLS = "tool_calls"
     TOOL_RESULTS = "tool_results"
     STATE_VALUES = "state_values"
+    STATE_DELTA = "state_delta"
+    SIDE_EFFECTS = "side_effects"
     PERMISSION_ENFORCEMENT = "permission_enforcement"
     COMPONENT_ERRORS = "component_errors"
     EXECUTION_ERROR = "execution_error"

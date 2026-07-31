@@ -215,8 +215,8 @@ report.raise_for_failure()
 ```
 
 内置 Oracle 覆盖目标完成、运行状态、停止原因、生命周期配对、工具调用约束、
-组件故障和预期执行异常。所有 Oracle 配置都会在创建 Engine 或调用真实依赖前
-完成校验。
+任务派生的环境状态增量、恰好一次副作用账本、组件故障和预期执行异常。所有
+Oracle 配置都会在创建 Engine 或调用真实依赖前完成校验。
 
 Trace-level Mutation Campaign 可以衡量这些 Oracle 能否发现受控的可观测故障：
 

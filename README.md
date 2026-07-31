@@ -218,9 +218,9 @@ report.raise_for_failure()
 ```
 
 Built-in oracles cover goal achievement, run status, stop reason, lifecycle
-pairing, tool-call constraints, component failures, and expected execution
-errors. Oracle configuration is validated before an engine or live dependency
-is invoked.
+pairing, tool-call constraints, task-derived environment deltas, exactly-once
+side-effect ledgers, component failures, and expected execution errors. Oracle
+configuration is validated before an engine or live dependency is invoked.
 
 Trace-level mutation campaigns can measure whether those oracles detect
 controlled observable faults:

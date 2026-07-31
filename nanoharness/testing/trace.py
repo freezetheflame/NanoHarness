@@ -47,6 +47,8 @@ class TraceEventType(str, Enum):
     STATE_SAVED = "state_saved"
     STATE_LOADED = "state_loaded"
     STATE_ERROR = "state_error"
+    ENVIRONMENT_DELTA = "environment_delta"
+    SIDE_EFFECT = "side_effect"
     HOOK_STARTED = "hook_started"
     HOOK_COMPLETED = "hook_completed"
     HOOK_FAILED = "hook_failed"
@@ -256,6 +258,51 @@ class TraceRecorder:
                     "metadata": self._metadata,
                 }
             )
+
+    def record_environment_delta(
+        self,
+        scope: str,
+        changes: Mapping[str, Any],
+    ) -> TraceEvent:
+        """Record a live pre/post-state projection for a process Oracle.
+
+        ``changes`` uses task-derived semantic paths rather than tool-call
+        positions. Adapters remain responsible for computing the projection
+        from the actual pre/post environment.
+        """
+
+        if not scope:
+            raise ValueError("environment-delta scope must not be empty")
+        return self.record(
+            TraceEventType.ENVIRONMENT_DELTA,
+            {"scope": scope, "changes": changes},
+        )
+
+    def record_side_effect(
+        self,
+        effect_id: str,
+        attempt_id: str,
+        *,
+        outcome: str,
+        attributes: Optional[Mapping[str, Any]] = None,
+    ) -> TraceEvent:
+        """Record one real side-effect attempt independently of tool syntax."""
+
+        if not effect_id or not attempt_id:
+            raise ValueError("side-effect and attempt IDs must not be empty")
+        if outcome not in {"committed", "rejected", "failed"}:
+            raise ValueError(
+                "side-effect outcome must be committed, rejected, or failed"
+            )
+        return self.record(
+            TraceEventType.SIDE_EFFECT,
+            {
+                "effect_id": effect_id,
+                "attempt_id": attempt_id,
+                "outcome": outcome,
+                "attributes": attributes or {},
+            },
+        )
 
     def reset(
         self,

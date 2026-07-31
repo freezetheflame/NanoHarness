@@ -23,6 +23,7 @@ from nanoharness.testing import (
     ScenarioAssertionError,
     ScenarioReport,
     ScenarioRunner,
+    TraceRecorder,
     UnsupportedScenarioVersionError,
 )
 
@@ -185,6 +186,159 @@ class TestBuiltInOracles:
 
         assert report.passed is True
         assert report.verdicts[0].evidence["counts"] == {"echo": 1}
+
+    def test_state_delta_oracle_uses_semantic_live_state_projection(self):
+        recorder = TraceRecorder()
+        recorder.record_environment_delta(
+            "retail-db",
+            {
+                "orders/#1/status": {"before": "delivered", "after": "exchanged"},
+            },
+        )
+        scenario = Scenario(
+            scenario_id="state-delta",
+            query="exchange the item",
+            oracles=[
+                _spec(
+                    OracleKind.STATE_DELTA,
+                    scope="retail-db",
+                    expected_changes={
+                        "orders/#1/status": {
+                            "before": "delivered",
+                            "after": "exchanged",
+                        }
+                    },
+                )
+            ],
+        )
+
+        verdict = OracleEvaluator().evaluate(
+            scenario,
+            result=None,
+            trace=recorder.snapshot(),
+            execution_error=None,
+        )[0]
+
+        assert verdict.passed is True
+        assert verdict.evidence["unexpected_changes"] == []
+
+    def test_state_delta_oracle_rejects_unrelated_changes(self):
+        recorder = TraceRecorder()
+        recorder.record_environment_delta(
+            "retail-db",
+            {
+                "orders/#1/status": {"before": "delivered", "after": "exchanged"},
+                "users/42/balance": {"before": 100, "after": 0},
+            },
+        )
+        scenario = Scenario(
+            scenario_id="state-delta-unrelated",
+            query="exchange the item",
+            oracles=[
+                _spec(
+                    OracleKind.STATE_DELTA,
+                    scope="retail-db",
+                    expected_changes={
+                        "orders/#1/status": {
+                            "before": "delivered",
+                            "after": "exchanged",
+                        }
+                    },
+                )
+            ],
+        )
+
+        verdict = OracleEvaluator().evaluate(
+            scenario,
+            result=None,
+            trace=recorder.snapshot(),
+            execution_error=None,
+        )[0]
+
+        assert verdict.passed is False
+        assert verdict.evidence["unexpected_changes"] == ["users/42/balance"]
+
+    def test_side_effect_oracle_counts_real_attempts_not_tool_sequence(self):
+        recorder = TraceRecorder()
+        recorder.record_side_effect(
+            "exchange-order-1",
+            "attempt-1",
+            outcome="committed",
+            attributes={"order_id": "#1"},
+        )
+        scenario = Scenario(
+            scenario_id="side-effect-ledger",
+            query="exchange the item",
+            oracles=[
+                _spec(
+                    OracleKind.SIDE_EFFECTS,
+                    expected_attempts={"exchange-order-1": 1},
+                    expected_commits={"exchange-order-1": 1},
+                    expected_attributes={"exchange-order-1": {"order_id": "#1"}},
+                )
+            ],
+        )
+        evaluator = OracleEvaluator()
+
+        baseline = evaluator.evaluate(
+            scenario,
+            result=None,
+            trace=recorder.snapshot(),
+            execution_error=None,
+        )[0]
+        recorder.record_side_effect(
+            "exchange-order-1",
+            "attempt-2",
+            outcome="committed",
+            attributes={"order_id": "#1"},
+        )
+        duplicate = evaluator.evaluate(
+            scenario,
+            result=None,
+            trace=recorder.snapshot(),
+            execution_error=None,
+        )[0]
+
+        assert baseline.passed is True
+        assert duplicate.passed is False
+        assert duplicate.evidence["attempt_counts"] == {"exchange-order-1": 2}
+        assert duplicate.evidence["commit_counts"] == {"exchange-order-1": 2}
+
+    def test_side_effect_oracle_rejects_duplicate_attempt_ids(self):
+        recorder = TraceRecorder()
+        recorder.record_side_effect(
+            "exchange-order-1",
+            "reused-attempt",
+            outcome="committed",
+        )
+        recorder.record_side_effect(
+            "notify-customer-1",
+            "reused-attempt",
+            outcome="committed",
+        )
+        scenario = Scenario(
+            scenario_id="side-effect-attempt-ids",
+            query="exchange and notify",
+            oracles=[
+                _spec(
+                    OracleKind.SIDE_EFFECTS,
+                    expected_commits={
+                        "exchange-order-1": 1,
+                        "notify-customer-1": 1,
+                    },
+                )
+            ],
+        )
+
+        verdict = OracleEvaluator().evaluate(
+            scenario,
+            result=None,
+            trace=recorder.snapshot(),
+            execution_error=None,
+        )[0]
+
+        assert verdict.passed is False
+        assert verdict.evidence["duplicate_attempt_ids"] == ["reused-attempt"]
 
     @pytest.mark.parametrize("allowed, expected_pass", [([], False), (["tool"], True)])
     def test_component_error_oracle_can_forbid_or_allow_failures(
