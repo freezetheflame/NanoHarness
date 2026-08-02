@@ -37,10 +37,16 @@ The runner rejects version, Git revision, and `tasks.json` checksum drift. It
 emits the bound Benchmark Manifest, raw Scenario reports, a claim-bounded
 summary, and SHA-256 checksums.
 
-## Archived execution
+## Archived executions
 
-The `raw/2026-08-02/` snapshot was executed on Windows with Python 3.12.11.
-All eight reports passed T0-DB, state-delta, and side-effect Oracles. Its
-Manifest digest is
+| Snapshot | Environment | Python | Reports | T0-DB | State delta | Side effects |
+| --- | --- | --- | ---: | ---: | ---: | ---: |
+| `raw/2026-08-02/` | Windows | 3.12.11 | 8/8 | 8/8 | 8/8 | 8/8 |
+| `raw/2026-08-02-wsl/` | WSL2 Ubuntu | 3.12.10 | 8/8 | 8/8 | 8/8 | 8/8 |
+
+The executions agree on the eight task IDs, tau2 revision, descriptive
+counts, and Manifest digest
 `f61c4c4d14c2c41762c388364a433129da2e51f6f7c9f70ff1b78245eaf818c6`.
-This remains engineering evidence for native bridge plumbing only.
+Report-file checksums may differ because trace identifiers and timestamps are
+execution-specific. These snapshots remain engineering evidence for native
+bridge plumbing only.

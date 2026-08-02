@@ -1,0 +1,24 @@
+{
+  "claim_boundary": "Reference trajectories validate native grader/state/ledger plumbing; they are not agent-performance or confirmatory mutation evidence.",
+  "live_model": false,
+  "manifest_digest": "f61c4c4d14c2c41762c388364a433129da2e51f6f7c9f70ff1b78245eaf818c6",
+  "passed_count": 8,
+  "python": "3.12.10",
+  "report_count": 8,
+  "side_effects_passed_count": 8,
+  "state_delta_passed_count": 8,
+  "status": "engineering-pilot",
+  "t0_db_passed_count": 8,
+  "task_ids": [
+    "62",
+    "65",
+    "7",
+    "37",
+    "96",
+    "95",
+    "10",
+    "50"
+  ],
+  "tau2_revision": "fc0055dc4e0a316c3f83133267fbd6faaa770992",
+  "tau2_version": "1.0.1"
+}
