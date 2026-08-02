@@ -415,6 +415,12 @@ class Tau2SubjectAdapter:
         gold_environment = self._initialized_environment(task)
         criteria = getattr(task, "evaluation_criteria", None)
         for action in (getattr(criteria, "actions", None) or []):
+            if not _tool_mutates(
+                gold_environment,
+                action.name,
+                action.requestor,
+            ):
+                continue
             gold_environment.make_tool_call(
                 tool_name=action.name,
                 requestor=action.requestor,

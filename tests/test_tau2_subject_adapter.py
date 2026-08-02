@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import datetime, timezone
 from enum import Enum
 from types import SimpleNamespace
@@ -75,11 +76,12 @@ class FakeToolkit:
         return name in {
             "exchange_item",
             "exchange_item_alternative",
+            "read_missing_order",
             "read_order",
         }
 
     def tool_mutates_state(self, name):
-        return name != "read_order"
+        return name not in {"read_missing_order", "read_order"}
 
 
 class FakeEnvironment:
@@ -116,6 +118,8 @@ class FakeEnvironment:
             return "ok"
         if tool_name == "read_order":
             return self.tools.db.orders[kwargs["order_id"]]
+        if tool_name == "read_missing_order":
+            raise ValueError("Order not found")
         raise ValueError(tool_name)
 
 
@@ -183,7 +187,7 @@ RAW_TASK = {
 }
 
 
-def _manifest():
+def _manifest(raw_task=RAW_TASK):
     source = BenchmarkSourceIdentity(
         benchmark_id="tau2@test",
         distribution="tau2",
@@ -194,7 +198,7 @@ def _manifest():
     )
     return Tau2BenchmarkAdapter(
         source,
-        [RAW_TASK],
+        [raw_task],
         tasks_sha256="1" * 64,
         domain_db={"orders": {"#1": {"status": "delivered"}}},
         domain_db_sha256="2" * 64,
@@ -232,8 +236,8 @@ def _messages(tool_names):
     return messages
 
 
-def _adapter(tool_names):
-    task = FakeTask.model_validate(RAW_TASK)
+def _adapter(tool_names, raw_task=RAW_TASK):
+    task = FakeTask.model_validate(raw_task)
 
     def factory(scenario, native_task, recorder):
         return SimpleNamespace(
@@ -244,7 +248,7 @@ def _adapter(tool_names):
 
     return Tau2SubjectAdapter(
         _identity(),
-        _manifest(),
+        _manifest(raw_task),
         factory,
         lambda: [task],
         FakeEnvironment,
@@ -309,3 +313,21 @@ def test_tau2_native_bridge_reports_missing_required_state_change():
     assert report.result.evaluation.achieved is False
     assert report.passed is False
     assert [verdict.passed for verdict in report.verdicts] == [False, False, False]
+
+
+def test_tau2_state_derivation_ignores_failed_read_only_reference_action():
+    raw_task = deepcopy(RAW_TASK)
+    raw_task["evaluation_criteria"]["actions"].insert(
+        0,
+        {
+            "action_id": "7-read-missing",
+            "requestor": "assistant",
+            "name": "read_missing_order",
+            "arguments": {"order_id": "#missing"},
+        },
+    )
+    adapter = _adapter(["exchange_item"], raw_task=raw_task)
+
+    scenario = adapter.scenario_for("7")
+
+    assert scenario.fixtures["tau2_t2"]["expected_state_delta"]
