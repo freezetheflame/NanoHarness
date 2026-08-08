@@ -184,8 +184,30 @@ from nanoharness.testing.benchmarks import (
     TAU2_TAG_OBJECT,
     Tau2BenchmarkAdapter,
 )
+from nanoharness.testing.conformance import (
+    RUNTIME_CONFORMANCE_CASE_IDS,
+    RUNTIME_CONFORMANCE_RUNTIMES,
+    RUNTIME_CONFORMANCE_SCHEMA_VERSION,
+    CaseConformanceResult,
+    PermissionDecisionProjection,
+    ProjectionMismatch,
+    RuntimeCaseEvidence,
+    RuntimeConformanceReport,
+    SemanticProjection,
+    ToolAttemptProjection,
+)
 
 __all__ = [
+    "RUNTIME_CONFORMANCE_CASE_IDS",
+    "RUNTIME_CONFORMANCE_RUNTIMES",
+    "RUNTIME_CONFORMANCE_SCHEMA_VERSION",
+    "CaseConformanceResult",
+    "PermissionDecisionProjection",
+    "ProjectionMismatch",
+    "RuntimeCaseEvidence",
+    "RuntimeConformanceReport",
+    "SemanticProjection",
+    "ToolAttemptProjection",
     "BENCHMARK_MANIFEST_SCHEMA_VERSION",
     "AGENTDOJO_BENCHMARK_VERSION",
     "AGENTDOJO_PACKAGE_VERSION",
