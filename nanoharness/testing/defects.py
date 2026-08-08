@@ -64,6 +64,78 @@ class AnnotationDecision(str, Enum):
     UNCERTAIN = "uncertain"
 
 
+class CodingPass(str, Enum):
+    """Blind human-coding phase."""
+
+    PASS_A = "pass_a"
+    PASS_B = "pass_b"
+
+
+class CoderCompletionDeclaration(BaseModel):
+    """A human coder's declaration that a submission is complete and blind."""
+
+    completed_at: datetime
+    independent: bool
+    packet_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def require_timezone_and_independence(self):
+        if self.completed_at.utcoffset() is None:
+            raise ValueError("completed_at must include a timezone offset")
+        if not self.independent:
+            raise ValueError("completed submission must confirm independence")
+        return self
+
+
+class DefectCodingEntry(BaseModel):
+    """One independent human judgment in a blind coding submission."""
+
+    defect_id: str = Field(min_length=1)
+    decision: Optional[AnnotationDecision] = None
+    exclusion_reason: str = ""
+    boundaries: List[DefectBoundary] = Field(default_factory=list)
+    operator_ids: List[str] = Field(default_factory=list)
+    trigger: str = ""
+    symptom: str = ""
+    root_cause: str = ""
+    impact: str = ""
+    evidence_ids: List[str] = Field(default_factory=list)
+    rationale: str = Field(min_length=1)
+
+
+class DefectCodingSubmission(BaseModel):
+    """Digest-bound Pass A or Pass B judgments from one human coder."""
+
+    schema_version: int = Field(default=1, ge=1)
+    corpus_id: str = Field(min_length=1)
+    pass_id: CodingPass
+    coder_id: str = Field(min_length=1)
+    manual_version: str = Field(min_length=1)
+    packet_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    entries: List[DefectCodingEntry]
+    completion: Optional[CoderCompletionDeclaration] = None
+
+    @model_validator(mode="after")
+    def validate_pass(self):
+        entry_ids = [entry.defect_id for entry in self.entries]
+        if len(entry_ids) != len(set(entry_ids)):
+            raise ValueError("coding entry IDs must be unique")
+        if self.pass_id is CodingPass.PASS_A:
+            if any(entry.operator_ids for entry in self.entries):
+                raise ValueError("Pass A cannot contain operator labels")
+            if any(entry.decision is None for entry in self.entries):
+                raise ValueError("Pass A requires a decision for every entry")
+        if self.pass_id is CodingPass.PASS_B:
+            if any(entry.decision is not None for entry in self.entries):
+                raise ValueError("Pass B cannot revise Pass A decisions")
+        if (
+            self.completion is not None
+            and self.completion.packet_sha256 != self.packet_sha256
+        ):
+            raise ValueError("completion packet digest must match submission")
+        return self
+
+
 class DefectEvidence(BaseModel):
     """Stable locator for one source used to audit a defect claim."""
 
