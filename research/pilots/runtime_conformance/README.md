@@ -14,7 +14,7 @@ facts, and compares those projections without rewriting runtime-private events.
 
 - Experiment: `m1-m4-runtime-conformance-v1`
 - NanoHarness implementation revision:
-  `cb61901d99ec5a0ee0c48e71408246221a846086`
+  `5e118cae7471d5902452ec19a52f13be789a49ed`
 - NanoHarness package: `0.1.0`
 - LangGraph package: `1.2.10`
 - Python: `3.12.2`
