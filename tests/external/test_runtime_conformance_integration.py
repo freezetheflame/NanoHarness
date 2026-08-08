@@ -98,7 +98,7 @@ def test_archived_m1_m4_evidence_matches_manifest_and_checksums():
     summary = json.loads((root / "summary.json").read_text(encoding="utf-8"))
 
     assert report.manifest_digest == manifest.manifest_digest
-    assert report.artifact_revision == "5e118cae7471d5902452ec19a52f13be789a49ed"
+    assert report.artifact_revision == "1e138b50590b6e91d85f63e84db7ef53c0bd654a"
     assert len(report.cells) == 8
     assert len(report.comparisons) == 4
     assert all(item.passed and not item.mismatches for item in report.comparisons)

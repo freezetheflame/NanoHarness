@@ -2,13 +2,13 @@
   "schema_version": 1,
   "experiment_id": "m1-m4-runtime-conformance-v1",
   "manifest_digest": "c504ffe68abdbc5f398d0aa25c68d88f770d52da64c2648fd93cb2671cd8c304",
-  "artifact_revision": "5e118cae7471d5902452ec19a52f13be789a49ed",
+  "artifact_revision": "1e138b50590b6e91d85f63e84db7ef53c0bd654a",
   "runtime_versions": {
     "nanoharness": "0.1.0",
     "langgraph": "1.2.10"
   },
-  "started_at": "2026-08-08T19:34:15.152716+08:00",
-  "finished_at": "2026-08-08T19:34:15.184324+08:00",
+  "started_at": "2026-08-08T20:00:14.946991+08:00",
+  "finished_at": "2026-08-08T20:00:14.983176+08:00",
   "cells": [
     {
       "case_id": "M1",
@@ -130,16 +130,16 @@
         },
         "trace": {
           "schema_version": 2,
-          "trace_id": "936f3982-82cb-49e0-a012-fdd8b8c7fc22",
-          "started_at": 1786188855.1532168,
+          "trace_id": "52dcafc5-c784-4397-a7a2-73dcaffc3e9c",
+          "started_at": 1786190414.947491,
           "events": [
             {
               "schema_version": 2,
-              "event_id": "f28162c6-a87c-4cbf-89ae-e467e3461ad8",
-              "trace_id": "936f3982-82cb-49e0-a012-fdd8b8c7fc22",
+              "event_id": "59e5eda9-b5f0-42df-b32e-353baa16f1f3",
+              "trace_id": "52dcafc5-c784-4397-a7a2-73dcaffc3e9c",
               "sequence": 0,
               "event_type": "task_started",
-              "timestamp": 1786188855.1537178,
+              "timestamp": 1786190414.947491,
               "payload": {
                 "data": "Look up order 7 once."
               },
@@ -147,11 +147,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "b633a6ed-c3d9-474d-89d7-072095ebc421",
-              "trace_id": "936f3982-82cb-49e0-a012-fdd8b8c7fc22",
+              "event_id": "a662984c-e36b-4904-aea3-50f3894b4400",
+              "trace_id": "52dcafc5-c784-4397-a7a2-73dcaffc3e9c",
               "sequence": 1,
               "event_type": "tool_schemas",
-              "timestamp": 1786188855.1537178,
+              "timestamp": 1786190414.9479935,
               "payload": {
                 "schemas": [
                   {
@@ -200,11 +200,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "9e174f9e-9690-479d-b94a-e94f1d0e8979",
-              "trace_id": "936f3982-82cb-49e0-a012-fdd8b8c7fc22",
+              "event_id": "8a47c8ef-04b0-4911-882d-6cc83d5b6584",
+              "trace_id": "52dcafc5-c784-4397-a7a2-73dcaffc3e9c",
               "sequence": 2,
               "event_type": "model_exchange",
-              "timestamp": 1786188855.1542177,
+              "timestamp": 1786190414.9479935,
               "payload": {
                 "messages": [
                   {
@@ -265,17 +265,17 @@
                     }
                   ]
                 },
-                "duration_ms": 0.0022999993234407157
+                "duration_ms": 0.0027999994927085936
               },
               "metadata": {}
             },
             {
               "schema_version": 2,
-              "event_id": "a1051ddf-40a1-469d-98f6-d8bc8e1a7b94",
-              "trace_id": "936f3982-82cb-49e0-a012-fdd8b8c7fc22",
+              "event_id": "efcefe19-05a2-4365-84f6-3f4950ba25bf",
+              "trace_id": "52dcafc5-c784-4397-a7a2-73dcaffc3e9c",
               "sequence": 3,
               "event_type": "model_response",
-              "timestamp": 1786188855.1542177,
+              "timestamp": 1786190414.9479935,
               "payload": {
                 "content": "lookup",
                 "tool_calls": [
@@ -291,11 +291,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "553ae4bf-76e3-4da8-83fe-a49e2a62d9bc",
-              "trace_id": "936f3982-82cb-49e0-a012-fdd8b8c7fc22",
+              "event_id": "89eb5413-6e68-41d5-830a-f35db9e05a57",
+              "trace_id": "52dcafc5-c784-4397-a7a2-73dcaffc3e9c",
               "sequence": 4,
               "event_type": "tool_exchange",
-              "timestamp": 1786188855.1542177,
+              "timestamp": 1786190414.9479935,
               "payload": {
                 "name": "lookup_order",
                 "arguments": {
@@ -305,17 +305,17 @@
                   "status": "open"
                 },
                 "attempt_count": 1,
-                "duration_ms": 0.004899999112240039
+                "duration_ms": 0.0035999983083456755
               },
               "metadata": {}
             },
             {
               "schema_version": 2,
-              "event_id": "39e8fb99-39fb-462d-ad32-8714396696a9",
-              "trace_id": "936f3982-82cb-49e0-a012-fdd8b8c7fc22",
+              "event_id": "198a77ef-73b6-4428-b4ac-83603fd0f23a",
+              "trace_id": "52dcafc5-c784-4397-a7a2-73dcaffc3e9c",
               "sequence": 5,
               "event_type": "step_completed",
-              "timestamp": 1786188855.1542177,
+              "timestamp": 1786190414.9484937,
               "payload": {
                 "step_id": 0,
                 "thought": "lookup",
@@ -333,11 +333,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "c4704c2f-12d6-4d2f-a6a2-f90bc3996aaf",
-              "trace_id": "936f3982-82cb-49e0-a012-fdd8b8c7fc22",
+              "event_id": "4ebe251b-daf6-45cb-b416-828b735fe302",
+              "trace_id": "52dcafc5-c784-4397-a7a2-73dcaffc3e9c",
               "sequence": 6,
               "event_type": "tool_schemas",
-              "timestamp": 1786188855.1542177,
+              "timestamp": 1786190414.9484937,
               "payload": {
                 "schemas": [
                   {
@@ -386,11 +386,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "de7a2196-a21c-49f1-9e33-4c3f93902b77",
-              "trace_id": "936f3982-82cb-49e0-a012-fdd8b8c7fc22",
+              "event_id": "c07e7e43-f730-413c-8ac3-fefc66fde5a6",
+              "trace_id": "52dcafc5-c784-4397-a7a2-73dcaffc3e9c",
               "sequence": 7,
               "event_type": "model_exchange",
-              "timestamp": 1786188855.1542177,
+              "timestamp": 1786190414.9484937,
               "payload": {
                 "messages": [
                   {
@@ -463,17 +463,17 @@
                   "content": "order is open",
                   "tool_calls": null
                 },
-                "duration_ms": 0.0018999999156221747
+                "duration_ms": 0.0014999986888142303
               },
               "metadata": {}
             },
             {
               "schema_version": 2,
-              "event_id": "1e0789b4-c52f-4c3c-b61c-e7f438bb5ef6",
-              "trace_id": "936f3982-82cb-49e0-a012-fdd8b8c7fc22",
+              "event_id": "848f63b7-0297-4714-b01b-1b4c2ddce5f4",
+              "trace_id": "52dcafc5-c784-4397-a7a2-73dcaffc3e9c",
               "sequence": 8,
               "event_type": "model_response",
-              "timestamp": 1786188855.1547167,
+              "timestamp": 1786190414.9484937,
               "payload": {
                 "content": "order is open",
                 "tool_calls": null
@@ -482,11 +482,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "d2b96818-aaf1-412b-8098-12a2952ffdd4",
-              "trace_id": "936f3982-82cb-49e0-a012-fdd8b8c7fc22",
+              "event_id": "2da8da9c-90b8-4c8e-a7aa-2ed5280e3dda",
+              "trace_id": "52dcafc5-c784-4397-a7a2-73dcaffc3e9c",
               "sequence": 9,
               "event_type": "step_completed",
-              "timestamp": 1786188855.1547167,
+              "timestamp": 1786190414.9484937,
               "payload": {
                 "step_id": 1,
                 "thought": "order is open",
@@ -499,11 +499,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "870b538e-d4f2-43e1-bb9e-216c7ad77b47",
-              "trace_id": "936f3982-82cb-49e0-a012-fdd8b8c7fc22",
+              "event_id": "d436ec6e-8508-4a93-a399-1ffba4b49a80",
+              "trace_id": "52dcafc5-c784-4397-a7a2-73dcaffc3e9c",
               "sequence": 10,
               "event_type": "task_completed",
-              "timestamp": 1786188855.1547167,
+              "timestamp": 1786190414.9489963,
               "payload": {
                 "status": "completed",
                 "stop_reason": "model_terminated",
@@ -774,16 +774,16 @@
         },
         "trace": {
           "schema_version": 2,
-          "trace_id": "9a72adab-5ae5-49fd-ae09-b2a1041cd76d",
-          "started_at": 1786188855.1562216,
+          "trace_id": "2e3f775d-8404-44d5-85fc-eda9c4b9ddc8",
+          "started_at": 1786190414.9514952,
           "events": [
             {
               "schema_version": 2,
-              "event_id": "f6391bdb-7535-4e7a-b727-1a45aa032f7d",
-              "trace_id": "9a72adab-5ae5-49fd-ae09-b2a1041cd76d",
+              "event_id": "1d266d96-1838-4868-9269-2016273b82f7",
+              "trace_id": "2e3f775d-8404-44d5-85fc-eda9c4b9ddc8",
               "sequence": 0,
               "event_type": "task_started",
-              "timestamp": 1786188855.1562216,
+              "timestamp": 1786190414.9514952,
               "payload": {
                 "query": "Look up order 7 once.",
                 "adapter_managed": true
@@ -792,11 +792,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "fc6211bc-8404-4533-b8b5-e386dfee440b",
-              "trace_id": "9a72adab-5ae5-49fd-ae09-b2a1041cd76d",
+              "event_id": "3e72866f-67fb-4bec-9426-1f5d5c2b499e",
+              "trace_id": "2e3f775d-8404-44d5-85fc-eda9c4b9ddc8",
               "sequence": 1,
               "event_type": "custom",
-              "timestamp": 1786188855.1627483,
+              "timestamp": 1786190414.9586082,
               "payload": {
                 "adapter": "langgraph",
                 "adapter_event": "state_snapshot",
@@ -809,11 +809,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "da375f65-d29f-4e26-bd1b-ba5237c97c08",
-              "trace_id": "9a72adab-5ae5-49fd-ae09-b2a1041cd76d",
+              "event_id": "6c18da09-c7ea-47f0-a171-fcdf1349450c",
+              "trace_id": "2e3f775d-8404-44d5-85fc-eda9c4b9ddc8",
               "sequence": 2,
               "event_type": "tool_exchange",
-              "timestamp": 1786188855.1627483,
+              "timestamp": 1786190414.9586082,
               "payload": {
                 "name": "lookup_order",
                 "arguments": {
@@ -828,11 +828,26 @@
             },
             {
               "schema_version": 2,
-              "event_id": "3ef545df-50cd-489d-928a-c77bfc106c81",
-              "trace_id": "9a72adab-5ae5-49fd-ae09-b2a1041cd76d",
+              "event_id": "dcdac703-2115-4968-8e7c-0e167178a52f",
+              "trace_id": "2e3f775d-8404-44d5-85fc-eda9c4b9ddc8",
               "sequence": 3,
               "event_type": "custom",
-              "timestamp": 1786188855.1632478,
+              "timestamp": 1786190414.9586082,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "boundary_audit",
+                "lookup_attempts": 1,
+                "update_attempts": 0
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "08d2b903-00ff-41f5-a27b-5e11695c00bd",
+              "trace_id": "2e3f775d-8404-44d5-85fc-eda9c4b9ddc8",
+              "sequence": 4,
+              "event_type": "custom",
+              "timestamp": 1786190414.959106,
               "payload": {
                 "adapter": "langgraph",
                 "adapter_event": "state_snapshot",
@@ -847,11 +862,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "7a888700-7187-46c5-81ba-454afb9cd3d4",
-              "trace_id": "9a72adab-5ae5-49fd-ae09-b2a1041cd76d",
-              "sequence": 4,
+              "event_id": "295b6509-bd85-46d7-8ee1-ba618b5336a7",
+              "trace_id": "2e3f775d-8404-44d5-85fc-eda9c4b9ddc8",
+              "sequence": 5,
               "event_type": "task_completed",
-              "timestamp": 1786188855.1632478,
+              "timestamp": 1786190414.959106,
               "payload": {
                 "result": {
                   "status": "completed",
@@ -930,7 +945,7 @@
                 0
               ],
               "end_sequences": [
-                4
+                5
               ]
             }
           },
@@ -1145,16 +1160,16 @@
         },
         "trace": {
           "schema_version": 2,
-          "trace_id": "885a23e7-819f-47f1-b105-786638d1d463",
-          "started_at": 1786188855.1647484,
+          "trace_id": "49c1eb83-fc9e-4fd2-b96f-895c6d55ac38",
+          "started_at": 1786190414.9601057,
           "events": [
             {
               "schema_version": 2,
-              "event_id": "f5267806-6df4-4dff-acba-41a14f46a724",
-              "trace_id": "885a23e7-819f-47f1-b105-786638d1d463",
+              "event_id": "0cf14d7d-fca3-444e-9b40-2cc226d365ed",
+              "trace_id": "49c1eb83-fc9e-4fd2-b96f-895c6d55ac38",
               "sequence": 0,
               "event_type": "task_started",
-              "timestamp": 1786188855.1647484,
+              "timestamp": 1786190414.9601057,
               "payload": {
                 "data": "Look up order 7 and recover from one transient error."
               },
@@ -1162,11 +1177,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "57846055-35ad-45ad-b74e-7b09ae6b3a19",
-              "trace_id": "885a23e7-819f-47f1-b105-786638d1d463",
+              "event_id": "cecb0153-6ca1-43ab-b032-13bc5c29858e",
+              "trace_id": "49c1eb83-fc9e-4fd2-b96f-895c6d55ac38",
               "sequence": 1,
               "event_type": "tool_schemas",
-              "timestamp": 1786188855.1647484,
+              "timestamp": 1786190414.9606059,
               "payload": {
                 "schemas": [
                   {
@@ -1215,11 +1230,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "841cc522-153e-44ca-842a-d6015e0e287d",
-              "trace_id": "885a23e7-819f-47f1-b105-786638d1d463",
+              "event_id": "68e312ee-11a6-4168-a308-dffba8946f32",
+              "trace_id": "49c1eb83-fc9e-4fd2-b96f-895c6d55ac38",
               "sequence": 2,
               "event_type": "model_exchange",
-              "timestamp": 1786188855.1647484,
+              "timestamp": 1786190414.9606059,
               "payload": {
                 "messages": [
                   {
@@ -1280,17 +1295,17 @@
                     }
                   ]
                 },
-                "duration_ms": 0.0010000003385357559
+                "duration_ms": 0.0021000014385208488
               },
               "metadata": {}
             },
             {
               "schema_version": 2,
-              "event_id": "c9c3afc9-acaa-483c-837e-2afaa5f23b90",
-              "trace_id": "885a23e7-819f-47f1-b105-786638d1d463",
+              "event_id": "0dd26862-bd02-4f0f-8b96-3c2d61ae73fd",
+              "trace_id": "49c1eb83-fc9e-4fd2-b96f-895c6d55ac38",
               "sequence": 3,
               "event_type": "model_response",
-              "timestamp": 1786188855.1647484,
+              "timestamp": 1786190414.9606059,
               "payload": {
                 "content": "lookup",
                 "tool_calls": [
@@ -1306,11 +1321,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "6fcb5cbb-8387-484b-a4f9-85797b0014f8",
-              "trace_id": "885a23e7-819f-47f1-b105-786638d1d463",
+              "event_id": "e4b24a59-d17b-43af-bfa1-c96bf62f4bb6",
+              "trace_id": "49c1eb83-fc9e-4fd2-b96f-895c6d55ac38",
               "sequence": 4,
               "event_type": "tool_error",
-              "timestamp": 1786188855.1652474,
+              "timestamp": 1786190414.9606059,
               "payload": {
                 "name": "lookup_order",
                 "arguments": {
@@ -1318,17 +1333,17 @@
                 },
                 "error_type": "TransientToolError",
                 "error_message": "retryable",
-                "duration_ms": 0.005399999281507917
+                "duration_ms": 0.005899999450775795
               },
               "metadata": {}
             },
             {
               "schema_version": 2,
-              "event_id": "2d323f4e-5d80-44bc-b752-28ff09378b6b",
-              "trace_id": "885a23e7-819f-47f1-b105-786638d1d463",
+              "event_id": "b2a639ac-f32f-4103-984b-35cdd68114b4",
+              "trace_id": "49c1eb83-fc9e-4fd2-b96f-895c6d55ac38",
               "sequence": 5,
               "event_type": "step_completed",
-              "timestamp": 1786188855.1652474,
+              "timestamp": 1786190414.9606059,
               "payload": {
                 "step_id": 0,
                 "thought": "lookup",
@@ -1341,11 +1356,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "a67886da-7768-4437-b8fc-6639b32c3f1e",
-              "trace_id": "885a23e7-819f-47f1-b105-786638d1d463",
+              "event_id": "0429b31a-5a20-4c89-9a1b-71ba6462aa10",
+              "trace_id": "49c1eb83-fc9e-4fd2-b96f-895c6d55ac38",
               "sequence": 6,
               "event_type": "tool_schemas",
-              "timestamp": 1786188855.1652474,
+              "timestamp": 1786190414.9606059,
               "payload": {
                 "schemas": [
                   {
@@ -1394,11 +1409,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "52372f6f-4400-48ef-ad8c-5fb7e5709fa3",
-              "trace_id": "885a23e7-819f-47f1-b105-786638d1d463",
+              "event_id": "b8998477-52f3-4104-aba8-f3b7901bc063",
+              "trace_id": "49c1eb83-fc9e-4fd2-b96f-895c6d55ac38",
               "sequence": 7,
               "event_type": "model_exchange",
-              "timestamp": 1786188855.1652474,
+              "timestamp": 1786190414.9611058,
               "payload": {
                 "messages": [
                   {
@@ -1478,17 +1493,17 @@
                     }
                   ]
                 },
-                "duration_ms": 0.0005999991117278114
+                "duration_ms": 0.0010999992809956893
               },
               "metadata": {}
             },
             {
               "schema_version": 2,
-              "event_id": "97801339-e6a4-4602-81a5-9e39676f344a",
-              "trace_id": "885a23e7-819f-47f1-b105-786638d1d463",
+              "event_id": "ad5cc237-dc7b-4fcf-a13b-f6fb6d2f006e",
+              "trace_id": "49c1eb83-fc9e-4fd2-b96f-895c6d55ac38",
               "sequence": 8,
               "event_type": "model_response",
-              "timestamp": 1786188855.1652474,
+              "timestamp": 1786190414.9611058,
               "payload": {
                 "content": "lookup",
                 "tool_calls": [
@@ -1504,11 +1519,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "dd81ef31-3069-4164-b5f6-f3c96c08c114",
-              "trace_id": "885a23e7-819f-47f1-b105-786638d1d463",
+              "event_id": "0755ecc6-1498-4544-9c8c-74f84934c92d",
+              "trace_id": "49c1eb83-fc9e-4fd2-b96f-895c6d55ac38",
               "sequence": 9,
               "event_type": "tool_exchange",
-              "timestamp": 1786188855.1652474,
+              "timestamp": 1786190414.9611058,
               "payload": {
                 "name": "lookup_order",
                 "arguments": {
@@ -1518,17 +1533,17 @@
                   "status": "open"
                 },
                 "attempt_count": 1,
-                "duration_ms": 0.0013999997463542968
+                "duration_ms": 0.002099999619531445
               },
               "metadata": {}
             },
             {
               "schema_version": 2,
-              "event_id": "8d2dff58-3a4a-4268-b3f6-e39044b1e737",
-              "trace_id": "885a23e7-819f-47f1-b105-786638d1d463",
+              "event_id": "01218255-2e6d-4eb6-a39f-e27d8df11a08",
+              "trace_id": "49c1eb83-fc9e-4fd2-b96f-895c6d55ac38",
               "sequence": 10,
               "event_type": "step_completed",
-              "timestamp": 1786188855.1652474,
+              "timestamp": 1786190414.9611058,
               "payload": {
                 "step_id": 1,
                 "thought": "lookup",
@@ -1546,11 +1561,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "8c6aff85-a3d9-4d37-8716-ea07eb89cc67",
-              "trace_id": "885a23e7-819f-47f1-b105-786638d1d463",
+              "event_id": "32c3f890-a53f-4953-be90-bceca3f73219",
+              "trace_id": "49c1eb83-fc9e-4fd2-b96f-895c6d55ac38",
               "sequence": 11,
               "event_type": "tool_schemas",
-              "timestamp": 1786188855.1652474,
+              "timestamp": 1786190414.961606,
               "payload": {
                 "schemas": [
                   {
@@ -1599,11 +1614,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "efd5cbf3-7202-4647-9b37-7c59e06b25ec",
-              "trace_id": "885a23e7-819f-47f1-b105-786638d1d463",
+              "event_id": "e858b8d4-33ed-4651-83f8-7a9759cbab27",
+              "trace_id": "49c1eb83-fc9e-4fd2-b96f-895c6d55ac38",
               "sequence": 12,
               "event_type": "model_exchange",
-              "timestamp": 1786188855.1652474,
+              "timestamp": 1786190414.961606,
               "payload": {
                 "messages": [
                   {
@@ -1695,17 +1710,17 @@
                   "content": "order is open",
                   "tool_calls": null
                 },
-                "duration_ms": 0.0005000001692678779
+                "duration_ms": 0.0012000000424450263
               },
               "metadata": {}
             },
             {
               "schema_version": 2,
-              "event_id": "10625f25-e928-4be5-b18c-39ce8e039bf1",
-              "trace_id": "885a23e7-819f-47f1-b105-786638d1d463",
+              "event_id": "482f3722-31ee-415a-878b-9c614a68e3d2",
+              "trace_id": "49c1eb83-fc9e-4fd2-b96f-895c6d55ac38",
               "sequence": 13,
               "event_type": "model_response",
-              "timestamp": 1786188855.1652474,
+              "timestamp": 1786190414.961606,
               "payload": {
                 "content": "order is open",
                 "tool_calls": null
@@ -1714,11 +1729,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "c43cefd6-1e47-4652-8edf-01b935275f6b",
-              "trace_id": "885a23e7-819f-47f1-b105-786638d1d463",
+              "event_id": "63726a93-2d95-4f08-b31b-2971f6ee1ef4",
+              "trace_id": "49c1eb83-fc9e-4fd2-b96f-895c6d55ac38",
               "sequence": 14,
               "event_type": "step_completed",
-              "timestamp": 1786188855.1652474,
+              "timestamp": 1786190414.961606,
               "payload": {
                 "step_id": 2,
                 "thought": "order is open",
@@ -1731,11 +1746,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "261286da-db4a-439f-82b6-ededf9aa4cd1",
-              "trace_id": "885a23e7-819f-47f1-b105-786638d1d463",
+              "event_id": "06a32355-1a15-4dbf-8fde-82be37097b53",
+              "trace_id": "49c1eb83-fc9e-4fd2-b96f-895c6d55ac38",
               "sequence": 15,
               "event_type": "task_completed",
-              "timestamp": 1786188855.1652474,
+              "timestamp": 1786190414.961606,
               "payload": {
                 "status": "completed",
                 "stop_reason": "model_terminated",
@@ -2055,16 +2070,16 @@
         },
         "trace": {
           "schema_version": 2,
-          "trace_id": "323ad160-66f7-4b4e-8d9f-bb665e7ca023",
-          "started_at": 1786188855.1678,
+          "trace_id": "bf8f4bed-ebf5-479a-a8a9-42f4a6eeb912",
+          "started_at": 1786190414.9641066,
           "events": [
             {
               "schema_version": 2,
-              "event_id": "21e9b284-8d6c-4c5a-8e05-b3a3e5015a92",
-              "trace_id": "323ad160-66f7-4b4e-8d9f-bb665e7ca023",
+              "event_id": "baa7b57c-106f-40ff-808f-5efa5d83c82d",
+              "trace_id": "bf8f4bed-ebf5-479a-a8a9-42f4a6eeb912",
               "sequence": 0,
               "event_type": "task_started",
-              "timestamp": 1786188855.1678,
+              "timestamp": 1786190414.9641066,
               "payload": {
                 "query": "Look up order 7 and recover from one transient error.",
                 "adapter_managed": true
@@ -2073,11 +2088,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "964950ee-cb2b-4d60-bee9-ef818ed8c10d",
-              "trace_id": "323ad160-66f7-4b4e-8d9f-bb665e7ca023",
+              "event_id": "12ef83e0-d8a7-4b5e-85b4-82edb12957be",
+              "trace_id": "bf8f4bed-ebf5-479a-a8a9-42f4a6eeb912",
               "sequence": 1,
               "event_type": "custom",
-              "timestamp": 1786188855.1703002,
+              "timestamp": 1786190414.9671397,
               "payload": {
                 "adapter": "langgraph",
                 "adapter_event": "state_snapshot",
@@ -2090,11 +2105,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "335b3ef5-3ef1-469d-af8f-22a02710a9a9",
-              "trace_id": "323ad160-66f7-4b4e-8d9f-bb665e7ca023",
+              "event_id": "aa178be2-17ae-4ee9-8a20-58cd6c8bc178",
+              "trace_id": "bf8f4bed-ebf5-479a-a8a9-42f4a6eeb912",
               "sequence": 2,
               "event_type": "tool_error",
-              "timestamp": 1786188855.170801,
+              "timestamp": 1786190414.9676404,
               "payload": {
                 "name": "lookup_order",
                 "arguments": {
@@ -2108,11 +2123,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "a869666d-a177-40ea-81a5-1770138d297a",
-              "trace_id": "323ad160-66f7-4b4e-8d9f-bb665e7ca023",
+              "event_id": "ea7c665f-8cec-41ef-8191-d456154ab406",
+              "trace_id": "bf8f4bed-ebf5-479a-a8a9-42f4a6eeb912",
               "sequence": 3,
               "event_type": "tool_exchange",
-              "timestamp": 1786188855.170801,
+              "timestamp": 1786190414.9676404,
               "payload": {
                 "name": "lookup_order",
                 "arguments": {
@@ -2127,11 +2142,26 @@
             },
             {
               "schema_version": 2,
-              "event_id": "173e459c-a69f-4c5a-82ba-4fd7f26578fc",
-              "trace_id": "323ad160-66f7-4b4e-8d9f-bb665e7ca023",
+              "event_id": "e2858b2b-c9bd-4919-9193-980e01149c5b",
+              "trace_id": "bf8f4bed-ebf5-479a-a8a9-42f4a6eeb912",
               "sequence": 4,
               "event_type": "custom",
-              "timestamp": 1786188855.170801,
+              "timestamp": 1786190414.9676404,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "boundary_audit",
+                "lookup_attempts": 2,
+                "update_attempts": 0
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "9390d317-02db-49bb-9675-4b4e33da0f80",
+              "trace_id": "bf8f4bed-ebf5-479a-a8a9-42f4a6eeb912",
+              "sequence": 5,
+              "event_type": "custom",
+              "timestamp": 1786190414.9676404,
               "payload": {
                 "adapter": "langgraph",
                 "adapter_event": "state_snapshot",
@@ -2146,11 +2176,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "781b6895-64ea-410c-9dea-f2d7e3f2d978",
-              "trace_id": "323ad160-66f7-4b4e-8d9f-bb665e7ca023",
-              "sequence": 5,
+              "event_id": "a8c6194c-8546-40c9-a681-b508a11fe926",
+              "trace_id": "bf8f4bed-ebf5-479a-a8a9-42f4a6eeb912",
+              "sequence": 6,
               "event_type": "task_completed",
-              "timestamp": 1786188855.170801,
+              "timestamp": 1786190414.9676404,
               "payload": {
                 "result": {
                   "status": "completed",
@@ -2229,7 +2259,7 @@
                 0
               ],
               "end_sequences": [
-                5
+                6
               ]
             }
           },
@@ -2411,16 +2441,16 @@
         },
         "trace": {
           "schema_version": 2,
-          "trace_id": "30c5f143-465c-4871-94a4-8c215d1a6a32",
-          "started_at": 1786188855.1718004,
+          "trace_id": "be88539e-a2c3-497f-8be0-36d91c69c65c",
+          "started_at": 1786190414.9686403,
           "events": [
             {
               "schema_version": 2,
-              "event_id": "0a0647d7-5eda-48b9-969b-55de60b07843",
-              "trace_id": "30c5f143-465c-4871-94a4-8c215d1a6a32",
+              "event_id": "8fae6630-3751-4818-8faa-5fe2b7cdb822",
+              "trace_id": "be88539e-a2c3-497f-8be0-36d91c69c65c",
               "sequence": 0,
               "event_type": "task_started",
-              "timestamp": 1786188855.1722991,
+              "timestamp": 1786190414.969139,
               "payload": {
                 "data": "Stop without completing the requested lookup."
               },
@@ -2428,11 +2458,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "8b7cd685-c462-444d-993c-2f93feffe88e",
-              "trace_id": "30c5f143-465c-4871-94a4-8c215d1a6a32",
+              "event_id": "761e75bc-52f5-4bcd-ac7b-7bd0b4526b9b",
+              "trace_id": "be88539e-a2c3-497f-8be0-36d91c69c65c",
               "sequence": 1,
               "event_type": "tool_schemas",
-              "timestamp": 1786188855.1722991,
+              "timestamp": 1786190414.969139,
               "payload": {
                 "schemas": [
                   {
@@ -2481,11 +2511,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "efc3c252-a43e-453f-9ee2-6a096d12caad",
-              "trace_id": "30c5f143-465c-4871-94a4-8c215d1a6a32",
+              "event_id": "9bf780bd-30e0-400d-a54d-951dfeed826a",
+              "trace_id": "be88539e-a2c3-497f-8be0-36d91c69c65c",
               "sequence": 2,
               "event_type": "model_exchange",
-              "timestamp": 1786188855.1722991,
+              "timestamp": 1786190414.969139,
               "payload": {
                 "messages": [
                   {
@@ -2539,17 +2569,17 @@
                   "content": "stopping without lookup",
                   "tool_calls": null
                 },
-                "duration_ms": 0.0011000010999850929
+                "duration_ms": 0.0008999995770864189
               },
               "metadata": {}
             },
             {
               "schema_version": 2,
-              "event_id": "6bd91272-399c-4a62-823c-38742c7b30a9",
-              "trace_id": "30c5f143-465c-4871-94a4-8c215d1a6a32",
+              "event_id": "dbe9aa00-5a53-405d-b36d-30af5a5ce3fb",
+              "trace_id": "be88539e-a2c3-497f-8be0-36d91c69c65c",
               "sequence": 3,
               "event_type": "model_response",
-              "timestamp": 1786188855.1722991,
+              "timestamp": 1786190414.969139,
               "payload": {
                 "content": "stopping without lookup",
                 "tool_calls": null
@@ -2558,11 +2588,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "3cd23c33-6559-4330-ad8c-76f02b8face3",
-              "trace_id": "30c5f143-465c-4871-94a4-8c215d1a6a32",
+              "event_id": "6cdea825-d1f5-4bd3-990c-eef91ecfb8ea",
+              "trace_id": "be88539e-a2c3-497f-8be0-36d91c69c65c",
               "sequence": 4,
               "event_type": "step_completed",
-              "timestamp": 1786188855.1722991,
+              "timestamp": 1786190414.969139,
               "payload": {
                 "step_id": 0,
                 "thought": "stopping without lookup",
@@ -2575,11 +2605,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "8b880fd2-9082-4924-9581-0690f8a9508c",
-              "trace_id": "30c5f143-465c-4871-94a4-8c215d1a6a32",
+              "event_id": "b85a8c81-7154-45be-9694-a7a5c84c1c41",
+              "trace_id": "be88539e-a2c3-497f-8be0-36d91c69c65c",
               "sequence": 5,
               "event_type": "task_completed",
-              "timestamp": 1786188855.1722991,
+              "timestamp": 1786190414.969139,
               "payload": {
                 "status": "completed",
                 "stop_reason": "model_terminated",
@@ -2755,16 +2785,16 @@
         },
         "trace": {
           "schema_version": 2,
-          "trace_id": "2c1b2870-4e1b-48b9-a582-8dc1df8ebd27",
-          "started_at": 1786188855.1743,
+          "trace_id": "bc433b62-e8e7-4a7e-a244-0a7a38030a39",
+          "started_at": 1786190414.9711401,
           "events": [
             {
               "schema_version": 2,
-              "event_id": "28f57708-026c-4d70-8c31-f9f821a23a23",
-              "trace_id": "2c1b2870-4e1b-48b9-a582-8dc1df8ebd27",
+              "event_id": "0209b898-e89b-4dea-9d66-646d6556f69f",
+              "trace_id": "bc433b62-e8e7-4a7e-a244-0a7a38030a39",
               "sequence": 0,
               "event_type": "task_started",
-              "timestamp": 1786188855.1743,
+              "timestamp": 1786190414.9711401,
               "payload": {
                 "query": "Stop without completing the requested lookup.",
                 "adapter_managed": true
@@ -2773,11 +2803,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "91328ce5-d2a6-4385-bf47-ae2db4ee317b",
-              "trace_id": "2c1b2870-4e1b-48b9-a582-8dc1df8ebd27",
+              "event_id": "257465c9-5e9d-4eef-92fb-d27e88dcc5c3",
+              "trace_id": "bc433b62-e8e7-4a7e-a244-0a7a38030a39",
               "sequence": 1,
               "event_type": "custom",
-              "timestamp": 1786188855.1763048,
+              "timestamp": 1786190414.9736414,
               "payload": {
                 "adapter": "langgraph",
                 "adapter_event": "state_snapshot",
@@ -2790,11 +2820,26 @@
             },
             {
               "schema_version": 2,
-              "event_id": "7f99880c-27b4-413d-ad15-2519745ff76c",
-              "trace_id": "2c1b2870-4e1b-48b9-a582-8dc1df8ebd27",
+              "event_id": "a8093f16-fe8d-48b2-bb19-987a0f0e6875",
+              "trace_id": "bc433b62-e8e7-4a7e-a244-0a7a38030a39",
               "sequence": 2,
               "event_type": "custom",
-              "timestamp": 1786188855.1763048,
+              "timestamp": 1786190414.9736414,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "boundary_audit",
+                "lookup_attempts": 0,
+                "update_attempts": 0
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "796bf0f5-6d74-4389-977a-8bd3ca8924bd",
+              "trace_id": "bc433b62-e8e7-4a7e-a244-0a7a38030a39",
+              "sequence": 3,
+              "event_type": "custom",
+              "timestamp": 1786190414.974141,
               "payload": {
                 "adapter": "langgraph",
                 "adapter_event": "state_snapshot",
@@ -2809,11 +2854,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "d3c3bd2d-f5e1-4557-ae59-fce382c87462",
-              "trace_id": "2c1b2870-4e1b-48b9-a582-8dc1df8ebd27",
-              "sequence": 3,
+              "event_id": "8acbe694-385b-490d-931f-31fcc5e656f9",
+              "trace_id": "bc433b62-e8e7-4a7e-a244-0a7a38030a39",
+              "sequence": 4,
               "event_type": "task_completed",
-              "timestamp": 1786188855.1763048,
+              "timestamp": 1786190414.974141,
               "payload": {
                 "result": {
                   "status": "completed",
@@ -2892,7 +2937,7 @@
                 0
               ],
               "end_sequences": [
-                3
+                4
               ]
             }
           }
@@ -3011,16 +3056,16 @@
         },
         "trace": {
           "schema_version": 2,
-          "trace_id": "df69c7ea-413e-4ba3-94ed-2875e3f935f2",
-          "started_at": 1786188855.17732,
+          "trace_id": "53613ac8-2a02-4678-b765-19cc8685f643",
+          "started_at": 1786190414.9746423,
           "events": [
             {
               "schema_version": 2,
-              "event_id": "82c1f237-d039-41d1-8407-425bd78e75da",
-              "trace_id": "df69c7ea-413e-4ba3-94ed-2875e3f935f2",
+              "event_id": "d8cd6ab9-75d3-4480-947c-7681a531274b",
+              "trace_id": "53613ac8-2a02-4678-b765-19cc8685f643",
               "sequence": 0,
               "event_type": "task_started",
-              "timestamp": 1786188855.17732,
+              "timestamp": 1786190414.9746423,
               "payload": {
                 "data": "Update order 7 to closed even though writes are denied."
               },
@@ -3028,11 +3073,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "ba773bcd-c808-4c68-9521-f0b3afdab911",
-              "trace_id": "df69c7ea-413e-4ba3-94ed-2875e3f935f2",
+              "event_id": "6ab3364f-b34c-41dd-830f-8357d4474fe3",
+              "trace_id": "53613ac8-2a02-4678-b765-19cc8685f643",
               "sequence": 1,
               "event_type": "tool_schemas",
-              "timestamp": 1786188855.17732,
+              "timestamp": 1786190414.9746423,
               "payload": {
                 "schemas": [
                   {
@@ -3081,11 +3126,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "8bd5c953-b820-4630-a052-5b3c930ac8a2",
-              "trace_id": "df69c7ea-413e-4ba3-94ed-2875e3f935f2",
+              "event_id": "90df78f9-91ad-496a-aa07-3d251411f703",
+              "trace_id": "53613ac8-2a02-4678-b765-19cc8685f643",
               "sequence": 2,
               "event_type": "model_exchange",
-              "timestamp": 1786188855.17732,
+              "timestamp": 1786190414.9746423,
               "payload": {
                 "messages": [
                   {
@@ -3153,11 +3198,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "9889565b-aaf5-49ef-b0a4-8bc310b1ae17",
-              "trace_id": "df69c7ea-413e-4ba3-94ed-2875e3f935f2",
+              "event_id": "c9e77941-1fd6-499f-bb21-ad25a98d71bc",
+              "trace_id": "53613ac8-2a02-4678-b765-19cc8685f643",
               "sequence": 3,
               "event_type": "model_response",
-              "timestamp": 1786188855.177825,
+              "timestamp": 1786190414.9746423,
               "payload": {
                 "content": "update",
                 "tool_calls": [
@@ -3174,11 +3219,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "46482759-6862-4f03-b615-f296ad008f74",
-              "trace_id": "df69c7ea-413e-4ba3-94ed-2875e3f935f2",
+              "event_id": "53e8bcf8-fd34-4946-8ed9-11bf700e5343",
+              "trace_id": "53613ac8-2a02-4678-b765-19cc8685f643",
               "sequence": 4,
               "event_type": "permission_decision",
-              "timestamp": 1786188855.177825,
+              "timestamp": 1786190414.9746423,
               "payload": {
                 "tool_name": "update_order",
                 "arguments": {
@@ -3187,17 +3232,17 @@
                 },
                 "allowed": false,
                 "denial": "write denied by policy",
-                "duration_ms": 0.0022999993234407157
+                "duration_ms": 0.0025000008463393897
               },
               "metadata": {}
             },
             {
               "schema_version": 2,
-              "event_id": "a39af34e-001e-423a-ba45-4d20f3da7678",
-              "trace_id": "df69c7ea-413e-4ba3-94ed-2875e3f935f2",
+              "event_id": "bf7097bd-7dc4-4741-8aa5-3972d48b6119",
+              "trace_id": "53613ac8-2a02-4678-b765-19cc8685f643",
               "sequence": 5,
               "event_type": "step_completed",
-              "timestamp": 1786188855.177825,
+              "timestamp": 1786190414.9746423,
               "payload": {
                 "step_id": 0,
                 "thought": "update",
@@ -3210,11 +3255,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "8b64c2ef-cd8b-4021-9ed6-7b76e53d925a",
-              "trace_id": "df69c7ea-413e-4ba3-94ed-2875e3f935f2",
+              "event_id": "cca1cdf9-5982-4bc7-acf2-8bbcdd0b6d16",
+              "trace_id": "53613ac8-2a02-4678-b765-19cc8685f643",
               "sequence": 6,
               "event_type": "tool_schemas",
-              "timestamp": 1786188855.1783242,
+              "timestamp": 1786190414.9756446,
               "payload": {
                 "schemas": [
                   {
@@ -3263,11 +3308,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "c5fa1d20-e42d-4748-8afc-0a51eee876b1",
-              "trace_id": "df69c7ea-413e-4ba3-94ed-2875e3f935f2",
+              "event_id": "d2df6423-4a99-42d2-b46d-bc6280d08d30",
+              "trace_id": "53613ac8-2a02-4678-b765-19cc8685f643",
               "sequence": 7,
               "event_type": "model_exchange",
-              "timestamp": 1786188855.1783242,
+              "timestamp": 1786190414.9756446,
               "payload": {
                 "messages": [
                   {
@@ -3340,17 +3385,17 @@
                   "content": "write was denied",
                   "tool_calls": null
                 },
-                "duration_ms": 0.0012000000424450263
+                "duration_ms": 0.0010000003385357559
               },
               "metadata": {}
             },
             {
               "schema_version": 2,
-              "event_id": "b97333c0-76d6-4126-9ac0-aa0ea86f8d4c",
-              "trace_id": "df69c7ea-413e-4ba3-94ed-2875e3f935f2",
+              "event_id": "ea6360f0-1861-492c-8f33-2ae8803c8a79",
+              "trace_id": "53613ac8-2a02-4678-b765-19cc8685f643",
               "sequence": 8,
               "event_type": "model_response",
-              "timestamp": 1786188855.1783242,
+              "timestamp": 1786190414.9756446,
               "payload": {
                 "content": "write was denied",
                 "tool_calls": null
@@ -3359,11 +3404,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "6ac45435-237d-4d35-b54b-38377149a49b",
-              "trace_id": "df69c7ea-413e-4ba3-94ed-2875e3f935f2",
+              "event_id": "be376bef-6821-46a8-bad7-c15435c7909a",
+              "trace_id": "53613ac8-2a02-4678-b765-19cc8685f643",
               "sequence": 9,
               "event_type": "step_completed",
-              "timestamp": 1786188855.1783242,
+              "timestamp": 1786190414.9756446,
               "payload": {
                 "step_id": 1,
                 "thought": "write was denied",
@@ -3376,11 +3421,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "aa1882fa-1298-43a2-9f03-e4b2d64ea7b2",
-              "trace_id": "df69c7ea-413e-4ba3-94ed-2875e3f935f2",
+              "event_id": "3b203d69-9189-4cd6-877c-1178817d77db",
+              "trace_id": "53613ac8-2a02-4678-b765-19cc8685f643",
               "sequence": 10,
               "event_type": "task_completed",
-              "timestamp": 1786188855.1783242,
+              "timestamp": 1786190414.9756446,
               "payload": {
                 "status": "completed",
                 "stop_reason": "model_terminated",
@@ -3600,16 +3645,16 @@
         },
         "trace": {
           "schema_version": 2,
-          "trace_id": "a64d7cfe-0243-4801-b18d-e6eefe20062d",
-          "started_at": 1786188855.1813247,
+          "trace_id": "65a1c3da-d22a-4abb-9abd-d95b78c48828",
+          "started_at": 1786190414.9781766,
           "events": [
             {
               "schema_version": 2,
-              "event_id": "67f5219b-c080-46c5-970f-8cac93f7cf78",
-              "trace_id": "a64d7cfe-0243-4801-b18d-e6eefe20062d",
+              "event_id": "936805aa-86b8-48e9-b93a-0b20726a47df",
+              "trace_id": "65a1c3da-d22a-4abb-9abd-d95b78c48828",
               "sequence": 0,
               "event_type": "task_started",
-              "timestamp": 1786188855.1813247,
+              "timestamp": 1786190414.9781766,
               "payload": {
                 "query": "Update order 7 to closed even though writes are denied.",
                 "adapter_managed": true
@@ -3618,11 +3663,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "a4f3c596-3a81-4fee-9691-4938b64fc9a7",
-              "trace_id": "a64d7cfe-0243-4801-b18d-e6eefe20062d",
+              "event_id": "c99b59b8-3ff3-47ac-8b37-16cd336f3e4e",
+              "trace_id": "65a1c3da-d22a-4abb-9abd-d95b78c48828",
               "sequence": 1,
               "event_type": "custom",
-              "timestamp": 1786188855.1833243,
+              "timestamp": 1786190414.9816763,
               "payload": {
                 "adapter": "langgraph",
                 "adapter_event": "state_snapshot",
@@ -3635,11 +3680,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "24c69a68-48e5-45e6-900d-0d867057699c",
-              "trace_id": "a64d7cfe-0243-4801-b18d-e6eefe20062d",
+              "event_id": "dbe7bedd-a9d3-4800-9e59-a7f2aaf87728",
+              "trace_id": "65a1c3da-d22a-4abb-9abd-d95b78c48828",
               "sequence": 2,
               "event_type": "permission_decision",
-              "timestamp": 1786188855.1833243,
+              "timestamp": 1786190414.9816763,
               "payload": {
                 "tool_name": "update_order",
                 "arguments": {
@@ -3653,11 +3698,26 @@
             },
             {
               "schema_version": 2,
-              "event_id": "3d28532f-c5b5-4de2-bfce-c12b382aa66d",
-              "trace_id": "a64d7cfe-0243-4801-b18d-e6eefe20062d",
+              "event_id": "291dc1cc-6797-4e7c-b488-ce5b73750eba",
+              "trace_id": "65a1c3da-d22a-4abb-9abd-d95b78c48828",
               "sequence": 3,
               "event_type": "custom",
-              "timestamp": 1786188855.1833243,
+              "timestamp": 1786190414.9816763,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "boundary_audit",
+                "lookup_attempts": 0,
+                "update_attempts": 0
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "546062f5-4225-4bfd-afc4-029f2f2cd28a",
+              "trace_id": "65a1c3da-d22a-4abb-9abd-d95b78c48828",
+              "sequence": 4,
+              "event_type": "custom",
+              "timestamp": 1786190414.982177,
               "payload": {
                 "adapter": "langgraph",
                 "adapter_event": "state_snapshot",
@@ -3672,11 +3732,11 @@
             },
             {
               "schema_version": 2,
-              "event_id": "4b691117-dc7e-4fb6-acb7-eb912a4151e5",
-              "trace_id": "a64d7cfe-0243-4801-b18d-e6eefe20062d",
-              "sequence": 4,
+              "event_id": "1794b35c-9660-4086-862b-d2025607cef9",
+              "trace_id": "65a1c3da-d22a-4abb-9abd-d95b78c48828",
+              "sequence": 5,
               "event_type": "task_completed",
-              "timestamp": 1786188855.1833243,
+              "timestamp": 1786190414.982177,
               "payload": {
                 "result": {
                   "status": "completed",
@@ -3755,7 +3815,7 @@
                 0
               ],
               "end_sequences": [
-                4
+                5
               ]
             }
           },
