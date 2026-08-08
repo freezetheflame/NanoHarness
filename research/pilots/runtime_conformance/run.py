@@ -152,7 +152,11 @@ def run_experiment(
             item.case_id for item in report.comparisons if not item.passed
         ]
         raise RuntimeError(f"semantic conformance failed for cases {failures}")
-    raw_path.write_text(report.model_dump_json(indent=2) + "\n", encoding="utf-8")
+    raw_path.write_text(
+        report.model_dump_json(indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
 
     summary = {
         "schema_version": 1,
@@ -177,6 +181,7 @@ def run_experiment(
     summary_path.write_text(
         json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     _write_hashes(output_root)
     return report, summary
@@ -217,7 +222,7 @@ def _write_hashes(output_root: Path) -> None:
         for path in relative_paths
     ]
     (output_root / "SHA256SUMS").write_text(
-        "\n".join(lines) + "\n", encoding="utf-8"
+        "\n".join(lines) + "\n", encoding="utf-8", newline="\n"
     )
 
 

@@ -43,6 +43,9 @@ def test_runner_writes_eight_cells_four_comparisons_and_hashes(tmp_path):
     assert summary["comparisons"] == 4
     assert summary["passed"] is True
     assert summary["infrastructure_errors"] == []
+    assert b"\r\n" not in raw_path.read_bytes()
+    assert b"\r\n" not in (tmp_path / "summary.json").read_bytes()
+    assert b"\r\n" not in (tmp_path / "SHA256SUMS").read_bytes()
     _assert_hashes(tmp_path)
 
 
