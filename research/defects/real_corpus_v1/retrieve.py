@@ -233,6 +233,17 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def write_report(path: Path, report: Mapping[str, Any]) -> None:
+    """Write a canonical report after ensuring its explicit parent exists."""
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(report, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
     args = build_parser().parse_args(argv)
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
@@ -243,11 +254,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         query_ids=args.query_ids,
     )
     report_path = args.report or args.output.parent / "retrieval_report.json"
-    report_path.write_text(
-        json.dumps(report, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-        newline="\n",
-    )
+    write_report(report_path, report)
     print(json.dumps(report, indent=2, sort_keys=True))
     return 0 if report["complete"] else 1
 

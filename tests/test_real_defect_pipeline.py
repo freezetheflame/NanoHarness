@@ -16,6 +16,7 @@ from research.defects.real_corpus_v1.retrieve import (
     fetch_pages,
     parse_next_link,
     run_retrieval,
+    write_report,
 )
 
 
@@ -252,6 +253,14 @@ def test_run_retrieval_can_resume_one_declared_query(tmp_path):
         "second"
     ]
     assert "q=second" in transport.urls[-1]
+
+
+def test_write_report_creates_nested_parent_directory(tmp_path):
+    path = tmp_path / "repository" / "reports" / "query.json"
+
+    write_report(path, {"complete": True})
+
+    assert json.loads(path.read_text(encoding="utf-8")) == {"complete": True}
 
 
 def test_build_packets_creates_identical_blind_coder_templates(tmp_path):
