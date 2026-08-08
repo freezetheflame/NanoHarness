@@ -1,0 +1,19 @@
+From de5d2eaa9b12167ea14ecf59c70f59227fd63fe3 Mon Sep 17 00:00:00 2001
+From: Muhammad Noman Fareed <60171953+shnoman97@users.noreply.github.com>
+Date: Tue, 15 Oct 2024 01:30:31 +0500
+Subject: [PATCH] Fix Cache Typo in Documentation (#1441)
+
+
+diff --git a/docs/concepts/agents.mdx b/docs/concepts/agents.mdx
+index 16518e62..f7e97f18 100644
+--- a/docs/concepts/agents.mdx
++++ b/docs/concepts/agents.mdx
+@@ -33,7 +33,7 @@ Think of an agent as a member of a team, with specific skills and a particular j
+ | **Verbose** *(optional)*   | `verbose`  | Setting this to `True` configures the internal logger to provide detailed execution logs, aiding in debugging and monitoring. Default is `False`.                                                                                              |
+ | **Allow Delegation** *(optional)* | `allow_delegation`  | Agents can delegate tasks or questions to one another, ensuring that each task is handled by the most suitable agent. Default is `False`.
+ | **Step Callback** *(optional)* | `step_callback`  | A function that is called after each step of the agent. This can be used to log the agent's actions or to perform other operations. It will overwrite the crew `step_callback`.                                                               |
+-| gbv vbn zzdsxcdsdfc**Cache** *(optional)*     | `cache`  | Indicates if the agent should use a cache for tool usage. Default is `True`.                                                                                                                                                                  |
++| **Cache** *(optional)*     | `cache`  | Indicates if the agent should use a cache for tool usage. Default is `True`.                                                                                                                                                                  |
+ | **System Template** *(optional)*     | `system_template`  | Specifies the system format for the agent. Default is `None`.                                                                                                                                                                  |
+ | **Prompt Template** *(optional)*     | `prompt_template`  | Specifies the prompt format for the agent. Default is `None`.                                                                                                                                                                  |
+ | **Response Template** *(optional)*     | `response_template`  | Specifies the response format for the agent. Default is `None`.                                                                                                                                                                  |

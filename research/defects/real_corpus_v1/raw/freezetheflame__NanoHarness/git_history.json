@@ -1,0 +1,45 @@
+{
+  "candidate_count": 2,
+  "candidates": [
+    {
+      "canonical_locator": "https://github.com/freezetheflame/NanoHarness/commit/43fd031f3d89becdd6b2c293d4ca84f1ad04ca65",
+      "committed_at": "2026-05-14T09:15:06+08:00",
+      "evidence": [
+        {
+          "evidence_id": "43fd031f3d89-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/freezetheflame/NanoHarness/commit/43fd031f3d89becdd6b2c293d4ca84f1ad04ca65",
+          "revision": "43fd031f3d89becdd6b2c293d4ca84f1ad04ca65"
+        }
+      ],
+      "repository": "freezetheflame/NanoHarness",
+      "revision": "43fd031f3d89becdd6b2c293d4ca84f1ad04ca65",
+      "source_kind": "fixing_commit",
+      "title": "fix input error in llm request json"
+    },
+    {
+      "canonical_locator": "https://github.com/freezetheflame/NanoHarness/commit/ddf582b12ff151f56d7ebab89eac9046275e7f1e",
+      "committed_at": "2026-04-18T22:37:21+08:00",
+      "evidence": [
+        {
+          "evidence_id": "ddf582b12ff1-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/freezetheflame/NanoHarness/commit/ddf582b12ff151f56d7ebab89eac9046275e7f1e",
+          "revision": "ddf582b12ff151f56d7ebab89eac9046275e7f1e"
+        }
+      ],
+      "repository": "freezetheflame/NanoHarness",
+      "revision": "ddf582b12ff151f56d7ebab89eac9046275e7f1e",
+      "source_kind": "fixing_commit",
+      "title": "fix coding agent example"
+    }
+  ],
+  "pattern": "\\b(fix|bug|regression|revert)\\b",
+  "pinned_commit": "43fd031f3d89becdd6b2c293d4ca84f1ad04ca65",
+  "repository": "freezetheflame/NanoHarness",
+  "schema_version": 1,
+  "window": {
+    "end": "2026-06-30",
+    "start": "2024-01-01"
+  }
+}

@@ -1,0 +1,19 @@
+From 0df6be1fc1a82b64db078859023e9a4879fa30c0 Mon Sep 17 00:00:00 2001
+From: liuyunrui123 <liuyunrui2021@163.com>
+Date: Tue, 16 Sep 2025 15:42:35 +0800
+Subject: [PATCH] fix: extra args not work to disable thinking (#7006)
+
+
+diff --git a/python/packages/autogen-ext/src/autogen_ext/models/openai/_openai_client.py b/python/packages/autogen-ext/src/autogen_ext/models/openai/_openai_client.py
+index 02b8d911..359ddfe6 100644
+--- a/python/packages/autogen-ext/src/autogen_ext/models/openai/_openai_client.py
++++ b/python/packages/autogen-ext/src/autogen_ext/models/openai/_openai_client.py
+@@ -94,7 +94,7 @@ openai_init_kwargs = set(inspect.getfullargspec(AsyncOpenAI.__init__).kwonlyargs
+ aopenai_init_kwargs = set(inspect.getfullargspec(AsyncAzureOpenAI.__init__).kwonlyargs)
+ 
+ create_kwargs = set(completion_create_params.CompletionCreateParamsBase.__annotations__.keys()) | set(
+-    ("timeout", "stream")
++    ("timeout", "stream", "extra_body")
+ )
+ # Only single choice allowed
+ disallowed_create_args = set(["stream", "messages", "function_call", "functions", "n"])

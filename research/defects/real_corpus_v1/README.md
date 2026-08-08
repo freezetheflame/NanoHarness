@@ -1,0 +1,87 @@
+# Real-Defect Corpus v1 Retrieval Snapshot
+
+Status: candidate retrieval and blind packet complete; independent human coding
+has not started; no verified-defect or operator-representativeness claim is
+supported yet.
+
+## Authoritative sampling frame
+
+The sampling frame is the complete first-parent history of each pinned default
+branch between 2024-01-01 and 2026-06-30. Commit subjects are retained when the
+case-insensitive whole-word expression `\b(fix|bug|regression|revert)\b`
+matches. This produced:
+
+| Repository | Pinned commit | Candidate commits | Selected |
+|---|---|---:|---:|
+| `freezetheflame/NanoHarness` | `43fd031f3d89becdd6b2c293d4ca84f1ad04ca65` | 2 | 2 |
+| `langchain-ai/langgraph` | `5931a5f0b313feff24e2516a586c55601b868ac1` | 637 | 25 |
+| `microsoft/autogen` | `027ecf0a379bcc1d09956d46d12d44a3ad9cee14` | 422 | 25 |
+| `crewAIInc/crewAI` | `ba2dafdeda7944aae84057f3433a8347d05faf2c` | 539 | 25 |
+
+The complete universe contains 1,600 candidates. Repository-stratified SHA-256
+ranking selects 77: all two NanoHarness candidates and 25 from each external
+repository. The private split contains 47 derivation and 30 validation
+candidates; partition fields are absent from the human packet.
+
+Selection does not imply inclusion. Documentation, formatting, dependency, and
+non-Agent fixes deliberately remain available as human-screening negatives.
+
+## Search API correction
+
+The initially frozen GitHub Search lanes were executed for evidence discovery.
+One LangGraph pull-request query reached GitHub Search's 1,000-result ceiling,
+and the original long pull-request expression returned HTTP 422. The exact
+superseded report is retained under `protocol_corrections/`. Before human coding,
+the long expression was split to satisfy GitHub's Boolean-operator limit and
+the complete pinned Git history replaced Search as the sampling frame.
+
+The 81 retained Search response pages are stored in deterministic
+`raw/search_pages.zip`; `raw/search_pages_index.json` records the path, size, and
+SHA-256 of every original page. Search data remains supplementary and is not
+used to calculate the 1,600-candidate universe.
+
+## Human packet
+
+- `evidence_packet.json`: 77 partition-blind candidates.
+- `patches/`: one immutable patch per candidate.
+- `coding_templates/H1/pass_a.json`: blank H1 submission.
+- `coding_templates/H2/pass_a.json`: blank H2 submission.
+- `selected_candidates.private.json`: original hidden split.
+- `selected_candidates.enriched.private.json`: hidden split plus patch metadata.
+
+The evidence packet SHA-256 is
+`92fc19ca1f96e183dfb21087aae966445ce46e3ae75e81dbdbacfa1f74f82593`.
+Neither coder may receive either private file or a machine pre-code.
+
+## Reproduction
+
+Run the focused pipeline tests:
+
+```powershell
+$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD = '1'
+.venv\Scripts\python.exe -m pytest `
+  tests\test_defect_coding.py `
+  tests\test_real_defect_pipeline.py `
+  tests\test_defects.py -q
+```
+
+Regenerate each `git_history.json` with `collect_git_history.py`, then run:
+
+```powershell
+.venv\Scripts\python.exe `
+  research\defects\real_corpus_v1\build_candidate_index.py `
+  --raw research\defects\real_corpus_v1\raw `
+  --manifest research\defects\real_corpus_v1\manifest.json `
+  --output research\defects\real_corpus_v1
+```
+
+Repository checkout paths are local inputs to `enrich_candidates.py` and are
+never retained. After regeneration, verify every entry in `SHA256SUMS`.
+
+## Claim boundary
+
+The counts above describe retrieval and deterministic sampling only. They are
+not verified defect counts, defect prevalence, Operator support, held-out
+mapping, Mutation Score, Agent performance, or confirmation of Claim C2. C2
+remains planned until H1/H2 Pass A, adjudication, derivation-only Operator
+freeze, H1/H2 Pass B, readiness, and checksum gates all pass.

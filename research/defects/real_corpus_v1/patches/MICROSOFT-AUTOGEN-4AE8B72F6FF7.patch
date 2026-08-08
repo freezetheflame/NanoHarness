@@ -1,0 +1,30 @@
+From 83f9f3e73336fbad4d441e3db16c3a94a78d9443 Mon Sep 17 00:00:00 2001
+From: Li Jiang <bnujli@gmail.com>
+Date: Thu, 2 May 2024 02:05:45 +0800
+Subject: [PATCH] Fix chroma import error (#2557)
+
+* Fix chroma import error
+
+* fix format
+
+diff --git a/setup.py b/setup.py
+index a93f1de0..a5481c90 100644
+--- a/setup.py
++++ b/setup.py
+@@ -35,7 +35,15 @@ jupyter_executor = [
+     "ipykernel>=6.29.0",
+ ]
+ 
+-retrieve_chat = ["chromadb", "sentence_transformers", "pypdf", "ipython", "beautifulsoup4", "markdownify"]
++retrieve_chat = [
++    "protobuf==4.25.3",
++    "chromadb",
++    "sentence_transformers",
++    "pypdf",
++    "ipython",
++    "beautifulsoup4",
++    "markdownify",
++]
+ 
+ extra_require = {
+     "test": [

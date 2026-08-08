@@ -1,0 +1,134 @@
+From 6b262f5a6de3db915773d19df7fdbdca73fb49c2 Mon Sep 17 00:00:00 2001
+From: Vini Brasil <vini@hey.com>
+Date: Wed, 18 Mar 2026 15:05:41 -0300
+Subject: [PATCH] Fix lock_store crash when redis package is not installed
+ (#4943)
+
+* Fix lock_store crash when redis package is not installed
+
+`REDIS_URL` being set was enough to trigger a Redis lock, which would
+raise `ImportError` if the `redis` package wasn't available. Added
+`_redis_available()` to guard on both the env var and the import.
+
+* Simplify tests
+
+* Simplify tests #2
+
+diff --git a/lib/crewai/src/crewai/utilities/lock_store.py b/lib/crewai/src/crewai/utilities/lock_store.py
+index b2ac4d81..363448d8 100644
+--- a/lib/crewai/src/crewai/utilities/lock_store.py
++++ b/lib/crewai/src/crewai/utilities/lock_store.py
+@@ -1,7 +1,7 @@
+ """Centralised lock factory.
+ 
+-If ``REDIS_URL`` is set, locks are distributed via ``portalocker.RedisLock``. Otherwise, falls
+-back to the standard ``portalocker.Lock``.
++If ``REDIS_URL`` is set and the ``redis`` package is installed, locks are distributed via
++``portalocker.RedisLock``. Otherwise, falls back to the standard ``portalocker.Lock``.
+ """
+ 
+ from __future__ import annotations
+@@ -30,6 +30,18 @@ _REDIS_URL: str | None = os.environ.get("REDIS_URL")
+ _DEFAULT_TIMEOUT: Final[int] = 120
+ 
+ 
++def _redis_available() -> bool:
++    """Return True if redis is installed and REDIS_URL is set."""
++    if not _REDIS_URL:
++        return False
++    try:
++        import redis  # noqa: F401
++
++        return True
++    except ImportError:
++        return False
++
++
+ @lru_cache(maxsize=1)
+ def _redis_connection() -> redis.Redis:
+     """Return a cached Redis connection, creating one on first call."""
+@@ -51,7 +63,7 @@ def lock(name: str, *, timeout: float = _DEFAULT_TIMEOUT) -> Iterator[None]:
+     """
+     channel = f"crewai:{md5(name.encode(), usedforsecurity=False).hexdigest()}"
+ 
+-    if _REDIS_URL:
++    if _redis_available():
+         with portalocker.RedisLock(
+             channel=channel,
+             connection=_redis_connection(),
+diff --git a/lib/crewai/tests/utilities/test_lock_store.py b/lib/crewai/tests/utilities/test_lock_store.py
+new file mode 100644
+index 00000000..8e0e6bab
+--- /dev/null
++++ b/lib/crewai/tests/utilities/test_lock_store.py
+@@ -0,0 +1,70 @@
++"""Tests for lock_store.
++
++We verify our own logic: the _redis_available guard and which portalocker
++backend is selected. We trust portalocker to handle actual locking mechanics.
++"""
++
++from __future__ import annotations
++
++import sys
++from unittest import mock
++
++import pytest
++
++import crewai.utilities.lock_store as lock_store
++from crewai.utilities.lock_store import lock
++
++
++@pytest.fixture(autouse=True)
++def no_redis_url(monkeypatch):
++    monkeypatch.setattr(lock_store, "_REDIS_URL", None)
++
++
++# ---------------------------------------------------------------------------
++# _redis_available
++# ---------------------------------------------------------------------------
++
++
++def test_redis_not_available_without_url():
++    assert lock_store._redis_available() is False
++
++
++def test_redis_not_available_when_package_missing(monkeypatch):
++    monkeypatch.setattr(lock_store, "_REDIS_URL", "redis://localhost:6379")
++    monkeypatch.setitem(sys.modules, "redis", None)  # None → ImportError on import
++    assert lock_store._redis_available() is False
++
++
++def test_redis_available_with_url_and_package(monkeypatch):
++    monkeypatch.setattr(lock_store, "_REDIS_URL", "redis://localhost:6379")
++    monkeypatch.setitem(sys.modules, "redis", mock.MagicMock())
++    assert lock_store._redis_available() is True
++
++
++# ---------------------------------------------------------------------------
++# lock strategy selection
++# ---------------------------------------------------------------------------
++
++
++def test_uses_file_lock_when_redis_unavailable():
++    with mock.patch("portalocker.Lock") as mock_lock:
++        with lock("file_test"):
++            pass
++
++    mock_lock.assert_called_once()
++    assert "crewai:" in mock_lock.call_args.args[0]
++
++
++def test_uses_redis_lock_when_redis_available(monkeypatch):
++    fake_conn = mock.MagicMock()
++    monkeypatch.setattr(lock_store, "_redis_available", mock.Mock(return_value=True))
++    monkeypatch.setattr(lock_store, "_redis_connection", mock.Mock(return_value=fake_conn))
++
++    with mock.patch("portalocker.RedisLock") as mock_redis_lock:
++        with lock("redis_test"):
++            pass
++
++    mock_redis_lock.assert_called_once()
++    kwargs = mock_redis_lock.call_args.kwargs
++    assert kwargs["channel"].startswith("crewai:")
++    assert kwargs["connection"] is fake_conn

@@ -1,0 +1,31 @@
+From 36b6cd1493c01c8e6a32f611a1ec2c26c2e8f902 Mon Sep 17 00:00:00 2001
+From: William FH <13333726+hinthornw@users.noreply.github.com>
+Date: Mon, 2 Dec 2024 18:20:19 -0800
+Subject: [PATCH] fix: Handle empty store similarity (numpy) (#2602)
+
+
+diff --git a/libs/checkpoint/langgraph/store/memory/__init__.py b/libs/checkpoint/langgraph/store/memory/__init__.py
+index 40011a7b..eec511ac 100644
+--- a/libs/checkpoint/langgraph/store/memory/__init__.py
++++ b/libs/checkpoint/langgraph/store/memory/__init__.py
+@@ -413,6 +413,8 @@ def _cosine_similarity(X: list[float], Y: list[list[float]]) -> list[float]:
+     Compute cosine similarity between a vector X and a matrix Y.
+     Lazy import numpy for efficiency.
+     """
++    if not Y:
++        return []
+     if _check_numpy():
+         import numpy as np  # type: ignore
+ 
+diff --git a/libs/checkpoint/pyproject.toml b/libs/checkpoint/pyproject.toml
+index ef12f205..f48f46a1 100644
+--- a/libs/checkpoint/pyproject.toml
++++ b/libs/checkpoint/pyproject.toml
+@@ -1,6 +1,6 @@
+ [tool.poetry]
+ name = "langgraph-checkpoint"
+-version = "2.0.7"
++version = "2.0.8"
+ description = "Library with base interfaces for LangGraph checkpoint savers."
+ authors = []
+ license = "MIT"

@@ -1,0 +1,44 @@
+From aa0d835f4dd966f45bcd5d0fa354f88993ee70bc Mon Sep 17 00:00:00 2001
+From: Z1m4-blu3 <123018140+Z1m4-blu3@users.noreply.github.com>
+Date: Sun, 6 Jul 2025 05:42:59 +0200
+Subject: [PATCH] Fix function calling support for Llama3.3 (#6750)
+
+## Why are these changes needed?
+This PR fixes incorrect model metadata for llama3.3.
+The function_calling capability was previously set to False, but
+[llama3.3 supports function
+calling.](https://www.llama.com/docs/model-cards-and-prompt-formats/llama3_3/)
+with [ollama](https://ollama.com/library/llama3.3).
+
+<!-- Please give a short summary of the change and the problem this
+solves. -->
+
+## Related issue number
+
+<!-- For example: "Closes #1234" -->
+
+## Checks
+
+- [x] I've included any doc changes needed for
+<https://microsoft.github.io/autogen/>. See
+<https://github.com/microsoft/autogen/blob/main/CONTRIBUTING.md> to
+build and test documentation locally.
+- [x] I've added tests (if relevant) corresponding to the changes
+introduced in this PR.
+- [x] I've made sure all auto checks have passed.
+
+Co-authored-by: mh <>
+
+diff --git a/python/packages/autogen-ext/src/autogen_ext/models/ollama/_model_info.py b/python/packages/autogen-ext/src/autogen_ext/models/ollama/_model_info.py
+index 6ab239c9..086ef73a 100644
+--- a/python/packages/autogen-ext/src/autogen_ext/models/ollama/_model_info.py
++++ b/python/packages/autogen-ext/src/autogen_ext/models/ollama/_model_info.py
+@@ -141,7 +141,7 @@ _MODEL_INFO: Dict[str, ModelInfo] = {
+     },
+     "llama3.3": {
+         "vision": False,
+-        "function_calling": False,
++        "function_calling": True,
+         "json_output": True,
+         "family": ModelFamily.UNKNOWN,
+         "structured_output": True,

@@ -1,0 +1,31 @@
+From c620683ba640fd8e64f133cd3b374521d3e22c39 Mon Sep 17 00:00:00 2001
+From: effedici <26420747+dicaeffe@users.noreply.github.com>
+Date: Tue, 1 Apr 2025 09:44:49 +0200
+Subject: [PATCH] fix: the installation instruction had a missing step (#6166)
+
+## Why are these changes needed?
+
+Following the [guide
+instructions](https://microsoft.github.io/autogen/stable//user-guide/autogenstudio-user-guide/installation.html#a-install-from-source-manually)
+the user will execute the commands in the wrong directory.
+
+## Related issue number
+
+Closes #6165
+
+diff --git a/python/packages/autogen-core/docs/src/user-guide/autogenstudio-user-guide/installation.md b/python/packages/autogen-core/docs/src/user-guide/autogenstudio-user-guide/installation.md
+index 374ce2ff..ba8f562f 100644
+--- a/python/packages/autogen-core/docs/src/user-guide/autogenstudio-user-guide/installation.md
++++ b/python/packages/autogen-core/docs/src/user-guide/autogenstudio-user-guide/installation.md
+@@ -74,8 +74,9 @@ You have two options for installing from source: manually or using a dev contain
+ ### A) Install from source manually
+ 
+ 1. Ensure you have Python 3.10+ and Node.js (version above 14.15.0) installed.
+-2. Clone the AutoGen Studio repository and install its Python dependencies using `pip install -e .`
+-3. Navigate to the `python/packages/autogen-studio/frontend` directory, install the dependencies, and build the UI:
++2. Clone the AutoGen Studio repository.
++3. Navigate to the `python/packages/autogen-studio` and install its Python dependencies using `pip install -e .`
++4. Navigate to the `python/packages/autogen-studio/frontend` directory, install the dependencies, and build the UI:
+ 
+ ```bash
+ npm install -g gatsby-cli

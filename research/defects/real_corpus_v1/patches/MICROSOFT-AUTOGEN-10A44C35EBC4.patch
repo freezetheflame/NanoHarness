@@ -1,0 +1,20 @@
+From c930251ebc9547c9f744ecc08965ae1cfa6803bc Mon Sep 17 00:00:00 2001
+From: Jacob Alber <jaalber@microsoft.com>
+Date: Mon, 27 Jan 2025 17:56:38 -0500
+Subject: [PATCH] fix: Increase MethodGroup type precision
+
+* Fixes stackoverflow when calling InMemoryRutnime.RegisterAgentFactoryAsync()
+
+diff --git a/dotnet/src/Microsoft.AutoGen/Core/InProcessRuntime.cs b/dotnet/src/Microsoft.AutoGen/Core/InProcessRuntime.cs
+index dd8860d4..8e93a074 100644
+--- a/dotnet/src/Microsoft.AutoGen/Core/InProcessRuntime.cs
++++ b/dotnet/src/Microsoft.AutoGen/Core/InProcessRuntime.cs
+@@ -176,7 +176,7 @@ public sealed class InProcessRuntime : IAgentRuntime
+     }
+ 
+     public ValueTask<AgentType> RegisterAgentFactoryAsync<TAgent>(AgentType type, Func<AgentId, IAgentRuntime, ValueTask<TAgent>> factoryFunc) where TAgent : IHostableAgent
+-        => this.RegisterAgentFactoryAsync(type, async (agentId, runtime) => await factoryFunc(agentId, runtime));
++        => this.RegisterAgentFactoryAsync(type, async ValueTask<IHostableAgent> (agentId, runtime) => await factoryFunc(agentId, runtime));
+ 
+     public ValueTask<AgentType> RegisterAgentFactoryAsync(AgentType type, Func<AgentId, IAgentRuntime, ValueTask<IHostableAgent>> factoryFunc)
+     {

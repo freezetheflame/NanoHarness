@@ -1,0 +1,129 @@
+From f4f32b5f7fff51462e5f6c2bbd534d99929e73d9 Mon Sep 17 00:00:00 2001
+From: Lorenze Jay <63378463+lorenzejay@users.noreply.github.com>
+Date: Wed, 3 Sep 2025 16:36:50 -0700
+Subject: [PATCH] fix: suppress Pydantic deprecation warnings in initialization
+ (#3443)
+
+* fix: suppress Pydantic deprecation warnings in initialization
+
+- Implemented a function to filter out Pydantic deprecation warnings, enhancing the user experience by preventing unnecessary warning messages during execution.
+- Removed the previous warning filter setup to streamline the warning suppression process.
+- Updated the User-Agent header formatting for consistency.
+
+* fix type check
+
+* dropped
+
+* fix: update type-checker workflow and suppress warnings
+
+- Updated the Python version matrix in the type-checker workflow to use double quotes for consistency.
+- Added the `# type: ignore[assignment]` comment to the warning suppression assignment in `__init__.py` to address type checking issues.
+- Ensured that the mypy command in the workflow allows for untyped calls and generics, enhancing type checking flexibility.
+
+* better
+
+diff --git a/.github/workflows/type-checker.yml b/.github/workflows/type-checker.yml
+index e2171c53..e5af4ba9 100644
+--- a/.github/workflows/type-checker.yml
++++ b/.github/workflows/type-checker.yml
+@@ -12,13 +12,13 @@ jobs:
+     strategy:
+       fail-fast: false
+       matrix:
+-        python-version: ['3.10', '3.11', '3.12', '3.13']
++        python-version: ["3.10", "3.11", "3.12", "3.13"]
+ 
+     steps:
+       - name: Checkout code
+         uses: actions/checkout@v4
+         with:
+-          fetch-depth: 0  # Fetch all history for proper diff
++          fetch-depth: 0 # Fetch all history for proper diff
+ 
+       - name: Install uv
+         uses: astral-sh/setup-uv@v6
+@@ -40,10 +40,10 @@ jobs:
+           # Get the list of changed Python files compared to the base branch
+           echo "Fetching changed files..."
+           git diff --name-only --diff-filter=ACMRT origin/${{ github.base_ref }}...HEAD -- '*.py' > changed_files.txt
+-          
++
+           # Filter for files in src/ and tests/ directories
+           grep -E "^(src/|tests/)" changed_files.txt > filtered_changed_files.txt || true
+-          
++
+           # Check if there are any changed files
+           if [ -s filtered_changed_files.txt ]; then
+             echo "Changed Python files in src/ and tests/:"
+diff --git a/src/crewai/__init__.py b/src/crewai/__init__.py
+index 1a050588..f5334713 100644
+--- a/src/crewai/__init__.py
++++ b/src/crewai/__init__.py
+@@ -1,4 +1,30 @@
+ import warnings
++from typing import Any
++
++
++def _suppress_pydantic_deprecation_warnings() -> None:
++    """Suppress Pydantic deprecation warnings using targeted monkey patch."""
++    original_warn = warnings.warn
++
++    def filtered_warn(
++        message: Any,
++        category: type | None = None,
++        stacklevel: int = 1,
++        source: Any = None,
++    ) -> Any:
++        if (
++            category
++            and hasattr(category, "__module__")
++            and category.__module__ == "pydantic.warnings"
++        ):
++            return None
++        return original_warn(message, category, stacklevel + 1, source)
++
++    setattr(warnings, "warn", filtered_warn)
++
++
++_suppress_pydantic_deprecation_warnings()
++
+ import threading
+ import urllib.request
+ 
+@@ -15,17 +41,10 @@ from crewai.tasks.llm_guardrail import LLMGuardrail
+ from crewai.tasks.task_output import TaskOutput
+ from crewai.telemetry.telemetry import Telemetry
+ 
+-warnings.filterwarnings(
+-    "ignore",
+-    message="Pydantic serializer warnings:",
+-    category=UserWarning,
+-    module="pydantic.main",
+-)
+-
+ _telemetry_submitted = False
+ 
+ 
+-def _track_install():
++def _track_install() -> None:
+     """Track package installation/first-use via Scarf analytics."""
+     global _telemetry_submitted
+ 
+@@ -36,7 +55,7 @@ def _track_install():
+         pixel_url = "https://api.scarf.sh/v2/packages/CrewAI/crewai/docs/00f2dad1-8334-4a39-934e-003b2e1146db"
+ 
+         req = urllib.request.Request(pixel_url)
+-        req.add_header('User-Agent', f'CrewAI-Python/{__version__}')
++        req.add_header("User-Agent", f"CrewAI-Python/{__version__}")
+ 
+         with urllib.request.urlopen(req, timeout=2):  # nosec B310
+             _telemetry_submitted = True
+@@ -45,7 +64,7 @@ def _track_install():
+         pass
+ 
+ 
+-def _track_install_async():
++def _track_install_async() -> None:
+     """Track installation in background thread to avoid blocking imports."""
+     if not Telemetry._is_telemetry_disabled():
+         thread = threading.Thread(target=_track_install, daemon=True)

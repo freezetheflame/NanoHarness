@@ -1,0 +1,19 @@
+From 501f8d22726e687c55052682c20c97ce62f018ac Mon Sep 17 00:00:00 2001
+From: Dan <dan@loudbase.com>
+Date: Mon, 18 Mar 2024 20:27:00 -0700
+Subject: [PATCH] Fix typo in conversation-patterns.ipynb (#2066)
+
+
+diff --git a/website/docs/tutorial/conversation-patterns.ipynb b/website/docs/tutorial/conversation-patterns.ipynb
+index 2763787b..25b66da9 100644
+--- a/website/docs/tutorial/conversation-patterns.ipynb
++++ b/website/docs/tutorial/conversation-patterns.ipynb
+@@ -51,7 +51,7 @@
+     "message of the chat (i.e., `summary_method='last_msg'`).\n",
+     "\n",
+     "The example below is a two-agent chat between a student agent and a teacher\n",
+-    "agent. It's summarizer uses an LLM-based summary."
++    "agent. Its summarizer uses an LLM-based summary."
+    ]
+   },
+   {

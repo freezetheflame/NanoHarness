@@ -1,0 +1,25 @@
+From 220f9aaaabeca0a5a8d98697713f2c5fa59f58b3 Mon Sep 17 00:00:00 2001
+From: Eugene Yurtsev <eyurtsev@gmail.com>
+Date: Fri, 9 May 2025 16:48:13 -0400
+Subject: [PATCH] docs: fix formatting in overview for getting started tutorial
+ (#4639)
+
+
+diff --git a/docs/docs/concepts/why-langgraph.md b/docs/docs/concepts/why-langgraph.md
+index 1d27c28a..d31741ff 100644
+--- a/docs/docs/concepts/why-langgraph.md
++++ b/docs/docs/concepts/why-langgraph.md
+@@ -19,8 +19,8 @@ To get acquainted with LangGraph's key concepts and features, complete the follo
+ 
+ In completing this series of tutorials, you will build a support chatbot in LangGraph that can:
+ 
+-✅ **Answer common questions** by searching the web
+-✅ **Maintain conversation state** across calls  
+-✅ **Route complex queries** to a human for review  
+-✅ **Use custom state** to control its behavior  
+-✅ **Rewind and explore** alternative conversation paths  
++* ✅ **Answer common questions** by searching the web
++* ✅ **Maintain conversation state** across calls  
++* ✅ **Route complex queries** to a human for review  
++* ✅ **Use custom state** to control its behavior  
++* ✅ **Rewind and explore** alternative conversation paths  

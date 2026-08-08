@@ -1,0 +1,33 @@
+From 5abf9763735bb60c5a7b5ebc6da9d2faafcbf35f Mon Sep 17 00:00:00 2001
+From: Lucas Gomide <lucaslg200@gmail.com>
+Date: Tue, 4 Nov 2025 07:58:40 -0500
+Subject: [PATCH] fix: allow adding RAG source content from valid URLs (#3831)
+
+
+diff --git a/lib/crewai-tools/src/crewai_tools/adapters/crewai_rag_adapter.py b/lib/crewai-tools/src/crewai_tools/adapters/crewai_rag_adapter.py
+index f23cea85..9716ca4e 100644
+--- a/lib/crewai-tools/src/crewai_tools/adapters/crewai_rag_adapter.py
++++ b/lib/crewai-tools/src/crewai_tools/adapters/crewai_rag_adapter.py
+@@ -229,6 +229,7 @@ class CrewAIRagAdapter(Adapter):
+                             continue
+             else:
+                 metadata: dict[str, Any] = base_metadata.copy()
++                source_content = SourceContent(source_ref)
+ 
+                 if data_type in [
+                     DataType.PDF_FILE,
+@@ -239,13 +240,12 @@ class CrewAIRagAdapter(Adapter):
+                     DataType.XML,
+                     DataType.MDX,
+                 ]:
+-                    if not os.path.isfile(source_ref):
++                    if not source_content.is_url() and not source_content.path_exists():
+                         raise FileNotFoundError(f"File does not exist: {source_ref}")
+ 
+                 loader = data_type.get_loader()
+                 chunker = data_type.get_chunker()
+ 
+-                source_content = SourceContent(source_ref)
+                 loader_result: LoaderResult = loader.load(source_content)
+ 
+                 chunks = chunker.chunk(loader_result.content)

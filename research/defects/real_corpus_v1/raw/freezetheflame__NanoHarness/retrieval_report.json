@@ -1,0 +1,50 @@
+{
+  "complete": true,
+  "errors": [],
+  "manifest_id": "agent-real-defects-v1",
+  "repositories": [
+    {
+      "default_branch": "main",
+      "pinned_commit": "43fd031f3d89becdd6b2c293d4ca84f1ad04ca65",
+      "queries": [
+        {
+          "item_count": 0,
+          "query": "repo:freezetheflame/NanoHarness is:issue is:closed closed:2024-01-01..2026-06-30 label:bug",
+          "query_id": "issue-label-bug"
+        },
+        {
+          "item_count": 0,
+          "query": "repo:freezetheflame/NanoHarness is:issue is:closed closed:2024-01-01..2026-06-30 label:regression",
+          "query_id": "issue-label-regression"
+        },
+        {
+          "item_count": 0,
+          "query": "repo:freezetheflame/NanoHarness is:issue is:closed closed:2024-01-01..2026-06-30 (bug OR regression OR crash OR incorrect) in:title,body",
+          "query_id": "issue-defect-terms"
+        },
+        {
+          "item_count": 0,
+          "query": "repo:freezetheflame/NanoHarness is:pr is:merged merged:2024-01-01..2026-06-30 (bug OR fix OR regression OR crash) in:title,body",
+          "query_id": "merged-pr-core-defect-terms"
+        },
+        {
+          "item_count": 0,
+          "query": "repo:freezetheflame/NanoHarness is:pr is:merged merged:2024-01-01..2026-06-30 (duplicate OR retry OR state OR tool) in:title,body",
+          "query_id": "merged-pr-runtime-defect-terms"
+        },
+        {
+          "item_count": 0,
+          "query": "repo:freezetheflame/NanoHarness is:pr is:merged merged:2024-01-01..2026-06-30 (context OR permission OR termination OR replay OR checkpoint) in:title,body",
+          "query_id": "merged-pr-boundary-defect-terms"
+        },
+        {
+          "item_count": 0,
+          "query": "repo:freezetheflame/NanoHarness committer-date:2024-01-01..2026-06-30 (fix OR bug OR regression OR revert)",
+          "query_id": "fixing-commit-terms"
+        }
+      ],
+      "repository": "freezetheflame/NanoHarness",
+      "repository_id": 1299070734
+    }
+  ]
+}

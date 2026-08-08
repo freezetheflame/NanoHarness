@@ -1,0 +1,19 @@
+From bfcbb630172b673f6320f8823dd514042279ca19 Mon Sep 17 00:00:00 2001
+From: KazooTTT <turbopm@outlook.com>
+Date: Wed, 6 Mar 2024 23:41:40 +0800
+Subject: [PATCH] fix: update the docs link (#1879)
+
+
+diff --git a/README.md b/README.md
+index 247dc90e..bc2f3340 100644
+--- a/README.md
++++ b/README.md
+@@ -70,7 +70,7 @@ The easiest way to start playing is
+ ## [Installation](https://microsoft.github.io/autogen/docs/Installation)
+ ### Option 1. Install and Run AutoGen in Docker
+ 
+-Find detailed instructions for users [here](https://microsoft.github.io/autogen/docs/Installation#option-1-install-and-run-autogen-in-docker), and for developers [here](https://microsoft.github.io/autogen/docs/Contribute#docker-for-development).
++Find detailed instructions for users [here](https://microsoft.github.io/autogen/docs/installation/Docker#step-1-install-docker), and for developers [here](https://microsoft.github.io/autogen/docs/Contribute#docker-for-development).
+ 
+ ### Option 2. Install AutoGen Locally
+ 

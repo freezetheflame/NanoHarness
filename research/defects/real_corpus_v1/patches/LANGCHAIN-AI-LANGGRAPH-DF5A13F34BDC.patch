@@ -1,0 +1,76 @@
+From f087567853829e0c3a3e608e2cd5501a97aaefac Mon Sep 17 00:00:00 2001
+From: Sarath ak <aksarath@gmail.com>
+Date: Thu, 11 Sep 2025 00:01:07 +0530
+Subject: [PATCH] fix(cli): handle Docker SemVer build metadata in version
+ parsing #5965 (#6024)
+
+Description:
+Corrects _parse_version to support Docker versions with SemVer build
+metadata (e.g., 28.1.1+1), resolving #5965. Adds comprehensive unit
+tests for version parsing, including normal, v-prefixed, prerelease,
+build metadata, combined prerelease/build metadata, and edge cases with
+missing components.
+
+Issue:
+Closes #5965
+
+Dependencies:
+None
+
+---------
+
+Co-authored-by: Sydney Runkle <54324534+sydney-runkle@users.noreply.github.com>
+
+diff --git a/libs/cli/langgraph_cli/docker.py b/libs/cli/langgraph_cli/docker.py
+index 614dc636..17e37d32 100644
+--- a/libs/cli/langgraph_cli/docker.py
++++ b/libs/cli/langgraph_cli/docker.py
+@@ -40,7 +40,9 @@ def _parse_version(version: str) -> Version:
+         patch = "0"
+     else:
+         major, minor, patch = parts
+-    return Version(int(major.lstrip("v")), int(minor), int(patch.split("-")[0]))
++    return Version(
++        int(major.lstrip("v")), int(minor), int(patch.split("-")[0].split("+")[0])
++    )
+ 
+ 
+ def check_capabilities(runner) -> DockerCapabilities:
+diff --git a/libs/cli/tests/unit_tests/test_docker.py b/libs/cli/tests/unit_tests/test_docker.py
+index b29118a2..b16d0df1 100644
+--- a/libs/cli/tests/unit_tests/test_docker.py
++++ b/libs/cli/tests/unit_tests/test_docker.py
+@@ -1,7 +1,10 @@
++import pytest
++
+ from langgraph_cli.docker import (
+     DEFAULT_POSTGRES_URI,
+     DockerCapabilities,
+     Version,
++    _parse_version,
+     compose,
+ )
+ from langgraph_cli.util import clean_empty_lines
+@@ -363,3 +366,22 @@ services:
+             REDIS_URI: redis://langgraph-redis:6379
+             POSTGRES_URI: {DEFAULT_POSTGRES_URI}"""
+     assert clean_empty_lines(actual_compose_str) == expected_compose_str
++
++
++@pytest.mark.parametrize(
++    "input_str,expected",
++    [
++        ("1.2.3", Version(1, 2, 3)),
++        ("v1.2.3", Version(1, 2, 3)),
++        ("1.2.3-alpha", Version(1, 2, 3)),
++        ("1.2.3+1", Version(1, 2, 3)),
++        ("1.2.3-alpha+build", Version(1, 2, 3)),
++        ("1.2", Version(1, 2, 0)),
++        ("1", Version(1, 0, 0)),
++        ("v28.1.1+1", Version(28, 1, 1)),
++        ("2.0.0-beta.1+exp.sha.5114f85", Version(2, 0, 0)),
++        ("v3.4.5-rc1+build.123", Version(3, 4, 5)),
++    ],
++)
++def test_parse_version_w_edge_cases(input_str, expected):
++    assert _parse_version(input_str) == expected

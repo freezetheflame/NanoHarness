@@ -1,0 +1,549 @@
+From 6c8b656588cc3b99ff1e9d5fcf2d545068f02f2b Mon Sep 17 00:00:00 2001
+From: Jack Gerrits <jackgerrits@users.noreply.github.com>
+Date: Mon, 25 Nov 2024 16:07:45 -0500
+Subject: [PATCH] Fix examples in docstrings (#4356)
+
+* Fix examples in docstrings
+
+* formatting
+
+* Update python/packages/autogen-ext/src/autogen_ext/models/_reply_chat_completion_client.py
+
+Co-authored-by: Eric Zhu <ekzhu@users.noreply.github.com>
+
+* Update python/packages/autogen-ext/src/autogen_ext/models/_reply_chat_completion_client.py
+
+Co-authored-by: Eric Zhu <ekzhu@users.noreply.github.com>
+
+* Update python/packages/autogen-ext/src/autogen_ext/agents/_openai_assistant_agent.py
+
+Co-authored-by: Eric Zhu <ekzhu@users.noreply.github.com>
+
+* Update python/packages/autogen-ext/src/autogen_ext/agents/_openai_assistant_agent.py
+
+Co-authored-by: Eric Zhu <ekzhu@users.noreply.github.com>
+
+* Update python/packages/autogen-ext/src/autogen_ext/models/_reply_chat_completion_client.py
+
+Co-authored-by: Eric Zhu <ekzhu@users.noreply.github.com>
+
+* Update python/packages/autogen-ext/src/autogen_ext/models/_reply_chat_completion_client.py
+
+Co-authored-by: Eric Zhu <ekzhu@users.noreply.github.com>
+
+* Formattinggp
+
+---------
+
+Co-authored-by: Eric Zhu <ekzhu@users.noreply.github.com>
+
+diff --git a/python/packages/autogen-agentchat/src/autogen_agentchat/agents/_code_executor_agent.py b/python/packages/autogen-agentchat/src/autogen_agentchat/agents/_code_executor_agent.py
+index 7abe6813..5dd4c900 100644
+--- a/python/packages/autogen-agentchat/src/autogen_agentchat/agents/_code_executor_agent.py
++++ b/python/packages/autogen-agentchat/src/autogen_agentchat/agents/_code_executor_agent.py
+@@ -24,9 +24,11 @@ class CodeExecutorAgent(BaseChatAgent):
+ 
+         .. code-block:: python
+ 
+-
++            import asyncio
+             from autogen_agentchat.agents import CodeExecutorAgent
++            from autogen_agentchat.messages import TextMessage
+             from autogen_ext.code_executors import DockerCommandLineCodeExecutor
++            from autogen_core.base import CancellationToken
+ 
+ 
+             async def run_code_executor_agent() -> None:
+@@ -51,8 +53,7 @@ class CodeExecutorAgent(BaseChatAgent):
+                 await code_executor.stop()
+ 
+ 
+-            # Use asyncio.run(run_code_executor_agent()) when running in a script.
+-            await run_code_executor_agent()
++            asyncio.run(run_code_executor_agent())
+ 
+     """
+ 
+diff --git a/python/packages/autogen-agentchat/src/autogen_agentchat/base/_termination.py b/python/packages/autogen-agentchat/src/autogen_agentchat/base/_termination.py
+index 859740fa..c923e8ce 100644
+--- a/python/packages/autogen-agentchat/src/autogen_agentchat/base/_termination.py
++++ b/python/packages/autogen-agentchat/src/autogen_agentchat/base/_termination.py
+@@ -23,15 +23,15 @@ class TerminationCondition(ABC):
+         .. code-block:: python
+ 
+             import asyncio
+-            from autogen_agentchat.teams import MaxTurnsTermination, TextMentionTermination
++            from autogen_agentchat.task import MaxMessageTermination, TextMentionTermination
+ 
+ 
+             async def main() -> None:
+                 # Terminate the conversation after 10 turns or if the text "TERMINATE" is mentioned.
+-                cond1 = MaxTurnsTermination(10) | TextMentionTermination("TERMINATE")
++                cond1 = MaxMessageTermination(10) | TextMentionTermination("TERMINATE")
+ 
+                 # Terminate the conversation after 10 turns and if the text "TERMINATE" is mentioned.
+-                cond2 = MaxTurnsTermination(10) & TextMentionTermination("TERMINATE")
++                cond2 = MaxMessageTermination(10) & TextMentionTermination("TERMINATE")
+ 
+                 # ...
+ 
+diff --git a/python/packages/autogen-agentchat/src/autogen_agentchat/task/_terminations.py b/python/packages/autogen-agentchat/src/autogen_agentchat/task/_terminations.py
+index 0053ff98..9db5b584 100644
+--- a/python/packages/autogen-agentchat/src/autogen_agentchat/task/_terminations.py
++++ b/python/packages/autogen-agentchat/src/autogen_agentchat/task/_terminations.py
+@@ -218,6 +218,8 @@ class ExternalTermination(TerminationCondition):
+ 
+     .. code-block:: python
+ 
++        from autogen_agentchat.task import ExternalTermination
++
+         termination = ExternalTermination()
+ 
+         # Run the team in an asyncio task.
+diff --git a/python/packages/autogen-agentchat/src/autogen_agentchat/teams/_group_chat/_selector_group_chat.py b/python/packages/autogen-agentchat/src/autogen_agentchat/teams/_group_chat/_selector_group_chat.py
+index e21e99e0..cfcebd37 100644
+--- a/python/packages/autogen-agentchat/src/autogen_agentchat/teams/_group_chat/_selector_group_chat.py
++++ b/python/packages/autogen-agentchat/src/autogen_agentchat/teams/_group_chat/_selector_group_chat.py
+@@ -257,16 +257,18 @@ class SelectorGroupChat(BaseGroupChat):
+         .. code-block:: python
+ 
+             import asyncio
++            from typing import Sequence
+             from autogen_ext.models import OpenAIChatCompletionClient
+             from autogen_agentchat.agents import AssistantAgent
+             from autogen_agentchat.teams import SelectorGroupChat
+             from autogen_agentchat.task import TextMentionTermination, Console
++            from autogen_agentchat.messages import AgentMessage
+ 
+ 
+             async def main() -> None:
+                 model_client = OpenAIChatCompletionClient(model="gpt-4o")
+ 
+-                def check_caculation(x: int, y: int, answer: int) -> str:
++                def check_calculation(x: int, y: int, answer: int) -> str:
+                     if x + y == answer:
+                         return "Correct!"
+                     else:
+@@ -281,12 +283,12 @@ class SelectorGroupChat(BaseGroupChat):
+                 agent2 = AssistantAgent(
+                     "Agent2",
+                     model_client,
+-                    tools=[check_caculation],
++                    tools=[check_calculation],
+                     description="For checking calculation",
+                     system_message="Check the answer and respond with 'Correct!' or 'Incorrect!'",
+                 )
+ 
+-                def selector_func(messages):
++                def selector_func(messages: Sequence[AgentMessage]) -> str | None:
+                     if len(messages) == 1 or messages[-1].content == "Incorrect!":
+                         return "Agent1"
+                     if messages[-1].source == "Agent1":
+diff --git a/python/packages/autogen-core/src/autogen_core/base/_agent_runtime.py b/python/packages/autogen-core/src/autogen_core/base/_agent_runtime.py
+index defb1de7..a8e7f009 100644
+--- a/python/packages/autogen-core/src/autogen_core/base/_agent_runtime.py
++++ b/python/packages/autogen-core/src/autogen_core/base/_agent_runtime.py
+@@ -89,19 +89,6 @@ class AgentRuntime(Protocol):
+             agent_factory (Callable[[], T]): The factory that creates the agent, where T is a concrete Agent type. Inside the factory, use `autogen_core.base.AgentInstantiationContext` to access variables like the current runtime and agent ID.
+             subscriptions (Callable[[], list[Subscription]] | list[Subscription] | None, optional): The subscriptions that the agent should be subscribed to. Defaults to None.
+ 
+-        Example:
+-            .. code-block:: python
+-
+-                runtime.register(
+-                    "chat_agent",
+-                    lambda: ChatCompletionAgent(
+-                        description="A generic chat agent.",
+-                        system_messages=[SystemMessage("You are a helpful assistant")],
+-                        model_client=OpenAIChatCompletionClient(model="gpt-4o"),
+-                        memory=BufferedChatMemory(buffer_size=10),
+-                    ),
+-                )
+-
+         """
+         ...
+ 
+@@ -117,20 +104,6 @@ class AgentRuntime(Protocol):
+         Args:
+             type (str): The type of agent this factory creates. It is not the same as agent class name. The `type` parameter is used to differentiate between different factory functions rather than agent classes.
+             agent_factory (Callable[[], T]): The factory that creates the agent, where T is a concrete Agent type. Inside the factory, use `autogen_core.base.AgentInstantiationContext` to access variables like the current runtime and agent ID.
+-
+-        Example:
+-            .. code-block:: python
+-
+-                runtime.register(
+-                    "chat_agent",
+-                    lambda: ChatCompletionAgent(
+-                        description="A generic chat agent.",
+-                        system_messages=[SystemMessage("You are a helpful assistant")],
+-                        model_client=OpenAIChatCompletionClient(model="gpt-4o"),
+-                        memory=BufferedChatMemory(buffer_size=10),
+-                    ),
+-                )
+-
+         """
+         ...
+ 
+diff --git a/python/packages/autogen-core/src/autogen_core/components/_default_subscription.py b/python/packages/autogen-core/src/autogen_core/components/_default_subscription.py
+index aea5c381..3e1c0c43 100644
+--- a/python/packages/autogen-core/src/autogen_core/components/_default_subscription.py
++++ b/python/packages/autogen-core/src/autogen_core/components/_default_subscription.py
+@@ -10,12 +10,6 @@ class DefaultSubscription(TypeSubscription):
+ 
+     This topic by default uses the "default" topic type and attempts to detect the agent type to use based on the instantiation context.
+ 
+-    Example:
+-
+-        .. code-block:: python
+-
+-            await runtime.register("MyAgent", agent_factory, lambda: [DefaultSubscription()])
+-
+     Args:
+         topic_type (str, optional): The topic type to subscribe to. Defaults to "default".
+         agent_type (str, optional): The agent type to use for the subscription. Defaults to None, in which case it will attempt to detect the agent type based on the instantiation context.
+diff --git a/python/packages/autogen-core/src/autogen_core/components/_routed_agent.py b/python/packages/autogen-core/src/autogen_core/components/_routed_agent.py
+index 9c21670d..e7f266bf 100644
+--- a/python/packages/autogen-core/src/autogen_core/components/_routed_agent.py
++++ b/python/packages/autogen-core/src/autogen_core/components/_routed_agent.py
+@@ -422,9 +422,24 @@ class RoutedAgent(BaseAgent):
+ 
+     .. code-block:: python
+ 
++        from dataclasses import dataclass
+         from autogen_core.base import MessageContext
+         from autogen_core.components import RoutedAgent, event, rpc
+-        # Assume Message, MessageWithContent, and Response are defined elsewhere.
++
++
++        @dataclass
++        class Message:
++            pass
++
++
++        @dataclass
++        class MessageWithContent:
++            content: str
++
++
++        @dataclass
++        class Response:
++            pass
+ 
+ 
+         class MyAgent(RoutedAgent):
+@@ -433,9 +448,10 @@ class RoutedAgent(BaseAgent):
+ 
+             @event
+             async def handle_event_message(self, message: Message, ctx: MessageContext) -> None:
+-                self.publish_message(MessageWithContent("event handled"), ctx.topic_id)
++                assert ctx.topic_id is not None
++                await self.publish_message(MessageWithContent("event handled"), ctx.topic_id)
+ 
+-            @rpc(match=lambda message, ctx: message.content == "special")
++            @rpc(match=lambda message, ctx: message.content == "special")  # type: ignore
+             async def handle_special_rpc_message(self, message: MessageWithContent, ctx: MessageContext) -> Response:
+                 return Response()
+     """
+diff --git a/python/packages/autogen-core/src/autogen_core/components/_type_subscription.py b/python/packages/autogen-core/src/autogen_core/components/_type_subscription.py
+index d2123175..92709a45 100644
+--- a/python/packages/autogen-core/src/autogen_core/components/_type_subscription.py
++++ b/python/packages/autogen-core/src/autogen_core/components/_type_subscription.py
+@@ -14,6 +14,8 @@ class TypeSubscription(Subscription):
+ 
+         .. code-block:: python
+ 
++            from autogen_core.components import TypeSubscription
++
+             subscription = TypeSubscription(topic_type="t1", agent_type="a1")
+ 
+         In this case:
+diff --git a/python/packages/autogen-core/src/autogen_core/components/code_executor/_impl/local_commandline_code_executor.py b/python/packages/autogen-core/src/autogen_core/components/code_executor/_impl/local_commandline_code_executor.py
+index deca8355..31779f65 100644
+--- a/python/packages/autogen-core/src/autogen_core/components/code_executor/_impl/local_commandline_code_executor.py
++++ b/python/packages/autogen-core/src/autogen_core/components/code_executor/_impl/local_commandline_code_executor.py
+@@ -67,25 +67,31 @@ class LocalCommandLineCodeExecutor(CodeExecutor):
+ 
+             import venv
+             from pathlib import Path
++            import asyncio
+ 
+             from autogen_core.base import CancellationToken
+             from autogen_core.components.code_executor import CodeBlock, LocalCommandLineCodeExecutor
+ 
+-            work_dir = Path("coding")
+-            work_dir.mkdir(exist_ok=True)
+ 
+-            venv_dir = work_dir / ".venv"
+-            venv_builder = venv.EnvBuilder(with_pip=True)
+-            venv_builder.create(venv_dir)
+-            venv_context = venv_builder.ensure_directories(venv_dir)
++            async def example():
++                work_dir = Path("coding")
++                work_dir.mkdir(exist_ok=True)
+ 
+-            local_executor = LocalCommandLineCodeExecutor(work_dir=work_dir, virtual_env_context=venv_context)
+-            await local_executor.execute_code_blocks(
+-                code_blocks=[
+-                    CodeBlock(language="bash", code="pip install matplotlib"),
+-                ],
+-                cancellation_token=CancellationToken(),
+-            )
++                venv_dir = work_dir / ".venv"
++                venv_builder = venv.EnvBuilder(with_pip=True)
++                venv_builder.create(venv_dir)
++                venv_context = venv_builder.ensure_directories(venv_dir)
++
++                local_executor = LocalCommandLineCodeExecutor(work_dir=work_dir, virtual_env_context=venv_context)
++                await local_executor.execute_code_blocks(
++                    code_blocks=[
++                        CodeBlock(language="bash", code="pip install matplotlib"),
++                    ],
++                    cancellation_token=CancellationToken(),
++                )
++
++
++            asyncio.run(example())
+ 
+     """
+ 
+diff --git a/python/packages/autogen-core/src/autogen_core/components/tools/_function_tool.py b/python/packages/autogen-core/src/autogen_core/components/tools/_function_tool.py
+index 46237411..cc9145fa 100644
+--- a/python/packages/autogen-core/src/autogen_core/components/tools/_function_tool.py
++++ b/python/packages/autogen-core/src/autogen_core/components/tools/_function_tool.py
+@@ -41,6 +41,7 @@ class FunctionTool(BaseTool[BaseModel, BaseModel]):
+             from autogen_core.base import CancellationToken
+             from autogen_core.components.tools import FunctionTool
+             from typing_extensions import Annotated
++            import asyncio
+ 
+ 
+             async def get_stock_price(ticker: str, date: Annotated[str, "Date in YYYY/MM/DD"]) -> float:
+@@ -48,15 +49,19 @@ class FunctionTool(BaseTool[BaseModel, BaseModel]):
+                 return random.uniform(10, 200)
+ 
+ 
+-            # Initialize a FunctionTool instance for retrieving stock prices.
+-            stock_price_tool = FunctionTool(get_stock_price, description="Fetch the stock price for a given ticker.")
++            async def example():
++                # Initialize a FunctionTool instance for retrieving stock prices.
++                stock_price_tool = FunctionTool(get_stock_price, description="Fetch the stock price for a given ticker.")
+ 
+-            # Execute the tool with cancellation support.
+-            cancellation_token = CancellationToken()
+-            result = await stock_price_tool.run_json({"ticker": "AAPL", "date": "2021/01/01"}, cancellation_token)
++                # Execute the tool with cancellation support.
++                cancellation_token = CancellationToken()
++                result = await stock_price_tool.run_json({"ticker": "AAPL", "date": "2021/01/01"}, cancellation_token)
+ 
+-            # Output the result as a formatted string.
+-            print(stock_price_tool.return_value_as_string(result))
++                # Output the result as a formatted string.
++                print(stock_price_tool.return_value_as_string(result))
++
++
++            asyncio.run(example())
+     """
+ 
+     def __init__(self, func: Callable[..., Any], description: str, name: str | None = None) -> None:
+diff --git a/python/packages/autogen-ext/src/autogen_ext/agents/_openai_assistant_agent.py b/python/packages/autogen-ext/src/autogen_ext/agents/_openai_assistant_agent.py
+index a6dd85b1..7e112472 100644
+--- a/python/packages/autogen-ext/src/autogen_ext/agents/_openai_assistant_agent.py
++++ b/python/packages/autogen-ext/src/autogen_ext/agents/_openai_assistant_agent.py
+@@ -105,33 +105,41 @@ class OpenAIAssistantAgent(BaseChatAgent):
+ 
+             from openai import AsyncClient
+             from autogen_core.base import CancellationToken
++            import asyncio
+             from autogen_ext.agents import OpenAIAssistantAgent
+             from autogen_agentchat.messages import TextMessage
+ 
+-            # Create an OpenAI client
+-            client = AsyncClient(api_key="your-api-key", base_url="your-base-url")
+-
+-            # Create an assistant with code interpreter
+-            assistant = OpenAIAssistantAgent(
+-                name="Python Helper",
+-                description="Helps with Python programming",
+-                client=client,
+-                model="gpt-4",
+-                instructions="You are a helpful Python programming assistant.",
+-                tools=["code_interpreter"],
+-            )
+ 
+-            # Upload files for the assistant to use
+-            await assistant.on_upload_for_code_interpreter("data.csv", cancellation_token)
++            async def example():
++                cancellation_token = CancellationToken()
++
++                # Create an OpenAI client
++                client = AsyncClient(api_key="your-api-key", base_url="your-base-url")
++
++                # Create an assistant with code interpreter
++                assistant = OpenAIAssistantAgent(
++                    name="Python Helper",
++                    description="Helps with Python programming",
++                    client=client,
++                    model="gpt-4",
++                    instructions="You are a helpful Python programming assistant.",
++                    tools=["code_interpreter"],
++                )
++
++                # Upload files for the assistant to use
++                await assistant.on_upload_for_code_interpreter("data.csv", cancellation_token)
++
++                # Get response from the assistant
++                _response = await assistant.on_messages(
++                    [TextMessage(source="user", content="Analyze the data in data.csv")], cancellation_token
++                )
++
++                # Clean up resources
++                await assistant.delete_uploaded_files(cancellation_token)
++                await assistant.delete_assistant(cancellation_token)
+ 
+-            # Get response from the assistant
+-            response = await assistant.on_messages(
+-                [TextMessage(source="user", content="Analyze the data in data.csv")], cancellation_token
+-            )
+ 
+-            # Clean up resources
+-            await assistant.delete_uploaded_files(cancellation_token)
+-            await assistant.delete_assistant(cancellation_token)
++            asyncio.run(example())
+ 
+     Args:
+         name (str): Name of the assistant
+diff --git a/python/packages/autogen-ext/src/autogen_ext/models/_openai/_openai_client.py b/python/packages/autogen-ext/src/autogen_ext/models/_openai/_openai_client.py
+index 28dc81a3..f7d4adb3 100644
+--- a/python/packages/autogen-ext/src/autogen_ext/models/_openai/_openai_client.py
++++ b/python/packages/autogen-ext/src/autogen_ext/models/_openai/_openai_client.py
+@@ -917,12 +917,12 @@ class OpenAIChatCompletionClient(BaseOpenAIChatCompletionClient):
+             from autogen_ext.models import OpenAIChatCompletionClient
+             from autogen_core.components.models import UserMessage
+ 
+-            opneai_model_client = OpenAIChatCompletionClient(
++            openai_client = OpenAIChatCompletionClient(
+                 model="gpt-4o-2024-08-06",
+                 # api_key="sk-...", # Optional if you have an OPENAI_API_KEY environment variable set.
+             )
+ 
+-            result = await opneai_model_client.create([UserMessage(content="What is the capital of France?", source="user")])
++            result = await openai_client.create([UserMessage(content="What is the capital of France?", source="user")])  # type: ignore
+             print(result)
+ 
+ 
+@@ -931,7 +931,6 @@ class OpenAIChatCompletionClient(BaseOpenAIChatCompletionClient):
+         .. code-block:: python
+ 
+             from autogen_ext.models import OpenAIChatCompletionClient
+-            from autogen_core.components.models import UserMessage
+ 
+             custom_model_client = OpenAIChatCompletionClient(
+                 model="custom-model-name",
+diff --git a/python/packages/autogen-ext/src/autogen_ext/models/_reply_chat_completion_client.py b/python/packages/autogen-ext/src/autogen_ext/models/_reply_chat_completion_client.py
+index a4889f44..187dfdac 100644
+--- a/python/packages/autogen-ext/src/autogen_ext/models/_reply_chat_completion_client.py
++++ b/python/packages/autogen-ext/src/autogen_ext/models/_reply_chat_completion_client.py
+@@ -38,50 +38,73 @@ class ReplayChatCompletionClient:
+ 
+         .. code-block:: python
+ 
+-            chat_completions = [
+-                "Hello, how can I assist you today?",
+-                "I'm happy to help with any questions you have.",
+-                "Is there anything else I can assist you with?",
+-            ]
+-            client = ReplayChatCompletionClient(chat_completions)
+-            messages = [LLMMessage(content="What can you do?")]
+-            response = await client.create(messages)
+-            print(response.content)  # Output: "Hello, how can I assist you today?"
++            from autogen_ext.models import ReplayChatCompletionClient
++            from autogen_core.components.models import UserMessage
++
++
++            async def example():
++                chat_completions = [
++                    "Hello, how can I assist you today?",
++                    "I'm happy to help with any questions you have.",
++                    "Is there anything else I can assist you with?",
++                ]
++                client = ReplayChatCompletionClient(chat_completions)
++                messages = [UserMessage(content="What can you do?", source="user")]
++                response = await client.create(messages)
++                print(response.content)  # Output: "Hello, how can I assist you today?"
+ 
+     Simple streaming chat completion client to return pre-defined responses
+ 
+         .. code-block:: python
+ 
+-            chat_completions = [
+-                "Hello, how can I assist you today?",
+-                "I'm happy to help with any questions you have.",
+-                "Is there anything else I can assist you with?",
+-            ]
+-            client = ReplayChatCompletionClient(chat_completions)
++            import asyncio
++            from autogen_ext.models import ReplayChatCompletionClient
++            from autogen_core.components.models import UserMessage
++
++
++            async def example():
++                chat_completions = [
++                    "Hello, how can I assist you today?",
++                    "I'm happy to help with any questions you have.",
++                    "Is there anything else I can assist you with?",
++                ]
++                client = ReplayChatCompletionClient(chat_completions)
++                messages = [UserMessage(content="What can you do?", source="user")]
++
++                async for token in client.create_stream(messages):
++                    print(token, end="")  # Output: "Hello, how can I assist you today?"
+ 
+-            async for token in client.create_stream(messages):
+-                print(token, end="")  # Output: "Hello, how can I assist you today?"
++                async for token in client.create_stream(messages):
++                    print(token, end="")  # Output: "I'm happy to help with any questions you have."
+ 
+-            async for token in client.create_stream(messages):
+-                print(token, end="")  # Output: "I'm happy to help with any questions you have."
++                asyncio.run(example())
+ 
+     Using `.reset` to reset the chat client state
+ 
+         .. code-block:: python
+ 
+-            chat_completions = [
+-                "Hello, how can I assist you today?",
+-            ]
+-            client = ReplayChatCompletionClient(chat_completions)
+-            messages = [LLMMessage(content="What can you do?")]
+-            response = await client.create(messages)
+-            print(response.content)  # Output: "Hello, how can I assist you today?"
++            import asyncio
++            from autogen_ext.models import ReplayChatCompletionClient
++            from autogen_core.components.models import UserMessage
++
++
++            async def example():
++                chat_completions = [
++                    "Hello, how can I assist you today?",
++                ]
++                client = ReplayChatCompletionClient(chat_completions)
++                messages = [UserMessage(content="What can you do?", source="user")]
++                response = await client.create(messages)
++                print(response.content)  # Output: "Hello, how can I assist you today?"
++
++                response = await client.create(messages)  # Raises ValueError("No more mock responses available")
++
++                client.reset()  # Reset the client state (current index of message and token usages)
++                response = await client.create(messages)
++                print(response.content)  # Output: "Hello, how can I assist you today?" again
+ 
+-            response = await client.create(messages)  # Raises ValueError("No more mock responses available")
+ 
+-            client.reset()  # Reset the client state (current index of message and token usages)
+-            response = await client.create(messages)
+-            print(response.content)  # Output: "Hello, how can I assist you today?" again
++            asyncio.run(example())
+ 
+     """
+ 

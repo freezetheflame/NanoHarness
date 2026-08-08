@@ -1,0 +1,63 @@
+From dc55ec964bdcc39f8bacce17d75fc945ac6826e9 Mon Sep 17 00:00:00 2001
+From: peterychang <49209570+peterychang@users.noreply.github.com>
+Date: Wed, 26 Feb 2025 11:59:07 -0500
+Subject: [PATCH] Fix visual accessibility issues 6 and 20 (#5725)
+
+<!-- Thank you for your contribution! Please review
+https://microsoft.github.io/autogen/docs/Contribute before opening a
+pull request. -->
+
+<!-- Please add a reviewer to the assignee section when you create a PR.
+If you don't have the access to it, we will shortly find a reviewer and
+assign them to your PR. -->
+
+## Why are these changes needed?
+
+Fixes visual accessibility issues `(6) Luminosity contrast ratio of
+focus indicator on 'Venv' control is less than 3:1.` and `(20) "Only
+color is used to indicate the focus indicator on the 'Venv', and 'conda'
+Tab controls."`
+
+## Related issue number
+
+#5633
+
+before:
+<img width="162" alt="image"
+src="https://github.com/user-attachments/assets/ac317e82-c82e-4d3b-910b-e9eb5d087340"
+/>
+
+![image](https://github.com/user-attachments/assets/2971043a-8b5b-4521-8135-c411c0ecab1f)
+
+after:
+<img width="160" alt="image"
+src="https://github.com/user-attachments/assets/8053ae77-4d62-491b-9d78-657646ed71a6"
+/>
+
+![image](https://github.com/user-attachments/assets/5c3ac2c3-4813-461b-8958-4665860574a0)
+
+diff --git a/python/packages/autogen-core/docs/src/_static/custom.css b/python/packages/autogen-core/docs/src/_static/custom.css
+index a8e47451..6cdc1127 100644
+--- a/python/packages/autogen-core/docs/src/_static/custom.css
++++ b/python/packages/autogen-core/docs/src/_static/custom.css
+@@ -66,13 +66,16 @@ html[data-theme="light"] .bd-header {
+ .bd-content .sd-tab-set>input:checked+label {
+   border: none;
+   transform: translateY(0);
+-  font-weight: 600;
+-  border-bottom: 2px solid var(--pst-color-secondary);
+-
++  font-weight: 700;
++  border-bottom: 4px solid var(--pst-color-secondary);
++}
++.bd-content .sd-tab-set>input:focus-visible+label {
++  border: 2px outset var(--pst-color-secondary);
++  transform: translateY(0);
+ }
+ .bd-content .sd-tab-set>label {
+   background-color: transparent;
+-  border: none;
++  font-weight: 500;
+ }
+ 
+ .card-title {

@@ -1,0 +1,19 @@
+From e3a30a9b69ca7ca83740c420280c04fbdbeec45c Mon Sep 17 00:00:00 2001
+From: Vadym Barda <vadym@langchain.dev>
+Date: Tue, 19 Nov 2024 09:42:20 -0500
+Subject: [PATCH] docs: fix prompt (#2467)
+
+
+diff --git a/docs/docs/tutorials/multi_agent/hierarchical_agent_teams.ipynb b/docs/docs/tutorials/multi_agent/hierarchical_agent_teams.ipynb
+index 60f0245b..f96e55c3 100644
+--- a/docs/docs/tutorials/multi_agent/hierarchical_agent_teams.ipynb
++++ b/docs/docs/tutorials/multi_agent/hierarchical_agent_teams.ipynb
+@@ -527,7 +527,7 @@
+     "    tools=[write_document, edit_document, read_document],\n",
+     "    state_modifier=(\n",
+     "        \"You can read, write and edit documents based on note-taker's outlines. \"\n",
+-    "        \"Don't ask follow-up questions.\",\n",
++    "        \"Don't ask follow-up questions.\"\n",
+     "    ),\n",
+     ")\n",
+     "\n",

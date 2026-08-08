@@ -1,0 +1,39 @@
+From 46be5e8097a4e18fd9ab05e630b784658e7da2a6 Mon Sep 17 00:00:00 2001
+From: Archkon <180910180+Archkon@users.noreply.github.com>
+Date: Mon, 9 Dec 2024 23:53:55 +0800
+Subject: [PATCH] fix:typo error (#1732)
+
+* Update crew_agent_executor.py
+
+typo error
+
+* Update en.json
+
+typo error
+
+diff --git a/src/crewai/agents/crew_agent_executor.py b/src/crewai/agents/crew_agent_executor.py
+index 00545e76..649360e3 100644
+--- a/src/crewai/agents/crew_agent_executor.py
++++ b/src/crewai/agents/crew_agent_executor.py
+@@ -299,7 +299,7 @@ class CrewAgentExecutor(CrewAgentExecutorMixin):
+                         self._i18n.slice("summarizer_system_message"), role="system"
+                     ),
+                     self._format_msg(
+-                        self._i18n.slice("sumamrize_instruction").format(group=group),
++                        self._i18n.slice("summarize_instruction").format(group=group),
+                     ),
+                 ],
+                 callbacks=self.callbacks,
+diff --git a/src/crewai/translations/en.json b/src/crewai/translations/en.json
+index d30606dc..7353cfc3 100644
+--- a/src/crewai/translations/en.json
++++ b/src/crewai/translations/en.json
+@@ -19,7 +19,7 @@
+     "human_feedback": "You got human feedback on your work, re-evaluate it and give a new Final Answer when ready.\n {human_feedback}",
+     "getting_input": "This is the agent's final answer: {final_answer}\n\n",
+     "summarizer_system_message": "You are a helpful assistant that summarizes text.",
+-    "sumamrize_instruction": "Summarize the following text, make sure to include all the important information: {group}",
++    "summarize_instruction": "Summarize the following text, make sure to include all the important information: {group}",
+     "summary": "This is a summary of our conversation so far:\n{merged_summary}",
+     "manager_request": "Your best answer to your coworker asking you this, accounting for the context shared.",
+     "formatted_task_instructions": "Ensure your final answer contains only the content in the following format: {output_format}\n\nEnsure the final output does not include any code block markers like ```json or ```python.",

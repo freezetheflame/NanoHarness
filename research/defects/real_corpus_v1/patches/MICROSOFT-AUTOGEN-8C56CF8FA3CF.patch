@@ -1,0 +1,28 @@
+From fef953e062bf37d95eaec299756c8a15adcce054 Mon Sep 17 00:00:00 2001
+From: Hussein Mozannar <hmozannar@microsoft.com>
+Date: Thu, 20 Mar 2025 14:53:53 -0400
+Subject: [PATCH] Fix bytes in markdown converter playwright (#6044)
+
+Fix error:
+
+TypeError: Input stream must be opened in bytes mode, not in text mode.
+
+Markdown converter takes binary stream
+
+diff --git a/python/packages/autogen-ext/src/autogen_ext/agents/web_surfer/playwright_controller.py b/python/packages/autogen-ext/src/autogen_ext/agents/web_surfer/playwright_controller.py
+index 305bc807..de29b45a 100644
+--- a/python/packages/autogen-ext/src/autogen_ext/agents/web_surfer/playwright_controller.py
++++ b/python/packages/autogen-ext/src/autogen_ext/agents/web_surfer/playwright_controller.py
+@@ -565,8 +565,11 @@ class PlaywrightController:
+         assert page is not None
+         if self._markdown_converter is None and markitdown is not None:
+             self._markdown_converter = markitdown.MarkItDown()
++            assert self._markdown_converter is not None
+             html = await page.evaluate("document.documentElement.outerHTML;")
+-            res = self._markdown_converter.convert_stream(io.StringIO(html), file_extension=".html", url=page.url)  # type: ignore
++            res = self._markdown_converter.convert_stream(
++                io.BytesIO(html.encode("utf-8")), file_extension=".html", url=page.url
++            )
+             assert hasattr(res, "text_content") and isinstance(res.text_content, str)
+             return res.text_content
+         else:

@@ -1,0 +1,140 @@
+{
+  "complete": false,
+  "errors": [
+    {
+      "error": "GitHub HTTP 422; rate remaining=7; reset=1786195844",
+      "query_id": "merged-pr-defect-terms",
+      "repository": "freezetheflame/NanoHarness"
+    },
+    {
+      "error": "GitHub HTTP 422; rate remaining=6; reset=1786195884",
+      "query_id": "merged-pr-defect-terms",
+      "repository": "langchain-ai/langgraph"
+    },
+    {
+      "error": "GitHub HTTP 422; rate remaining=0; reset=1786195978",
+      "query_id": "merged-pr-defect-terms",
+      "repository": "microsoft/autogen"
+    },
+    {
+      "error": "GitHub HTTP 403; rate remaining=0; reset=1786196048",
+      "query_id": "issue-defect-terms",
+      "repository": "crewAIInc/crewAI"
+    },
+    {
+      "error": "GitHub HTTP 403; rate remaining=0; reset=1786196048",
+      "query_id": "merged-pr-defect-terms",
+      "repository": "crewAIInc/crewAI"
+    }
+  ],
+  "manifest_id": "agent-real-defects-v1",
+  "repositories": [
+    {
+      "default_branch": "main",
+      "pinned_commit": "43fd031f3d89becdd6b2c293d4ca84f1ad04ca65",
+      "queries": [
+        {
+          "item_count": 0,
+          "query": "repo:freezetheflame/NanoHarness is:issue is:closed closed:2024-01-01..2026-06-30 label:bug",
+          "query_id": "issue-label-bug"
+        },
+        {
+          "item_count": 0,
+          "query": "repo:freezetheflame/NanoHarness is:issue is:closed closed:2024-01-01..2026-06-30 label:regression",
+          "query_id": "issue-label-regression"
+        },
+        {
+          "item_count": 0,
+          "query": "repo:freezetheflame/NanoHarness is:issue is:closed closed:2024-01-01..2026-06-30 (bug OR regression OR crash OR incorrect) in:title,body",
+          "query_id": "issue-defect-terms"
+        },
+        {
+          "item_count": 0,
+          "query": "repo:freezetheflame/NanoHarness committer-date:2024-01-01..2026-06-30 (fix OR bug OR regression OR revert)",
+          "query_id": "fixing-commit-terms"
+        }
+      ],
+      "repository": "freezetheflame/NanoHarness",
+      "repository_id": 1299070734
+    },
+    {
+      "default_branch": "main",
+      "pinned_commit": "5931a5f0b313feff24e2516a586c55601b868ac1",
+      "queries": [
+        {
+          "item_count": 245,
+          "query": "repo:langchain-ai/langgraph is:issue is:closed closed:2024-01-01..2026-06-30 label:bug",
+          "query_id": "issue-label-bug"
+        },
+        {
+          "item_count": 0,
+          "query": "repo:langchain-ai/langgraph is:issue is:closed closed:2024-01-01..2026-06-30 label:regression",
+          "query_id": "issue-label-regression"
+        },
+        {
+          "item_count": 794,
+          "query": "repo:langchain-ai/langgraph is:issue is:closed closed:2024-01-01..2026-06-30 (bug OR regression OR crash OR incorrect) in:title,body",
+          "query_id": "issue-defect-terms"
+        },
+        {
+          "item_count": 1000,
+          "query": "repo:langchain-ai/langgraph committer-date:2024-01-01..2026-06-30 (fix OR bug OR regression OR revert)",
+          "query_id": "fixing-commit-terms"
+        }
+      ],
+      "repository": "langchain-ai/langgraph",
+      "repository_id": 676672661
+    },
+    {
+      "default_branch": "main",
+      "pinned_commit": "027ecf0a379bcc1d09956d46d12d44a3ad9cee14",
+      "queries": [
+        {
+          "item_count": 0,
+          "query": "repo:microsoft/autogen is:issue is:closed closed:2024-01-01..2026-06-30 label:bug",
+          "query_id": "issue-label-bug"
+        },
+        {
+          "item_count": 0,
+          "query": "repo:microsoft/autogen is:issue is:closed closed:2024-01-01..2026-06-30 label:regression",
+          "query_id": "issue-label-regression"
+        },
+        {
+          "item_count": 821,
+          "query": "repo:microsoft/autogen is:issue is:closed closed:2024-01-01..2026-06-30 (bug OR regression OR crash OR incorrect) in:title,body",
+          "query_id": "issue-defect-terms"
+        },
+        {
+          "item_count": 924,
+          "query": "repo:microsoft/autogen committer-date:2024-01-01..2026-06-30 (fix OR bug OR regression OR revert)",
+          "query_id": "fixing-commit-terms"
+        }
+      ],
+      "repository": "microsoft/autogen",
+      "repository_id": 680120071
+    },
+    {
+      "default_branch": "main",
+      "pinned_commit": "ba2dafdeda7944aae84057f3433a8347d05faf2c",
+      "queries": [
+        {
+          "item_count": 789,
+          "query": "repo:crewAIInc/crewAI is:issue is:closed closed:2024-01-01..2026-06-30 label:bug",
+          "query_id": "issue-label-bug"
+        },
+        {
+          "item_count": 0,
+          "query": "repo:crewAIInc/crewAI is:issue is:closed closed:2024-01-01..2026-06-30 label:regression",
+          "query_id": "issue-label-regression"
+        },
+        {
+          "item_count": 970,
+          "query": "repo:crewAIInc/crewAI committer-date:2024-01-01..2026-06-30 (fix OR bug OR regression OR revert)",
+          "query_id": "fixing-commit-terms"
+        }
+      ],
+      "repository": "crewAIInc/crewAI",
+      "repository_id": 710601088
+    }
+  ]
+}

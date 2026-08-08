@@ -1,0 +1,29 @@
+From 0b6a9e345d3301705e884857d6710a1a84a8edaa Mon Sep 17 00:00:00 2001
+From: jito <pigberger70@gmail.com>
+Date: Fri, 11 Jul 2025 10:39:59 +0900
+Subject: [PATCH] fix(langgraph): replace _state_schema to state_schema when
+ accessing StateGraph (#5436)
+
+
+diff --git a/libs/langgraph/langgraph/graph/state.py b/libs/langgraph/langgraph/graph/state.py
+index ac0a11e7..f5e35c66 100644
+--- a/libs/langgraph/langgraph/graph/state.py
++++ b/libs/langgraph/langgraph/graph/state.py
+@@ -794,7 +794,7 @@ class StateGraph(Generic[StateT, InputT, OutputT]):
+         interrupt_after: All | list[str] | None = None,
+         debug: bool = False,
+         name: str | None = None,
+-    ) -> CompiledStateGraph[StateT, InputT]:
++    ) -> CompiledStateGraph[StateT, InputT, OutputT]:
+         """Compiles the state graph into a `CompiledStateGraph` object.
+ 
+         The compiled graph implements the `Runnable` interface and can be invoked,
+@@ -996,7 +996,7 @@ class CompiledStateGraph(
+                 writers=[ChannelWrite(write_entries)],
+             )
+         elif node is not None:
+-            input_schema = node.input if node else self.builder._state_schema
++            input_schema = node.input if node else self.builder.state_schema
+             input_channels = list(self.builder.schemas[input_schema])
+             is_single_input = len(input_channels) == 1 and "__root__" in input_channels
+             if input_schema in self.schema_to_mapper:

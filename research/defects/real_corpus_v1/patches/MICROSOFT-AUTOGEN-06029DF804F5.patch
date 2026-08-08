@@ -1,0 +1,233 @@
+From de757707bcaaedfb62d90a78977d79e3b983671e Mon Sep 17 00:00:00 2001
+From: Jack Gerrits <jackgerrits@users.noreply.github.com>
+Date: Mon, 4 Mar 2024 09:44:41 -0500
+Subject: [PATCH] Upgrade quarto and include mitigation for title issue, fix
+ links (#1851)
+
+* Upgrade quarto and include mitigation for title issue, fix links
+
+* repo_root
+
+* dont run quarto independently
+
+* test paths
+
+* test
+
+* resolve intermediate parents
+
+* remove print
+
+diff --git a/.devcontainer/Dockerfile b/.devcontainer/Dockerfile
+index 0ca2c251..4431ee58 100644
+--- a/.devcontainer/Dockerfile
++++ b/.devcontainer/Dockerfile
+@@ -14,9 +14,9 @@ RUN apt-get update \
+    && apt-get -y install --no-install-recommends build-essential npm \
+    && apt-get autoremove -y \
+    && apt-get clean -y \
+-   && wget https://github.com/quarto-dev/quarto-cli/releases/download/v1.4.549/quarto-1.4.549-linux-amd64.deb \
+-   && dpkg -i quarto-1.4.549-linux-amd64.deb \
+-   && rm -rf /var/lib/apt/lists/* quarto-1.4.549-linux-amd64.deb
++   && wget https://github.com/quarto-dev/quarto-cli/releases/download/v1.5.23/quarto-1.5.23-linux-amd64.deb \
++   && dpkg -i quarto-1.5.23-linux-amd64.deb \
++   && rm -rf /var/lib/apt/lists/* quarto-1.5.23-linux-amd64.deb
+ ENV DEBIAN_FRONTEND=dialog
+ 
+ # For docs
+diff --git a/.devcontainer/dev/Dockerfile b/.devcontainer/dev/Dockerfile
+index 48215743..4749e41b 100644
+--- a/.devcontainer/dev/Dockerfile
++++ b/.devcontainer/dev/Dockerfile
+@@ -33,12 +33,12 @@ RUN cd website
+ RUN yarn install --frozen-lockfile --ignore-engines
+ 
+ RUN arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && \
+-    wget -q https://github.com/quarto-dev/quarto-cli/releases/download/v1.4.549/quarto-1.4.549-linux-${arch}.tar.gz && \
++    wget -q https://github.com/quarto-dev/quarto-cli/releases/download/v1.5.23/quarto-1.5.23-linux-${arch}.tar.gz && \
+     mkdir -p /home/autogen/quarto/ && \
+-    tar -xzf quarto-1.4.549-linux-${arch}.tar.gz --directory /home/autogen/quarto/ && \
+-    rm quarto-1.4.549-linux-${arch}.tar.gz
++    tar -xzf quarto-1.5.23-linux-${arch}.tar.gz --directory /home/autogen/quarto/ && \
++    rm quarto-1.5.23-linux-${arch}.tar.gz
+ 
+-ENV PATH="${PATH}:/home/autogen/quarto/quarto-1.4.549/bin/"
++ENV PATH="${PATH}:/home/autogen/quarto/quarto-1.5.23/bin/"
+ 
+ # Exposes the Yarn port for Docusaurus
+ EXPOSE 3000
+diff --git a/.github/workflows/deploy-website.yml b/.github/workflows/deploy-website.yml
+index 13180d50..0f2702e5 100644
+--- a/.github/workflows/deploy-website.yml
++++ b/.github/workflows/deploy-website.yml
+@@ -44,12 +44,9 @@ jobs:
+       - name: quarto install
+         working-directory: ${{ runner.temp }}
+         run: |
+-          wget -q https://github.com/quarto-dev/quarto-cli/releases/download/v1.4.549/quarto-1.4.549-linux-amd64.tar.gz
+-          tar -xzf quarto-1.4.549-linux-amd64.tar.gz
+-          echo "$(pwd)/quarto-1.4.549/bin/" >> $GITHUB_PATH
+-      - name: quarto run
+-        run: |
+-          quarto render .
++          wget -q https://github.com/quarto-dev/quarto-cli/releases/download/v1.5.23/quarto-1.5.23-linux-amd64.tar.gz
++          tar -xzf quarto-1.5.23-linux-amd64.tar.gz
++          echo "$(pwd)/quarto-1.5.23/bin/" >> $GITHUB_PATH
+       - name: Process notebooks
+         run: |
+           python process_notebooks.py render
+@@ -90,12 +87,9 @@ jobs:
+       - name: quarto install
+         working-directory: ${{ runner.temp }}
+         run: |
+-          wget -q https://github.com/quarto-dev/quarto-cli/releases/download/v1.4.549/quarto-1.4.549-linux-amd64.tar.gz
+-          tar -xzf quarto-1.4.549-linux-amd64.tar.gz
+-          echo "$(pwd)/quarto-1.4.549/bin/" >> $GITHUB_PATH
+-      - name: quarto run
+-        run: |
+-          quarto render .
++          wget -q https://github.com/quarto-dev/quarto-cli/releases/download/v1.5.23/quarto-1.5.23-linux-amd64.tar.gz
++          tar -xzf quarto-1.5.23-linux-amd64.tar.gz
++          echo "$(pwd)/quarto-1.5.23/bin/" >> $GITHUB_PATH
+       - name: Process notebooks
+         run: |
+           python process_notebooks.py render
+diff --git a/website/process_notebooks.py b/website/process_notebooks.py
+index 2fd70a19..2246e07b 100755
+--- a/website/process_notebooks.py
++++ b/website/process_notebooks.py
+@@ -56,11 +56,11 @@ class Result:
+ def check_quarto_bin(quarto_bin: str = "quarto") -> None:
+     """Check if quarto is installed."""
+     try:
+-        subprocess.check_output([quarto_bin, "--version"], text=True).strip()
+-        # version = tuple(map(int, version.split(".")))
+-        # if version < (1, 5, 23):
+-        #     print("Quarto version is too old. Please upgrade to 1.5.23 or later.")
+-        #     sys.exit(1)
++        version = subprocess.check_output([quarto_bin, "--version"], text=True).strip()
++        version = tuple(map(int, version.split(".")))
++        if version < (1, 5, 23):
++            print("Quarto version is too old. Please upgrade to 1.5.23 or later.")
++            sys.exit(1)
+ 
+     except FileNotFoundError:
+         print("Quarto is not installed. Please install it from https://quarto.org")
+@@ -127,6 +127,27 @@ def skip_reason_or_none_if_ok(notebook: Path) -> typing.Optional[str]:
+     return None
+ 
+ 
++def extract_title(notebook: Path) -> Optional[str]:
++    """Extract the title of the notebook."""
++    with open(notebook, "r", encoding="utf-8") as f:
++        content = f.read()
++
++    # Load the json and get the first cell
++    json_content = json.loads(content)
++    first_cell = json_content["cells"][0]
++
++    # find the # title
++    for line in first_cell["source"]:
++        if line.startswith("# "):
++            title = line[2:].strip()
++            # Strip off the { if it exists
++            if "{" in title:
++                title = title[: title.find("{")].strip()
++            return title
++
++    return None
++
++
+ def process_notebook(src_notebook: Path, website_dir: Path, notebook_dir: Path, quarto_bin: str, dry_run: bool) -> str:
+     """Process a single notebook."""
+ 
+@@ -136,6 +157,16 @@ def process_notebook(src_notebook: Path, website_dir: Path, notebook_dir: Path,
+     if "skip_render" in metadata:
+         return fmt_skip(src_notebook, "skip_render is in notebook metadata")
+ 
++    title = extract_title(src_notebook)
++    if title is None:
++        return fmt_error(src_notebook, "Title not found in notebook")
++
++    front_matter = {}
++    if "front_matter" in metadata:
++        front_matter = metadata["front_matter"]
++
++    front_matter["title"] = title
++
+     if in_notebook_dir:
+         relative_notebook = src_notebook.resolve().relative_to(notebook_dir.resolve())
+         dest_dir = notebooks_target_dir(website_directory=website_dir)
+@@ -190,11 +221,7 @@ def process_notebook(src_notebook: Path, website_dir: Path, notebook_dir: Path,
+                 src_notebook, f"Failed to render {src_notebook}\n\nstderr:\n{result.stderr}\nstdout:\n{result.stdout}"
+             )
+ 
+-    front_matter = {}
+-    if "front_matter" in metadata:
+-        front_matter = metadata["front_matter"]
+-
+-    post_process_mdx(target_file, front_matter)
++    post_process_mdx(target_file, src_notebook, front_matter)
+ 
+     return fmt_ok(src_notebook)
+ 
+@@ -281,8 +308,7 @@ def get_error_info(nb: NotebookNode) -> Optional[NotebookError]:
+ 
+ 
+ # rendered_notebook is the final mdx file
+-def post_process_mdx(rendered_mdx: Path, front_matter: Dict) -> None:
+-    notebook_name = f"{rendered_mdx.stem}.ipynb"
++def post_process_mdx(rendered_mdx: Path, source_notebooks: Path, front_matter: Dict) -> None:
+     with open(rendered_mdx, "r", encoding="utf-8") as f:
+         content = f.read()
+ 
+@@ -292,8 +318,22 @@ def post_process_mdx(rendered_mdx: Path, front_matter: Dict) -> None:
+         front_matter = yaml.safe_load(content[4:front_matter_end])
+         content = content[front_matter_end + 3 :]
+ 
+-    front_matter["source_notebook"] = f"/notebook/{notebook_name}"
+-    front_matter["custom_edit_url"] = f"https://github.com/microsoft/autogen/edit/main/notebook/{notebook_name}"
++    # Each intermediate path needs to be resolved for this to work reliably
++    repo_root = Path(__file__).parent.resolve().parent.resolve()
++    repo_relative_notebook = source_notebooks.resolve().relative_to(repo_root)
++    front_matter["source_notebook"] = f"/{repo_relative_notebook}"
++    front_matter["custom_edit_url"] = f"https://github.com/microsoft/autogen/edit/main/{repo_relative_notebook}"
++
++    # Is there a title on the content? Only search up until the first code cell
++    first_code_cell = content.find("```")
++    if first_code_cell != -1:
++        title_search_content = content[:first_code_cell]
++    else:
++        title_search_content = content
++
++    title_exists = title_search_content.find("# ") != -1
++    if not title_exists:
++        content = f"# {front_matter['title']}\n{content}"
+ 
+     # inject in content directly after the markdown title the word done
+     # Find the end of the line with the title
+@@ -305,9 +345,7 @@ def post_process_mdx(rendered_mdx: Path, front_matter: Dict) -> None:
+     if "{" in title:
+         title = title[: title.find("{")].strip()
+ 
+-    front_matter["title"] = title
+-
+-    github_link = f"https://github.com/microsoft/autogen/blob/main/notebook/{notebook_name}"
++    github_link = f"https://github.com/microsoft/autogen/blob/main/{repo_relative_notebook}"
+     content = (
+         content[:title_end]
+         + "\n[![Open on GitHub](https://img.shields.io/badge/Open%20on%20GitHub-grey?logo=github)]("
+@@ -318,10 +356,11 @@ def post_process_mdx(rendered_mdx: Path, front_matter: Dict) -> None:
+ 
+     # If no colab link is present, insert one
+     if "colab-badge.svg" not in content:
++        colab_link = f"https://colab.research.google.com/github/microsoft/autogen/blob/main/{repo_relative_notebook}"
+         content = (
+             content[:title_end]
+-            + "\n[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/microsoft/autogen/blob/main/notebook/"
+-            + notebook_name
++            + "\n[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]("
++            + colab_link
+             + ")"
+             + content[title_end:]
+         )

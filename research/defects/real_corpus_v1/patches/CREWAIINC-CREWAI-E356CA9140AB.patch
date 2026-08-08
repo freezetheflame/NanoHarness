@@ -1,0 +1,49 @@
+From 7122a29a20a32f3867787cc19031c67cda1b5ca3 Mon Sep 17 00:00:00 2001
+From: "Brandon Hancock (bhancock_ai)"
+ <109994880+bhancockio@users.noreply.github.com>
+Date: Mon, 10 Mar 2025 12:08:43 -0400
+Subject: [PATCH] fix mistral issues (#2308)
+
+
+diff --git a/src/crewai/llm.py b/src/crewai/llm.py
+index b7f8f3dc..fb8367df 100644
+--- a/src/crewai/llm.py
++++ b/src/crewai/llm.py
+@@ -114,6 +114,19 @@ LLM_CONTEXT_WINDOW_SIZES = {
+     "Llama-3.2-11B-Vision-Instruct": 16384,
+     "Meta-Llama-3.2-3B-Instruct": 4096,
+     "Meta-Llama-3.2-1B-Instruct": 16384,
++    # mistral
++    "mistral-tiny": 32768,
++    "mistral-small-latest": 32768,
++    "mistral-medium-latest": 32768,
++    "mistral-large-latest": 32768,
++    "mistral-large-2407": 32768,
++    "mistral-large-2402": 32768,
++    "mistral/mistral-tiny": 32768,
++    "mistral/mistral-small-latest": 32768,
++    "mistral/mistral-medium-latest": 32768,
++    "mistral/mistral-large-latest": 32768,
++    "mistral/mistral-large-2407": 32768,
++    "mistral/mistral-large-2402": 32768,
+ }
+ 
+ DEFAULT_CONTEXT_WINDOW_SIZE = 8192
+@@ -789,6 +802,17 @@ class LLM:
+                     formatted_messages.append(msg)
+             return formatted_messages
+ 
++        # Handle Mistral models - they require the last message to have a role of 'user' or 'tool'
++        if "mistral" in self.model.lower():
++            # Check if the last message has a role of 'assistant'
++            if messages and messages[-1]["role"] == "assistant":
++                # Add a dummy user message to ensure the last message has a role of 'user'
++                messages = (
++                    messages.copy()
++                )  # Create a copy to avoid modifying the original
++                messages.append({"role": "user", "content": "Please continue."})
++            return messages
++
+         # Handle Anthropic models
+         if not self.is_anthropic:
+             return messages

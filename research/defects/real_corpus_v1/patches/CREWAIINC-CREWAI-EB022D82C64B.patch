@@ -1,0 +1,76 @@
+From baf91d8f0a15103d39e3cb87aafbb3d31229b600 Mon Sep 17 00:00:00 2001
+From: iris-clawd <iris@crewai.com>
+Date: Thu, 16 Apr 2026 11:01:59 -0700
+Subject: [PATCH] fix: update broken enterprise link on installation page
+ (OSS-36) (#5443)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* fix: update broken enterprise link on installation page (OSS-36)
+
+The 'Explore Enterprise Options' card on the installation page linked to
+https://crewai.com/enterprise which returns a 404. Updated the href to
+https://crewai.com/amp across all locales (en, pt-BR, ko, ar).
+
+* fix: use HubSpot form link for enterprise options card
+
+Updated per team feedback — the enterprise card should link to the
+HubSpot demo form instead of crewai.com/amp.
+
+---------
+
+Co-authored-by: Lorenze Jay <63378463+lorenzejay@users.noreply.github.com>
+
+diff --git a/docs/ar/installation.mdx b/docs/ar/installation.mdx
+index 3a902fae..6690e72e 100644
+--- a/docs/ar/installation.mdx
++++ b/docs/ar/installation.mdx
+@@ -196,7 +196,7 @@ python3 --version
+ - يدعم أي مزود سحابي بما في ذلك النشر المحلي
+ - تكامل مع أنظمة الأمان الحالية
+ 
+-<Card title="استكشف خيارات المؤسسات" icon="building" href="https://crewai.com/enterprise">
++<Card title="استكشف خيارات المؤسسات" icon="building" href="https://share.hsforms.com/1Ooo2UViKQ22UOzdr7i77iwr87kg">
+   تعرّف على عروض CrewAI للمؤسسات وجدول عرضًا توضيحيًا
+ </Card>
+ </Note>
+diff --git a/docs/en/installation.mdx b/docs/en/installation.mdx
+index 727f7122..50f43ff9 100644
+--- a/docs/en/installation.mdx
++++ b/docs/en/installation.mdx
+@@ -199,7 +199,7 @@ For teams and organizations, CrewAI offers enterprise deployment options that el
+ - Supports any hyperscaler including on prem deployments
+ - Integration with your existing security systems
+ 
+-<Card title="Explore Enterprise Options" icon="building" href="https://crewai.com/enterprise">
++<Card title="Explore Enterprise Options" icon="building" href="https://share.hsforms.com/1Ooo2UViKQ22UOzdr7i77iwr87kg">
+   Learn about CrewAI's enterprise offerings and schedule a demo
+ </Card>
+ </Note>
+diff --git a/docs/ko/installation.mdx b/docs/ko/installation.mdx
+index fc47d796..6363f327 100644
+--- a/docs/ko/installation.mdx
++++ b/docs/ko/installation.mdx
+@@ -189,7 +189,7 @@ CrewAI는 의존성 관리와 패키지 처리를 위해 `uv`를 사용합니다
+ - 온프레미스 배포를 포함하여 모든 하이퍼스케일러 지원
+ - 기존 보안 시스템과의 통합
+ 
+-<Card title="엔터프라이즈 옵션 살펴보기" icon="building" href="https://crewai.com/enterprise">
++<Card title="엔터프라이즈 옵션 살펴보기" icon="building" href="https://share.hsforms.com/1Ooo2UViKQ22UOzdr7i77iwr87kg">
+   CrewAI의 엔터프라이즈 서비스에 대해 알아보고 데모를 예약하세요
+ </Card>
+ </Note>
+diff --git a/docs/pt-BR/installation.mdx b/docs/pt-BR/installation.mdx
+index 868778af..74d0445d 100644
+--- a/docs/pt-BR/installation.mdx
++++ b/docs/pt-BR/installation.mdx
+@@ -191,7 +191,7 @@ Para equipes e organizações, o CrewAI oferece opções de implantação corpor
+ - Compatível com qualquer hyperscaler, incluindo ambientes on-premises
+ - Integração com seus sistemas de segurança existentes
+ 
+-<Card title="Explore as Opções Enterprise" icon="building" href="https://crewai.com/enterprise">
++<Card title="Explore as Opções Enterprise" icon="building" href="https://share.hsforms.com/1Ooo2UViKQ22UOzdr7i77iwr87kg">
+   Saiba mais sobre as soluções enterprise do CrewAI e agende uma demonstração
+ </Card>
+ </Note>

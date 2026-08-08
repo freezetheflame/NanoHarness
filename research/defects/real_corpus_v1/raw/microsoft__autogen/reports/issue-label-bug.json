@@ -1,0 +1,20 @@
+{
+  "complete": true,
+  "errors": [],
+  "manifest_id": "agent-real-defects-v1",
+  "repositories": [
+    {
+      "default_branch": "main",
+      "pinned_commit": "027ecf0a379bcc1d09956d46d12d44a3ad9cee14",
+      "queries": [
+        {
+          "item_count": 0,
+          "query": "repo:microsoft/autogen is:issue is:closed closed:2024-01-01..2026-06-30 label:bug",
+          "query_id": "issue-label-bug"
+        }
+      ],
+      "repository": "microsoft/autogen",
+      "repository_id": 680120071
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+From 5a8649a97f9ff0c92e791b8f28c95f06c040603e Mon Sep 17 00:00:00 2001
+From: hyjbrave <yujiang_hui@126.com>
+Date: Fri, 7 Feb 2025 23:38:15 +0800
+Subject: [PATCH] fix unstructured example flow (#2052)
+
+
+diff --git a/docs/concepts/flows.mdx b/docs/concepts/flows.mdx
+index 9820d346..c22a619f 100644
+--- a/docs/concepts/flows.mdx
++++ b/docs/concepts/flows.mdx
+@@ -232,18 +232,18 @@ class UnstructuredExampleFlow(Flow):
+     def first_method(self):
+         # The state automatically includes an 'id' field
+         print(f"State ID: {self.state['id']}")
+-        self.state.message = "Hello from structured flow"
+-        self.state.counter = 0
++        self.state['counter'] = 0
++        self.state['message'] = "Hello from structured flow"
+ 
+     @listen(first_method)
+     def second_method(self):
+-        self.state.counter += 1
+-        self.state.message += " - updated"
++        self.state['counter'] += 1
++        self.state['message'] += " - updated"
+ 
+     @listen(second_method)
+     def third_method(self):
+-        self.state.counter += 1
+-        self.state.message += " - updated again"
++        self.state['counter'] += 1
++        self.state['message'] += " - updated again"
+ 
+         print(f"State after third_method: {self.state}")
+ 

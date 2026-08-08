@@ -14,6 +14,9 @@ from research.defects.real_corpus_v1.collect_git_history import (
     collect_fixing_commits,
 )
 from research.defects.real_corpus_v1.enrich_candidates import enrich_candidates
+from research.defects.real_corpus_v1.archive_search_pages import (
+    archive_search_pages,
+)
 from research.defects.real_corpus_v1.pipeline import (
     blind_packet,
     canonical_candidate_key,
@@ -479,3 +482,69 @@ def test_enrich_candidates_archives_commit_evidence_and_patch(tmp_path):
     patch = tmp_path / "evidence" / record["patch_path"]
     assert patch.exists()
     assert record["patch_sha256"] == hashlib.sha256(patch.read_bytes()).hexdigest()
+
+
+def test_archive_search_pages_is_deterministic_and_indexes_exact_bytes(tmp_path):
+    raw = tmp_path / "raw"
+    first = raw / "owner__a" / "queries" / "q1" / "page-0001.json"
+    second = raw / "owner__b" / "queries" / "q2" / "page-0001.json"
+    first.parent.mkdir(parents=True)
+    second.parent.mkdir(parents=True)
+    first.write_bytes(b'{"items":[1]}')
+    second.write_bytes(b'{"items":[2]}')
+
+    first_archive = tmp_path / "first.zip"
+    second_archive = tmp_path / "second.zip"
+    first_index = archive_search_pages(raw, first_archive)
+    second_index = archive_search_pages(raw, second_archive)
+
+    assert first_archive.read_bytes() == second_archive.read_bytes()
+    assert first_index == second_index
+    assert [item["path"] for item in first_index["files"]] == [
+        "owner__a/queries/q1/page-0001.json",
+        "owner__b/queries/q2/page-0001.json",
+    ]
+    assert first_index["files"][0]["sha256"] == hashlib.sha256(
+        first.read_bytes()
+    ).hexdigest()
+
+
+def test_retained_real_defect_packet_is_blind_and_complete():
+    root = (
+        __import__("pathlib").Path(__file__).parents[1]
+        / "research"
+        / "defects"
+        / "real_corpus_v1"
+    )
+    packet_bytes = (root / "evidence_packet.json").read_bytes()
+    packet = json.loads(packet_bytes)
+    private = json.loads(
+        (root / "selected_candidates.private.json").read_text(encoding="utf-8")
+    )
+
+    assert len(packet["candidates"]) == 77
+    assert len(private["candidates"]) == 77
+    assert sum(item["partition"] == "derivation" for item in private["candidates"]) == 47
+    assert sum(item["partition"] == "validation" for item in private["candidates"]) == 30
+    assert b'"partition"' not in packet_bytes
+    assert b'"selection_rank"' not in packet_bytes
+    assert b'"operator_ids"' not in packet_bytes
+    assert b'"machine_precode"' not in packet_bytes
+    assert len(list((root / "patches").glob("*.patch"))) == 77
+
+
+def test_retained_real_defect_snapshot_checksums_match():
+    root = (
+        __import__("pathlib").Path(__file__).parents[1]
+        / "research"
+        / "defects"
+        / "real_corpus_v1"
+    )
+    lines = (root / "SHA256SUMS").read_text(encoding="utf-8").splitlines()
+
+    assert len(lines) == 117
+    for line in lines:
+        expected, relative = line.split("  ", 1)
+        path = root / relative
+        assert path.is_file(), relative
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == expected, relative

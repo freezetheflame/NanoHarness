@@ -1,0 +1,22 @@
+From 81bd81e5f5e78be0485a771af74fe13fa5c8a1fd Mon Sep 17 00:00:00 2001
+From: Greyson LaLonde <greyson.r.lalonde@gmail.com>
+Date: Fri, 12 Sep 2025 17:31:53 -0400
+Subject: [PATCH] fix: handle model parameter in OpenAI adapter initialization
+ (#3510)
+
+
+diff --git a/src/crewai/agents/agent_adapters/openai_agents/openai_adapter.py b/src/crewai/agents/agent_adapters/openai_agents/openai_adapter.py
+index d241d5c5..da0f185f 100644
+--- a/src/crewai/agents/agent_adapters/openai_agents/openai_adapter.py
++++ b/src/crewai/agents/agent_adapters/openai_agents/openai_adapter.py
+@@ -77,9 +77,9 @@ class OpenAIAgentAdapter(BaseAgentAdapter):
+         Raises:
+             ImportError: If OpenAI agent dependencies are not installed.
+         """
++        self.llm = kwargs.pop("model", "gpt-4o-mini")
+         super().__init__(**kwargs)
+         self._tool_adapter = OpenAIAgentToolAdapter(tools=kwargs.get("tools"))
+-        self.llm = kwargs.get("model", "gpt-4o-mini")
+         self._converter_adapter = OpenAIConverterAdapter(agent_adapter=self)
+ 
+     def _build_system_prompt(self) -> str:

@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "manifest_id": "agent-real-defects-v1",
+  "authoritative_candidate_frame": {
+    "complete": true,
+    "kind": "pinned_default_branch_first_parent_git_history",
+    "candidate_count": 1600,
+    "repositories": [
+      {
+        "candidate_count": 2,
+        "pinned_commit": "43fd031f3d89becdd6b2c293d4ca84f1ad04ca65",
+        "repository": "freezetheflame/NanoHarness",
+        "selected_count": 2
+      },
+      {
+        "candidate_count": 637,
+        "pinned_commit": "5931a5f0b313feff24e2516a586c55601b868ac1",
+        "repository": "langchain-ai/langgraph",
+        "selected_count": 25
+      },
+      {
+        "candidate_count": 422,
+        "pinned_commit": "027ecf0a379bcc1d09956d46d12d44a3ad9cee14",
+        "repository": "microsoft/autogen",
+        "selected_count": 25
+      },
+      {
+        "candidate_count": 539,
+        "pinned_commit": "ba2dafdeda7944aae84057f3433a8347d05faf2c",
+        "repository": "crewAIInc/crewAI",
+        "selected_count": 25
+      }
+    ],
+    "selected_count": 77,
+    "subject_pattern": "\\b(fix|bug|regression|revert)\\b",
+    "window": {
+      "end": "2026-06-30",
+      "start": "2024-01-01"
+    }
+  },
+  "blind_packet": {
+    "candidate_count": 77,
+    "partition_fields_present": false,
+    "sha256": "92fc19ca1f96e183dfb21087aae966445ce46e3ae75e81dbdbacfa1f74f82593"
+  },
+  "private_partition": {
+    "derivation_count": 47,
+    "validation_count": 30
+  },
+  "supplementary_search": {
+    "archive": "raw/search_pages.zip",
+    "archive_sha256": "ac9393e77df89da2346ce8ed0f0f68196924da605c4b23fa017425559dea728a",
+    "complete": false,
+    "page_count": 81,
+    "role": "supplementary evidence discovery",
+    "status_reason": "GitHub Search caps results at 1000 and the initial long PR query exceeded the Boolean-operator limit; these responses are not the sampling frame",
+    "superseded_report": "protocol_corrections/initial_search_report.json"
+  }
+}

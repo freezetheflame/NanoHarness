@@ -1,0 +1,20 @@
+From 8daeb561946bbe2d1e507db451aefe2097f346e3 Mon Sep 17 00:00:00 2001
+From: Hassan Memon <hassan.ghaddai@live.com>
+Date: Wed, 14 Aug 2024 19:08:26 +0500
+Subject: [PATCH] Fix typo in documentation: corrected 'they agent's' to 'their
+ agent's' (#1338)
+
+
+diff --git a/examples/introduction.ipynb b/examples/introduction.ipynb
+index d0f26994..24726a79 100644
+--- a/examples/introduction.ipynb
++++ b/examples/introduction.ipynb
+@@ -1563,7 +1563,7 @@
+    "source": [
+     "## Part 5: Manually Updating the State\n",
+     "\n",
+-    "In the previous section, we showed how to interrupt a graph so that a human could inspect its actions. This lets the human `read` the state, but if they want to change they agent's course, they'll need to have `write` access.\n",
++    "In the previous section, we showed how to interrupt a graph so that a human could inspect its actions. This lets the human `read` the state, but if they want to change their agent's course, they'll need to have `write` access.\n",
+     "\n",
+     "Thankfully, LangGraph lets you **manually update state**! Updating the state lets you control the agent's trajectory by modifying its actions (even modifying the past!). This capability is particularly useful when you want to correct the agent's mistakes, explore alternative paths, or guide the agent towards a specific goal.\n",
+     "\n",

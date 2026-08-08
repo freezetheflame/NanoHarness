@@ -1,0 +1,143 @@
+From a15f542a1f235a4b8622f958403971295df5fa8f Mon Sep 17 00:00:00 2001
+From: Nuno Campos <nuno@langchain.dev>
+Date: Wed, 13 Aug 2025 19:33:20 +0100
+Subject: [PATCH] fix: Persist resume_map values (#5898)
+
+Thank you for contributing to LangGraph! Follow these steps to mark your
+pull request as ready for review. **If any of these steps are not
+completed, your PR will not be considered for review.**
+
+- [ ] **PR title**: Follows the format: {TYPE}({SCOPE}): {DESCRIPTION}
+  - Examples:
+    - feat(core): add multi-tenant support
+    - fix(cli): resolve flag parsing error
+    - docs(openai): update API usage examples
+  - Allowed `{TYPE}` values:
+- feat, fix, docs, style, refactor, perf, test, build, ci, chore,
+revert, release
+  - Allowed `{SCOPE}` values (optional):
+- langgraph, docs, cli, checkpoint, checkpoint-postgres,
+checkpoint-sqlite, prebuilt, scheduler-kafka, sdk-py
+- Once you've written the title, please delete this checklist item; do
+not include it in the PR.
+
+- [ ] **PR message**: ***Delete this entire checklist*** and replace
+with
+- **Description:** a description of the change. Include a [closing
+keyword](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword)
+if applicable.
+  - **Issue:** the issue # it fixes, if applicable
+  - **Dependencies:** any dependencies required for this change
+- **Twitter handle:** if your PR gets announced, and you'd like a
+mention, we'll gladly shout you out!
+
+- [ ] **Add tests and docs**: If you're adding a new integration, you
+must include:
+1. A test for the integration, preferably unit tests that do not rely on
+network access,
+2. An example notebook showing its use. It lives in
+`docs/docs/integrations` directory.
+
+- [ ] **Lint and test**: Run `make format`, `make lint` and `make test`
+from the root of the package(s) you've modified. We will not consider a
+PR unless these three are passing in CI. See [contribution
+guidelines](https://github.com/langchain-ai/langgraph/blob/main/CONTRIBUTING.md)
+for more.
+
+Additional guidelines:
+
+- Make sure optional dependencies are imported within a function.
+- Please do not add dependencies to `pyproject.toml` files (even
+optional ones) unless they are **required** for unit tests.
+- Most PRs should not touch more than one package.
+- Changes should be backwards compatible.
+
+diff --git a/libs/langgraph/langgraph/types.py b/libs/langgraph/langgraph/types.py
+index 5fbc304b..a400e4de 100644
+--- a/libs/langgraph/langgraph/types.py
++++ b/libs/langgraph/langgraph/types.py
+@@ -507,6 +507,7 @@ def interrupt(value: Any) -> Any:
+     # find previous resume values
+     if scratchpad.resume:
+         if idx < len(scratchpad.resume):
++            conf[CONFIG_KEY_SEND]([(RESUME, scratchpad.resume)])
+             return scratchpad.resume[idx]
+     # find current resume value
+     v = scratchpad.get_null_resume(True)
+diff --git a/libs/langgraph/tests/conftest.py b/libs/langgraph/tests/conftest.py
+index 4ef30b91..465cdc9d 100644
+--- a/libs/langgraph/tests/conftest.py
++++ b/libs/langgraph/tests/conftest.py
+@@ -69,7 +69,7 @@ def cache(request: pytest.FixtureRequest) -> Iterator[BaseCache]:
+     elif request.param == "redis":
+         # Get worker ID for parallel test isolation
+         worker_id = getattr(request.config, "workerinput", {}).get("workerid", "master")
+-        
++
+         redis_client = redis.Redis(
+             host="localhost", port=6379, db=0, decode_responses=False
+         )
+diff --git a/libs/langgraph/tests/test_pregel.py b/libs/langgraph/tests/test_pregel.py
+index 71283b67..8c9dda4f 100644
+--- a/libs/langgraph/tests/test_pregel.py
++++ b/libs/langgraph/tests/test_pregel.py
+@@ -4805,7 +4805,10 @@ def test_interrupt_subgraph(sync_checkpointer: BaseCheckpointSaver):
+     assert graph.invoke(Command(resume="bar"), thread1)
+ 
+ 
+-def test_interrupt_multiple(sync_checkpointer: BaseCheckpointSaver):
++@pytest.mark.parametrize("resume_style", ["null", "map"])
++def test_interrupt_multiple(
++    sync_checkpointer: BaseCheckpointSaver, resume_style: Literal["null", "map"]
++):
+     class State(TypedDict):
+         my_key: Annotated[str, operator.add]
+ 
+@@ -4821,7 +4824,8 @@ def test_interrupt_multiple(sync_checkpointer: BaseCheckpointSaver):
+     graph = builder.compile(checkpointer=sync_checkpointer)
+     thread1 = {"configurable": {"thread_id": "1"}}
+ 
+-    assert [e for e in graph.stream({"my_key": "DE", "market": "DE"}, thread1)] == [
++    result = [e for e in graph.stream({"my_key": "DE", "market": "DE"}, thread1)]
++    assert result == [
+         {
+             "__interrupt__": (
+                 Interrupt(
+@@ -4832,12 +4836,19 @@ def test_interrupt_multiple(sync_checkpointer: BaseCheckpointSaver):
+         }
+     ]
+ 
+-    assert [
++    result = [
+         event
+         for event in graph.stream(
+-            Command(resume="answer 1", update={"my_key": " foofoo "}), thread1
++            Command(
++                resume="answer 1"
++                if resume_style == "null"
++                else {result[0]["__interrupt__"][0].id: "answer 1"},
++                update={"my_key": " foofoo "},
++            ),
++            thread1,
+         )
+-    ] == [
++    ]
++    assert result == [
+         {
+             "__interrupt__": (
+                 Interrupt(
+@@ -4851,7 +4862,13 @@ def test_interrupt_multiple(sync_checkpointer: BaseCheckpointSaver):
+     assert [
+         event
+         for event in graph.stream(
+-            Command(resume="answer 2"), thread1, stream_mode="values"
++            Command(
++                resume="answer 2"
++                if resume_style == "null"
++                else {result[0]["__interrupt__"][0].id: "answer 2"}
++            ),
++            thread1,
++            stream_mode="values",
+         )
+     ] == [
+         {"my_key": "DE foofoo "},

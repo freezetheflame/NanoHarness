@@ -1,0 +1,20 @@
+{
+  "complete": true,
+  "errors": [],
+  "manifest_id": "agent-real-defects-v1",
+  "repositories": [
+    {
+      "default_branch": "main",
+      "pinned_commit": "ba2dafdeda7944aae84057f3433a8347d05faf2c",
+      "queries": [
+        {
+          "item_count": 789,
+          "query": "repo:crewAIInc/crewAI is:issue is:closed closed:2024-01-01..2026-06-30 label:bug",
+          "query_id": "issue-label-bug"
+        }
+      ],
+      "repository": "crewAIInc/crewAI",
+      "repository_id": 710601088
+    }
+  ]
+}

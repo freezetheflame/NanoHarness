@@ -1,0 +1,55 @@
+From a1b34efdb00002cd31838cf92aa84a66a7fa3cb8 Mon Sep 17 00:00:00 2001
+From: mohanram <mohankumarelec@gmail.com>
+Date: Fri, 7 Nov 2025 22:12:15 +0530
+Subject: [PATCH] fix(checkpoint-postgres): ensure vector extension is created
+ only if not exists (#6154)
+
+Thank you for contributing to LangGraph! Follow these steps to mark your
+pull request as ready for review. **If any of these steps are not
+completed, your PR will not be considered for review.**
+
+- [x] **PR title**: Follows the format: {TYPE}({SCOPE}): {DESCRIPTION}
+  - Examples:
+    - feat(core): add multi-tenant support
+    - fix(cli): resolve flag parsing error
+    - docs(openai): update API usage examples
+  - Allowed `{TYPE}` values:
+- feat, fix, docs, style, refactor, perf, test, build, ci, chore,
+revert, release
+  - Allowed `{SCOPE}` values (optional):
+- langgraph, docs, cli, checkpoint, checkpoint-postgres,
+checkpoint-sqlite, prebuilt, scheduler-kafka, sdk-py
+- Once you've written the title, please delete this checklist item; do
+not include it in the PR.
+
+- **Description:** Azure Postgres SQL server has a limitation when doing
+create extension vector is not exists, even though it manually created
+before on a schema.
+- **Issue:** Even though `CREATE EXTENSION vector` is executed manually
+before, the permission issue arises. Putting it in an if else block
+solves the issue and its not a breaking change.
+```
+Because vector isn't a trusted extension, only members of "azure_pg_admin" are allowed to use CREATE EXTENSION vector
+HINT: to learn how to allow an extension or see the list of allowed extensions, please refer to https://go.microsoft.com/fwlink/?linkid=2301063
+```
+
+Co-authored-by: Josh Rogers <josh@langchain.dev>
+
+diff --git a/libs/checkpoint-postgres/langgraph/store/postgres/base.py b/libs/checkpoint-postgres/langgraph/store/postgres/base.py
+index a4d31b54..825590e2 100644
+--- a/libs/checkpoint-postgres/langgraph/store/postgres/base.py
++++ b/libs/checkpoint-postgres/langgraph/store/postgres/base.py
+@@ -91,7 +91,12 @@ WHERE expires_at IS NOT NULL;
+ VECTOR_MIGRATIONS: Sequence[Migration] = [
+     Migration(
+         """
+-CREATE EXTENSION IF NOT EXISTS vector;
++DO $$
++BEGIN
++    IF NOT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'vector') THEN
++        CREATE EXTENSION vector;
++    END IF;
++END $$;
+ """,
+     ),
+     Migration(

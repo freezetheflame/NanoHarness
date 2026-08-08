@@ -1,0 +1,46 @@
+From beddc7218900e396723e1d0b8dc7b7624b627bd7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jo=C3=A3o=20Moura?= <joaomdmoura@gmail.com>
+Date: Thu, 22 May 2025 21:47:23 -0700
+Subject: [PATCH] fix llm guardrail import and docs
+
+
+diff --git a/docs/concepts/tasks.mdx b/docs/concepts/tasks.mdx
+index 63b95fec..0952203d 100644
+--- a/docs/concepts/tasks.mdx
++++ b/docs/concepts/tasks.mdx
+@@ -369,7 +369,7 @@ blog_task = Task(
+    - Type hints are recommended but optional
+ 
+ 2. **Return Values**:
+-   - On success: it returns a tuple of `(bool, Any)`. For example: `(True, validated_result)` 
++   - On success: it returns a tuple of `(bool, Any)`. For example: `(True, validated_result)`
+    - On Failure: it returns a tuple of `(bool, str)`. For example: `(False, "Error message explain the failure")`
+ 
+ ### LLMGuardrail
+@@ -380,7 +380,7 @@ The `LLMGuardrail` class offers a robust mechanism for validating task outputs.
+ 
+ 1. **Structured Error Responses**:
+ ```python Code
+-from crewai import TaskOutput
++from crewai import TaskOutput, LLMGuardrail
+ 
+ def validate_with_context(result: TaskOutput) -> Tuple[bool, Any]:
+     try:
+diff --git a/src/crewai/__init__.py b/src/crewai/__init__.py
+index c256db73..3501a1a1 100644
+--- a/src/crewai/__init__.py
++++ b/src/crewai/__init__.py
+@@ -9,6 +9,7 @@ from crewai.llm import LLM
+ from crewai.llms.base_llm import BaseLLM
+ from crewai.process import Process
+ from crewai.task import Task
++from crewai.tasks.llm_guardrail import LLMGuardrail
+ from crewai.tasks.task_output import TaskOutput
+ 
+ warnings.filterwarnings(
+@@ -29,4 +30,5 @@ __all__ = [
+     "Flow",
+     "Knowledge",
+     "TaskOutput",
++    "LLMGuardrail",
+ ]

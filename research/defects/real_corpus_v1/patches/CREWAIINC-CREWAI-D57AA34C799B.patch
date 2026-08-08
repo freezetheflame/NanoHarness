@@ -1,0 +1,72 @@
+From 02718e291b6cf2b4cedb2f2d923ce7ffc5aa9963 Mon Sep 17 00:00:00 2001
+From: "Brandon Hancock (bhancock_ai)"
+ <109994880+bhancockio@users.noreply.github.com>
+Date: Thu, 10 Oct 2024 12:00:28 -0400
+Subject: [PATCH] fix task cloning error (#1416)
+
+
+diff --git a/src/crewai/crew.py b/src/crewai/crew.py
+index 91b75c6c..422f6424 100644
+--- a/src/crewai/crew.py
++++ b/src/crewai/crew.py
+@@ -900,7 +900,22 @@ class Crew(BaseModel):
+         }
+ 
+         cloned_agents = [agent.copy() for agent in self.agents]
+-        cloned_tasks = [task.copy(cloned_agents) for task in self.tasks]
++
++        task_mapping = {}
++
++        cloned_tasks = []
++        for task in self.tasks:
++            cloned_task = task.copy(cloned_agents, task_mapping)
++            cloned_tasks.append(cloned_task)
++            task_mapping[task.key] = cloned_task
++
++        for cloned_task, original_task in zip(cloned_tasks, self.tasks):
++            if original_task.context:
++                cloned_context = [
++                    task_mapping[context_task.key]
++                    for context_task in original_task.context
++                ]
++                cloned_task.context = cloned_context
+ 
+         copied_data = self.model_dump(exclude=exclude)
+         copied_data = {k: v for k, v in copied_data.items() if v is not None}
+diff --git a/src/crewai/task.py b/src/crewai/task.py
+index 979ebc34..82baa995 100644
+--- a/src/crewai/task.py
++++ b/src/crewai/task.py
+@@ -276,9 +276,7 @@ class Task(BaseModel):
+             content = (
+                 json_output
+                 if json_output
+-                else pydantic_output.model_dump_json()
+-                if pydantic_output
+-                else result
++                else pydantic_output.model_dump_json() if pydantic_output else result
+             )
+             self._save_file(content)
+ 
+@@ -319,7 +317,9 @@ class Task(BaseModel):
+             self.processed_by_agents.add(agent_name)
+         self.delegations += 1
+ 
+-    def copy(self, agents: List["BaseAgent"]) -> "Task":
++    def copy(
++        self, agents: List["BaseAgent"], task_mapping: Dict[str, "Task"]
++    ) -> "Task":
+         """Create a deep copy of the Task."""
+         exclude = {
+             "id",
+@@ -332,7 +332,9 @@ class Task(BaseModel):
+         copied_data = {k: v for k, v in copied_data.items() if v is not None}
+ 
+         cloned_context = (
+-            [task.copy(agents) for task in self.context] if self.context else None
++            [task_mapping[context_task.key] for context_task in self.context]
++            if self.context
++            else None
+         )
+ 
+         def get_agent_by_role(role: str) -> Union["BaseAgent", None]:

@@ -1,0 +1,30 @@
+From 25fcf39cc1030b841dc5b8c3f855a7784c5fa8e4 Mon Sep 17 00:00:00 2001
+From: Yanhu <huangfuyang900204@gmail.com>
+Date: Sun, 12 Apr 2026 15:50:56 +0800
+Subject: [PATCH] fix: preserve Bedrock tool call arguments by removing truthy
+ default
+
+func_info.get('arguments', '{}') returns '{}' (truthy) when no
+'function' wrapper exists (Bedrock format), causing the or-fallback
+to tool_call.get('input', {}) to never execute. The actual Bedrock
+arguments are silently discarded.
+
+Remove the default so get('arguments') returns None (falsy) when
+there's no function wrapper, allowing the or-chain to correctly
+fall through to Bedrock's 'input' field.
+
+Fixes #5275
+
+diff --git a/lib/crewai/src/crewai/agents/crew_agent_executor.py b/lib/crewai/src/crewai/agents/crew_agent_executor.py
+index 909fa5c6..b98840ca 100644
+--- a/lib/crewai/src/crewai/agents/crew_agent_executor.py
++++ b/lib/crewai/src/crewai/agents/crew_agent_executor.py
+@@ -827,7 +827,7 @@ class CrewAgentExecutor(BaseAgentExecutor):
+             func_name = sanitize_tool_name(
+                 func_info.get("name", "") or tool_call.get("name", "")
+             )
+-            func_args = func_info.get("arguments", "{}") or tool_call.get("input", {})
++            func_args = func_info.get("arguments") or tool_call.get("input", {})
+             return call_id, func_name, func_args
+         return None
+ 

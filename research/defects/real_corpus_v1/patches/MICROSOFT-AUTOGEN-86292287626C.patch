@@ -1,0 +1,24 @@
+From eec854279a7a36b0b39e37f100f91ec13bafaa26 Mon Sep 17 00:00:00 2001
+From: Li Jiang <bnujli@gmail.com>
+Date: Tue, 2 Apr 2024 13:17:13 +0800
+Subject: [PATCH] Fix unstructured deps installation error (#2248)
+
+
+diff --git a/.github/workflows/contrib-tests.yml b/.github/workflows/contrib-tests.yml
+index 942c36ef..800085f9 100644
+--- a/.github/workflows/contrib-tests.yml
++++ b/.github/workflows/contrib-tests.yml
+@@ -43,9 +43,11 @@ jobs:
+         if: matrix.python-version == '3.10'
+         run: |
+           pip install qdrant_client[fastembed]
+-      - name: Install unstructured when python-version is 3.9 and not windows
+-        if: matrix.python-version == '3.9' && matrix.os != 'windows-2019'
++      - name: Install unstructured when python-version is 3.9 and on linux
++        if: matrix.python-version == '3.9' && matrix.os == 'ubuntu-latest'
+         run: |
++          sudo apt-get update
++          sudo apt-get install -y tesseract-ocr poppler-utils
+           pip install unstructured[all-docs]
+       - name: Install packages and dependencies for RetrieveChat
+         run: |

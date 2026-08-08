@@ -1,0 +1,20 @@
+From 18887e9f86a6d8675a2b4aed03a1c190ef6e1581 Mon Sep 17 00:00:00 2001
+From: William FH <13333726+hinthornw@users.noreply.github.com>
+Date: Thu, 31 Jul 2025 06:15:03 -0700
+Subject: [PATCH] fix(langgraph): Remove duplicate call to ensure_config
+ (#5768)
+
+
+diff --git a/libs/langgraph/langgraph/pregel/main.py b/libs/langgraph/langgraph/pregel/main.py
+index cb23299f..2a65122e 100644
+--- a/libs/langgraph/langgraph/pregel/main.py
++++ b/libs/langgraph/langgraph/pregel/main.py
+@@ -1305,7 +1305,7 @@ class Pregel(
+     ) -> Iterator[StateSnapshot]:
+         """Get the history of the state of the graph."""
+         config = ensure_config(config)
+-        checkpointer: BaseCheckpointSaver | None = ensure_config(config)[CONF].get(
++        checkpointer: BaseCheckpointSaver | None = config[CONF].get(
+             CONFIG_KEY_CHECKPOINTER, self.checkpointer
+         )
+         if not checkpointer:

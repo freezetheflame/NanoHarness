@@ -1,0 +1,1470 @@
+{
+  "candidate_count": 77,
+  "candidates": [
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/de5d2eaa9b12167ea14ecf59c70f59227fd63fe3",
+      "committed_at": "2024-10-14T16:30:31-04:00",
+      "defect_id": "CREWAIINC-CREWAI-04B202486C03",
+      "evidence": [
+        {
+          "evidence_id": "de5d2eaa9b12-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/de5d2eaa9b12167ea14ecf59c70f59227fd63fe3",
+          "revision": "de5d2eaa9b12167ea14ecf59c70f59227fd63fe3"
+        }
+      ],
+      "partition": "validation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "de5d2eaa9b12167ea14ecf59c70f59227fd63fe3",
+      "selection_rank": "06ea8a14f926f08cb0695260cfa76ca0a8bf5c29e6d3b1cfff737799475be1d8",
+      "source_kind": "fixing_commit",
+      "title": "Fix Cache Typo in Documentation (#1441)"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/b38f0825e7acb6e02e5306e3ba10ee0fae99a042",
+      "committed_at": "2024-07-19T01:37:54-03:00",
+      "defect_id": "CREWAIINC-CREWAI-18B7D0AAA5B0",
+      "evidence": [
+        {
+          "evidence_id": "b38f0825e7ac-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/b38f0825e7acb6e02e5306e3ba10ee0fae99a042",
+          "revision": "b38f0825e7acb6e02e5306e3ba10ee0fae99a042"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "b38f0825e7acb6e02e5306e3ba10ee0fae99a042",
+      "selection_rank": "0d16f13550a4df1fdc362dbdf0beea57d792b3b59c18e65067e2c47dc7ef1b4d",
+      "source_kind": "fixing_commit",
+      "title": "Fix broken link to the installation guide (#912)"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/f700e014c9e6494ad693a6e48a5da7594efc88ad",
+      "committed_at": "2025-05-12T15:05:14-04:00",
+      "defect_id": "CREWAIINC-CREWAI-1E81F04FA0D3",
+      "evidence": [
+        {
+          "evidence_id": "f700e014c9e6-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/f700e014c9e6494ad693a6e48a5da7594efc88ad",
+          "revision": "f700e014c9e6494ad693a6e48a5da7594efc88ad"
+        }
+      ],
+      "partition": "validation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "f700e014c9e6494ad693a6e48a5da7594efc88ad",
+      "selection_rank": "01f31b9f94751063d2157c9aed36829bd6b7890c003b1fc668662ea50cfdae99",
+      "source_kind": "fixing_commit",
+      "title": "fix: address race condition in FilteredStream by using context managers (#2818)"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/f13d307534d3a09bc7adf4af22fb1e70f5af9272",
+      "committed_at": "2026-03-20T16:04:52-04:00",
+      "defect_id": "CREWAIINC-CREWAI-1E9135EB1AC6",
+      "evidence": [
+        {
+          "evidence_id": "f13d307534d3-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/f13d307534d3a09bc7adf4af22fb1e70f5af9272",
+          "revision": "f13d307534d3a09bc7adf4af22fb1e70f5af9272"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "f13d307534d3a09bc7adf4af22fb1e70f5af9272",
+      "selection_rank": "097642448f5664de2b7d877850725682ff24b4cbc851182ff7f470165a415112",
+      "source_kind": "fixing_commit",
+      "title": "fix: pass cache_function from BaseTool to CrewStructuredTool"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/46be5e8097a4e18fd9ab05e630b784658e7da2a6",
+      "committed_at": "2024-12-09T10:53:55-05:00",
+      "defect_id": "CREWAIINC-CREWAI-2250F67CC995",
+      "evidence": [
+        {
+          "evidence_id": "46be5e8097a4-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/46be5e8097a4e18fd9ab05e630b784658e7da2a6",
+          "revision": "46be5e8097a4e18fd9ab05e630b784658e7da2a6"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "46be5e8097a4e18fd9ab05e630b784658e7da2a6",
+      "selection_rank": "013d080ec7dd84e76acfb6d3e280832d52fde7bac2cec31e642bf0686fed5db4",
+      "source_kind": "fixing_commit",
+      "title": "fix:typo error (#1732)"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/b35c3e802492f03b81e07b43420fa42b10584f11",
+      "committed_at": "2025-06-26T12:29:06-04:00",
+      "defect_id": "CREWAIINC-CREWAI-39544CABB83E",
+      "evidence": [
+        {
+          "evidence_id": "b35c3e802492-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/b35c3e802492f03b81e07b43420fa42b10584f11",
+          "revision": "b35c3e802492f03b81e07b43420fa42b10584f11"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "b35c3e802492f03b81e07b43420fa42b10584f11",
+      "selection_rank": "096d27e42cb427e75ec89c2e46c6a228a481e4ff7a9ef49189b09f09e5a05c61",
+      "source_kind": "fixing_commit",
+      "title": "fix: ensure env-vars are written in upper case (#3072)"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/f4f32b5f7fff51462e5f6c2bbd534d99929e73d9",
+      "committed_at": "2025-09-03T16:36:50-07:00",
+      "defect_id": "CREWAIINC-CREWAI-3A3F746A0B2C",
+      "evidence": [
+        {
+          "evidence_id": "f4f32b5f7fff-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/f4f32b5f7fff51462e5f6c2bbd534d99929e73d9",
+          "revision": "f4f32b5f7fff51462e5f6c2bbd534d99929e73d9"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "f4f32b5f7fff51462e5f6c2bbd534d99929e73d9",
+      "selection_rank": "04d2da735796e76960904475a45a0b520b7d859d317d71710047844a6111099b",
+      "source_kind": "fixing_commit",
+      "title": "fix: suppress Pydantic deprecation warnings in initialization (#3443)"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/cc129a0bce435642d14df34cf9474ea0cc4838e2",
+      "committed_at": "2025-01-16T12:47:59-05:00",
+      "defect_id": "CREWAIINC-CREWAI-509EBFDD10D0",
+      "evidence": [
+        {
+          "evidence_id": "cc129a0bce43-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/cc129a0bce435642d14df34cf9474ea0cc4838e2",
+          "revision": "cc129a0bce435642d14df34cf9474ea0cc4838e2"
+        }
+      ],
+      "partition": "validation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "cc129a0bce435642d14df34cf9474ea0cc4838e2",
+      "selection_rank": "01ddfb13d71de6887391d7ed4beffff4f95abe28366fabe92d0ebdc15e251f86",
+      "source_kind": "fixing_commit",
+      "title": "Fix docling issues (#1909)"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/1da7473f262181ddf17311a71bbde65053bddfd5",
+      "committed_at": "2024-05-09T21:33:48-03:00",
+      "defect_id": "CREWAIINC-CREWAI-5261DAF3C41F",
+      "evidence": [
+        {
+          "evidence_id": "1da7473f2621-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/1da7473f262181ddf17311a71bbde65053bddfd5",
+          "revision": "1da7473f262181ddf17311a71bbde65053bddfd5"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "1da7473f262181ddf17311a71bbde65053bddfd5",
+      "selection_rank": "00a2ddc47ceb1eb42a2d9a1abcaeb97670010b58af6d936c8792ddb892a9c962",
+      "source_kind": "fixing_commit",
+      "title": "fix: fix test actually running (#587)"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/6b262f5a6de3db915773d19df7fdbdca73fb49c2",
+      "committed_at": "2026-03-18T15:05:41-03:00",
+      "defect_id": "CREWAIINC-CREWAI-55CE9DCF5420",
+      "evidence": [
+        {
+          "evidence_id": "6b262f5a6de3-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/6b262f5a6de3db915773d19df7fdbdca73fb49c2",
+          "revision": "6b262f5a6de3db915773d19df7fdbdca73fb49c2"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "6b262f5a6de3db915773d19df7fdbdca73fb49c2",
+      "selection_rank": "0d3e8d75d3b181f4b413eeb32304214f4f768c923e8c921281f7bc5855d875a9",
+      "source_kind": "fixing_commit",
+      "title": "Fix lock_store crash when redis package is not installed (#4943)"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/f89c2bfb7e5479a07df32e0b8eb593c2f40cdd3e",
+      "committed_at": "2025-05-02T12:40:42-04:00",
+      "defect_id": "CREWAIINC-CREWAI-64B8519A37DD",
+      "evidence": [
+        {
+          "evidence_id": "f89c2bfb7e54-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/f89c2bfb7e5479a07df32e0b8eb593c2f40cdd3e",
+          "revision": "f89c2bfb7e5479a07df32e0b8eb593c2f40cdd3e"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "f89c2bfb7e5479a07df32e0b8eb593c2f40cdd3e",
+      "selection_rank": "0aabf7d9be3ce0ea667b886746139a64eac591edf40b3b041d1aa290581782b9",
+      "source_kind": "fixing_commit",
+      "title": "Fix crewai reset-memories when Embedding dimension mismatch (#2737)"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/5abf9763735bb60c5a7b5ebc6da9d2faafcbf35f",
+      "committed_at": "2025-11-04T07:58:40-05:00",
+      "defect_id": "CREWAIINC-CREWAI-767929542075",
+      "evidence": [
+        {
+          "evidence_id": "5abf9763735b-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/5abf9763735bb60c5a7b5ebc6da9d2faafcbf35f",
+          "revision": "5abf9763735bb60c5a7b5ebc6da9d2faafcbf35f"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "5abf9763735bb60c5a7b5ebc6da9d2faafcbf35f",
+      "selection_rank": "0b8a0c9e88bcdc4e9c550f0c714b2e6bd7cd61d66c9f124643b0f9eb063456ca",
+      "source_kind": "fixing_commit",
+      "title": "fix: allow adding RAG source content from valid URLs (#3831)"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/a1033e4bfee1cf61b9ef1daab0d4855d544bdc3b",
+      "committed_at": "2026-05-27T13:20:53-07:00",
+      "defect_id": "CREWAIINC-CREWAI-7FA995D027A5",
+      "evidence": [
+        {
+          "evidence_id": "a1033e4bfee1-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/a1033e4bfee1cf61b9ef1daab0d4855d544bdc3b",
+          "revision": "a1033e4bfee1cf61b9ef1daab0d4855d544bdc3b"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "a1033e4bfee1cf61b9ef1daab0d4855d544bdc3b",
+      "selection_rank": "04e35f04dffb638713567f13e1692939b0a6d863821cf7f5c90f789e34ba4b58",
+      "source_kind": "fixing_commit",
+      "title": "Fix structured output leaks in tool-calling loops (#5897)"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/beef71264674727469760d8b88a60a5a153fe360",
+      "committed_at": "2025-12-08T19:04:21-05:00",
+      "defect_id": "CREWAIINC-CREWAI-86560271EDF6",
+      "evidence": [
+        {
+          "evidence_id": "beef71264674-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/beef71264674727469760d8b88a60a5a153fe360",
+          "revision": "beef71264674727469760d8b88a60a5a153fe360"
+        }
+      ],
+      "partition": "validation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "beef71264674727469760d8b88a60a5a153fe360",
+      "selection_rank": "01bce930892eba4af9e9cb47b0c7e3459eb8cc76416c82f4ec991f981e5850ab",
+      "source_kind": "fixing_commit",
+      "title": "fix: ensure token store file ops do not deadlock"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/5a8649a97f9ff0c92e791b8f28c95f06c040603e",
+      "committed_at": "2025-02-07T10:38:15-05:00",
+      "defect_id": "CREWAIINC-CREWAI-A70EE6E80215",
+      "evidence": [
+        {
+          "evidence_id": "5a8649a97f9f-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/5a8649a97f9ff0c92e791b8f28c95f06c040603e",
+          "revision": "5a8649a97f9ff0c92e791b8f28c95f06c040603e"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "5a8649a97f9ff0c92e791b8f28c95f06c040603e",
+      "selection_rank": "0c34c8e8536a7cafe6260491c4433b6d38586c8c097a36b7185b729040f482b4",
+      "source_kind": "fixing_commit",
+      "title": "fix unstructured example flow (#2052)"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/c50d62b82f037bf7a11ffaf18f92c70495bb9d3e",
+      "committed_at": "2024-10-02T16:06:10-04:00",
+      "defect_id": "CREWAIINC-CREWAI-A7BAD35DD871",
+      "evidence": [
+        {
+          "evidence_id": "c50d62b82f03-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/c50d62b82f037bf7a11ffaf18f92c70495bb9d3e",
+          "revision": "c50d62b82f037bf7a11ffaf18f92c70495bb9d3e"
+        }
+      ],
+      "partition": "validation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "c50d62b82f037bf7a11ffaf18f92c70495bb9d3e",
+      "selection_rank": "0bd403d907497246ee1e4412b4a5f44574f9366668009815a61573869ec71dc8",
+      "source_kind": "fixing_commit",
+      "title": "fix: JSON encoding date objects (#1374)"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/beddc7218900e396723e1d0b8dc7b7624b627bd7",
+      "committed_at": "2025-05-22T21:48:13-07:00",
+      "defect_id": "CREWAIINC-CREWAI-A8C087332C76",
+      "evidence": [
+        {
+          "evidence_id": "beddc7218900-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/beddc7218900e396723e1d0b8dc7b7624b627bd7",
+          "revision": "beddc7218900e396723e1d0b8dc7b7624b627bd7"
+        }
+      ],
+      "partition": "validation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "beddc7218900e396723e1d0b8dc7b7624b627bd7",
+      "selection_rank": "099417fa3f28f869eb66296b7a98aa08329eac07a1f642f9798648ebc3f1696c",
+      "source_kind": "fixing_commit",
+      "title": "fix llm guardrail import and docs"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/25fcf39cc1030b841dc5b8c3f855a7784c5fa8e4",
+      "committed_at": "2026-04-12T15:50:56+08:00",
+      "defect_id": "CREWAIINC-CREWAI-B357A08423FA",
+      "evidence": [
+        {
+          "evidence_id": "25fcf39cc103-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/25fcf39cc1030b841dc5b8c3f855a7784c5fa8e4",
+          "revision": "25fcf39cc1030b841dc5b8c3f855a7784c5fa8e4"
+        }
+      ],
+      "partition": "validation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "25fcf39cc1030b841dc5b8c3f855a7784c5fa8e4",
+      "selection_rank": "0ac48334b0428fb556cfb924377a9606e74d7e48df25a324f1b84a078c1f0c64",
+      "source_kind": "fixing_commit",
+      "title": "fix: preserve Bedrock tool call arguments by removing truthy default"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/81bd81e5f5e78be0485a771af74fe13fa5c8a1fd",
+      "committed_at": "2025-09-12T17:31:53-04:00",
+      "defect_id": "CREWAIINC-CREWAI-B54077DEA910",
+      "evidence": [
+        {
+          "evidence_id": "81bd81e5f5e7-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/81bd81e5f5e78be0485a771af74fe13fa5c8a1fd",
+          "revision": "81bd81e5f5e78be0485a771af74fe13fa5c8a1fd"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "81bd81e5f5e78be0485a771af74fe13fa5c8a1fd",
+      "selection_rank": "08b370afcb1b8ab01c761a042e2d93300c8a3817db9b276deb1f748579d3e859",
+      "source_kind": "fixing_commit",
+      "title": "fix: handle model parameter in OpenAI adapter initialization (#3510)"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/02718e291b6cf2b4cedb2f2d923ce7ffc5aa9963",
+      "committed_at": "2024-10-10T12:00:28-04:00",
+      "defect_id": "CREWAIINC-CREWAI-D57AA34C799B",
+      "evidence": [
+        {
+          "evidence_id": "02718e291b6c-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/02718e291b6cf2b4cedb2f2d923ce7ffc5aa9963",
+          "revision": "02718e291b6cf2b4cedb2f2d923ce7ffc5aa9963"
+        }
+      ],
+      "partition": "validation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "02718e291b6cf2b4cedb2f2d923ce7ffc5aa9963",
+      "selection_rank": "046d373f0a1f4ee947659b94426f5df29b849e8900e7be74eac387af714e8e0b",
+      "source_kind": "fixing_commit",
+      "title": "fix task cloning error (#1416)"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/4c74dc0f86a27af64624b21abc81e9eab4bb5e85",
+      "committed_at": "2026-04-29T02:10:17+08:00",
+      "defect_id": "CREWAIINC-CREWAI-DDB20ED36374",
+      "evidence": [
+        {
+          "evidence_id": "4c74dc0f86a2-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/4c74dc0f86a27af64624b21abc81e9eab4bb5e85",
+          "revision": "4c74dc0f86a27af64624b21abc81e9eab4bb5e85"
+        }
+      ],
+      "partition": "validation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "4c74dc0f86a27af64624b21abc81e9eab4bb5e85",
+      "selection_rank": "0973de3a3af65733b4ba4fd9d2b22de9130aa2ef2b4a0a12a2acaf1f0fa259b4",
+      "source_kind": "fixing_commit",
+      "title": "fix(executor): reset messages and iterations between invocations"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/1dbe8aab52b9acbf1647bbc0ecf91e7bd318e5f0",
+      "committed_at": "2025-09-24T00:05:43-04:00",
+      "defect_id": "CREWAIINC-CREWAI-E2AB332A0BAA",
+      "evidence": [
+        {
+          "evidence_id": "1dbe8aab52b9-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/1dbe8aab52b9acbf1647bbc0ecf91e7bd318e5f0",
+          "revision": "1dbe8aab52b9acbf1647bbc0ecf91e7bd318e5f0"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "1dbe8aab52b9acbf1647bbc0ecf91e7bd318e5f0",
+      "selection_rank": "01964c34d27b072d3e12047a10ab0ab23f0cf954c0056fb0f071ae96c7749852",
+      "source_kind": "fixing_commit",
+      "title": "fix: add batch_size support to prevent embedder token limit errors"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/7122a29a20a32f3867787cc19031c67cda1b5ca3",
+      "committed_at": "2025-03-10T12:08:43-04:00",
+      "defect_id": "CREWAIINC-CREWAI-E356CA9140AB",
+      "evidence": [
+        {
+          "evidence_id": "7122a29a20a3-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/7122a29a20a32f3867787cc19031c67cda1b5ca3",
+          "revision": "7122a29a20a32f3867787cc19031c67cda1b5ca3"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "7122a29a20a32f3867787cc19031c67cda1b5ca3",
+      "selection_rank": "0d731b17372155fb39bce0fe274a1b70ffd7c08fae023c9e21c600cdf6327241",
+      "source_kind": "fixing_commit",
+      "title": "fix mistral issues (#2308)"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/baf91d8f0a15103d39e3cb87aafbb3d31229b600",
+      "committed_at": "2026-04-16T11:01:59-07:00",
+      "defect_id": "CREWAIINC-CREWAI-EB022D82C64B",
+      "evidence": [
+        {
+          "evidence_id": "baf91d8f0a15-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/baf91d8f0a15103d39e3cb87aafbb3d31229b600",
+          "revision": "baf91d8f0a15103d39e3cb87aafbb3d31229b600"
+        }
+      ],
+      "partition": "validation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "baf91d8f0a15103d39e3cb87aafbb3d31229b600",
+      "selection_rank": "037bb4e656b80a9164038625d02cc131ff3f06c433f8802ecd4ad474528255ae",
+      "source_kind": "fixing_commit",
+      "title": "fix: update broken enterprise link on installation page (OSS-36) (#5443)"
+    },
+    {
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/887adafd2c569606816f3a8d356128ff6af9ffef",
+      "committed_at": "2026-06-12T12:55:22-04:00",
+      "defect_id": "CREWAIINC-CREWAI-EEDC3C0811C8",
+      "evidence": [
+        {
+          "evidence_id": "887adafd2c56-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/887adafd2c569606816f3a8d356128ff6af9ffef",
+          "revision": "887adafd2c569606816f3a8d356128ff6af9ffef"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "crewAIInc/crewAI",
+      "revision": "887adafd2c569606816f3a8d356128ff6af9ffef",
+      "selection_rank": "0502eb9966f188aab5ce6d5a4f2a93b3cc80d69e79fe2ad620685400bf42b102",
+      "source_kind": "fixing_commit",
+      "title": "fix: aggregate token usage across all LLM calls (#6122)"
+    },
+    {
+      "canonical_locator": "https://github.com/freezetheflame/NanoHarness/commit/43fd031f3d89becdd6b2c293d4ca84f1ad04ca65",
+      "committed_at": "2026-05-14T09:15:06+08:00",
+      "defect_id": "FREEZETHEFLAME-NANOHARNESS-35B5B7782B53",
+      "evidence": [
+        {
+          "evidence_id": "43fd031f3d89-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/freezetheflame/NanoHarness/commit/43fd031f3d89becdd6b2c293d4ca84f1ad04ca65",
+          "revision": "43fd031f3d89becdd6b2c293d4ca84f1ad04ca65"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "freezetheflame/NanoHarness",
+      "revision": "43fd031f3d89becdd6b2c293d4ca84f1ad04ca65",
+      "selection_rank": "985f5257806959ce70e3e13cfe4a02f8e1c412351d2e15d683d34188978f2030",
+      "source_kind": "fixing_commit",
+      "title": "fix input error in llm request json"
+    },
+    {
+      "canonical_locator": "https://github.com/freezetheflame/NanoHarness/commit/ddf582b12ff151f56d7ebab89eac9046275e7f1e",
+      "committed_at": "2026-04-18T22:37:21+08:00",
+      "defect_id": "FREEZETHEFLAME-NANOHARNESS-ECE647477872",
+      "evidence": [
+        {
+          "evidence_id": "ddf582b12ff1-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/freezetheflame/NanoHarness/commit/ddf582b12ff151f56d7ebab89eac9046275e7f1e",
+          "revision": "ddf582b12ff151f56d7ebab89eac9046275e7f1e"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "freezetheflame/NanoHarness",
+      "revision": "ddf582b12ff151f56d7ebab89eac9046275e7f1e",
+      "selection_rank": "4342762fe11e70e6be94184a57bdc19ae6e2bb46df1411895dc38ef7987cb5c7",
+      "source_kind": "fixing_commit",
+      "title": "fix coding agent example"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/3c75e414e5d4472ba5e6c747675cc23804ab23e8",
+      "committed_at": "2025-11-04T14:38:40-08:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-0182B80F458A",
+      "evidence": [
+        {
+          "evidence_id": "3c75e414e5d4-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/3c75e414e5d4472ba5e6c747675cc23804ab23e8",
+          "revision": "3c75e414e5d4472ba5e6c747675cc23804ab23e8"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "3c75e414e5d4472ba5e6c747675cc23804ab23e8",
+      "selection_rank": "02d4b8ae00224df54486e50a9119f53bc745f2f7fbfdc8bc9041a25dd4ea8666",
+      "source_kind": "fixing_commit",
+      "title": "fix(langgraph): do not apply pending writes when updating state (#6389)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/df191731918482c5eaf2934a2df0c9cb3571db0c",
+      "committed_at": "2025-12-10T19:02:36Z",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-06C154D70011",
+      "evidence": [
+        {
+          "evidence_id": "df1917319184-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/df191731918482c5eaf2934a2df0c9cb3571db0c",
+          "revision": "df191731918482c5eaf2934a2df0c9cb3571db0c"
+        }
+      ],
+      "partition": "validation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "df191731918482c5eaf2934a2df0c9cb3571db0c",
+      "selection_rank": "001cd2e9de4fd7ee01d88e002390b30b11fa2bee1df07d9515a0ca5196ee0701",
+      "source_kind": "fixing_commit",
+      "title": "fix: update readme (#6570)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/520de30350e8e15ae21bb5017898a6416b2f573b",
+      "committed_at": "2025-03-26T16:42:21-04:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-085B26BD19F0",
+      "evidence": [
+        {
+          "evidence_id": "520de30350e8-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/520de30350e8e15ae21bb5017898a6416b2f573b",
+          "revision": "520de30350e8e15ae21bb5017898a6416b2f573b"
+        }
+      ],
+      "partition": "validation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "520de30350e8e15ae21bb5017898a6416b2f573b",
+      "selection_rank": "02fca9293562332beaebe5a1aad6734e0362f4e66829c473e7a696c1827eeedf",
+      "source_kind": "fixing_commit",
+      "title": "langgraph: fix interrupt deserialization in RemoteGraph (#4040)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/36b6cd1493c01c8e6a32f611a1ec2c26c2e8f902",
+      "committed_at": "2024-12-02T18:20:19-08:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-0C116E758515",
+      "evidence": [
+        {
+          "evidence_id": "36b6cd1493c0-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/36b6cd1493c01c8e6a32f611a1ec2c26c2e8f902",
+          "revision": "36b6cd1493c01c8e6a32f611a1ec2c26c2e8f902"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "36b6cd1493c01c8e6a32f611a1ec2c26c2e8f902",
+      "selection_rank": "050f054bc088758d1c840adc04f23f318d3a2d68ef6b3232dc87637e20e7127b",
+      "source_kind": "fixing_commit",
+      "title": "fix: Handle empty store similarity (numpy) (#2602)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/470718381407f1d8a7d23ab684eac370e138f2c6",
+      "committed_at": "2024-04-22T09:56:30-07:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-1D85698F2DE2",
+      "evidence": [
+        {
+          "evidence_id": "470718381407-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/470718381407f1d8a7d23ab684eac370e138f2c6",
+          "revision": "470718381407f1d8a7d23ab684eac370e138f2c6"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "470718381407f1d8a7d23ab684eac370e138f2c6",
+      "selection_rank": "039faec976778f1e2101dbffa176bcc9c07672937c00f0017f9b1b555947fa85",
+      "source_kind": "fixing_commit",
+      "title": "Merge pull request #336 from langchain-ai/nc/22apr/fix-repeat-conditions"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/c87f9ab6b12be70e8421fa9fa3cd995b037454e3",
+      "committed_at": "2024-11-27T22:31:03-08:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-2CCC5002E185",
+      "evidence": [
+        {
+          "evidence_id": "c87f9ab6b12b-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/c87f9ab6b12be70e8421fa9fa3cd995b037454e3",
+          "revision": "c87f9ab6b12be70e8421fa9fa3cd995b037454e3"
+        }
+      ],
+      "partition": "validation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "c87f9ab6b12be70e8421fa9fa3cd995b037454e3",
+      "selection_rank": "03e0042c5ce6919621223aae6b583c066de1c6ae150962a5effb04d4f25f4cc7",
+      "source_kind": "fixing_commit",
+      "title": "Fix sentence fragment (#2566)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/151a38d6e93ef4f4655ca921f9dbe29f8a9669a9",
+      "committed_at": "2024-04-17T15:38:20-07:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-2F6D38B47498",
+      "evidence": [
+        {
+          "evidence_id": "151a38d6e93e-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/151a38d6e93ef4f4655ca921f9dbe29f8a9669a9",
+          "revision": "151a38d6e93ef4f4655ca921f9dbe29f8a9669a9"
+        }
+      ],
+      "partition": "validation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "151a38d6e93ef4f4655ca921f9dbe29f8a9669a9",
+      "selection_rank": "01859d13a51e804a8c2372f5e10b0c19cee03cbb7989544be15f7b0c19bf1d35",
+      "source_kind": "fixing_commit",
+      "title": "Merge pull request #320 from langchain-ai/nc/17apr/fix-stream-events"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/be088801baa2a5271e035db91d64dc72a727fbc7",
+      "committed_at": "2025-07-21T14:25:37-04:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-32E290AB59E2",
+      "evidence": [
+        {
+          "evidence_id": "be088801baa2-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/be088801baa2a5271e035db91d64dc72a727fbc7",
+          "revision": "be088801baa2a5271e035db91d64dc72a727fbc7"
+        }
+      ],
+      "partition": "validation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "be088801baa2a5271e035db91d64dc72a727fbc7",
+      "selection_rank": "05bab879550ac67bb174057e73848a24e426090d6088c5f3de3a6cdfca92f144",
+      "source_kind": "fixing_commit",
+      "title": "fix(langgraph): fix assertion in test (#5606)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/a1b34efdb00002cd31838cf92aa84a66a7fa3cb8",
+      "committed_at": "2025-11-07T11:42:15-05:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-37CF01E19507",
+      "evidence": [
+        {
+          "evidence_id": "a1b34efdb000-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/a1b34efdb00002cd31838cf92aa84a66a7fa3cb8",
+          "revision": "a1b34efdb00002cd31838cf92aa84a66a7fa3cb8"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "a1b34efdb00002cd31838cf92aa84a66a7fa3cb8",
+      "selection_rank": "023ca97872bcb4d07a74aff2f4a8f4a72c88759f2b4dec0c32e807fddac4fd2f",
+      "source_kind": "fixing_commit",
+      "title": "fix(checkpoint-postgres): ensure vector extension is created only if not exists (#6154)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/19ca6b416bd317346f4d0f5b472dea3fd39af0f0",
+      "committed_at": "2025-05-27T17:42:20Z",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-3A0A8FCFB120",
+      "evidence": [
+        {
+          "evidence_id": "19ca6b416bd3-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/19ca6b416bd317346f4d0f5b472dea3fd39af0f0",
+          "revision": "19ca6b416bd317346f4d0f5b472dea3fd39af0f0"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "19ca6b416bd317346f4d0f5b472dea3fd39af0f0",
+      "selection_rank": "0293cd2d6eed1f5fb326070dc129a41dfefe7f9c164b3dce4a8c1964d10fba9c",
+      "source_kind": "fixing_commit",
+      "title": "fix: `post_model_hook` should inject state + store into tool calls if necessary (#4842)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/e3a30a9b69ca7ca83740c420280c04fbdbeec45c",
+      "committed_at": "2024-11-19T09:42:20-05:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-472044FDBEB7",
+      "evidence": [
+        {
+          "evidence_id": "e3a30a9b69ca-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/e3a30a9b69ca7ca83740c420280c04fbdbeec45c",
+          "revision": "e3a30a9b69ca7ca83740c420280c04fbdbeec45c"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "e3a30a9b69ca7ca83740c420280c04fbdbeec45c",
+      "selection_rank": "06816c6d981f3ed286bb8b5e701574b2164da8237174b0cc1c25e1eaf66b9c47",
+      "source_kind": "fixing_commit",
+      "title": "docs: fix prompt (#2467)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/57b314c5d7d0046a89d31db77ccbfc9c5e57be09",
+      "committed_at": "2026-04-02T11:19:24-04:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-58B8EA28E2D3",
+      "evidence": [
+        {
+          "evidence_id": "57b314c5d7d0-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/57b314c5d7d0046a89d31db77ccbfc9c5e57be09",
+          "revision": "57b314c5d7d0046a89d31db77ccbfc9c5e57be09"
+        }
+      ],
+      "partition": "validation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "57b314c5d7d0046a89d31db77ccbfc9c5e57be09",
+      "selection_rank": "068464778175fd8b07b00a01ca085cf49d1b13e2d03aa42b8dcdff4a8bc9b362",
+      "source_kind": "fixing_commit",
+      "title": "fix: tool node injection bug (#7391)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/b6cc0228616c71586a1e9b29225a8ed4d4f32c38",
+      "committed_at": "2025-12-02T11:47:41-08:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-5EE53C71D22E",
+      "evidence": [
+        {
+          "evidence_id": "b6cc0228616c-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/b6cc0228616c71586a1e9b29225a8ed4d4f32c38",
+          "revision": "b6cc0228616c71586a1e9b29225a8ed4d4f32c38"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "b6cc0228616c71586a1e9b29225a8ed4d4f32c38",
+      "selection_rank": "03d01e04b4806e1131519dfc0db90237f5d0956654dd77c39e68f0933026e36d",
+      "source_kind": "fixing_commit",
+      "title": "fix(checkpoint): InMemorySaver context managers should return self in… (#6529)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/3dac1894cc051cf3e75851ce206aa1a1fae6d13d",
+      "committed_at": "2025-02-20T21:28:02+01:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-68228EF073F3",
+      "evidence": [
+        {
+          "evidence_id": "3dac1894cc05-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/3dac1894cc051cf3e75851ce206aa1a1fae6d13d",
+          "revision": "3dac1894cc051cf3e75851ce206aa1a1fae6d13d"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "3dac1894cc051cf3e75851ce206aa1a1fae6d13d",
+      "selection_rank": "0189596a1bf406c70a6423e603d05d81f76f14dcb84eee9cba616615965b9dff",
+      "source_kind": "fixing_commit",
+      "title": "fix(react): handle non-concatenable messages (#3536)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/18887e9f86a6d8675a2b4aed03a1c190ef6e1581",
+      "committed_at": "2025-07-31T09:15:03-04:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-68483D6E7574",
+      "evidence": [
+        {
+          "evidence_id": "18887e9f86a6-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/18887e9f86a6d8675a2b4aed03a1c190ef6e1581",
+          "revision": "18887e9f86a6d8675a2b4aed03a1c190ef6e1581"
+        }
+      ],
+      "partition": "validation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "18887e9f86a6d8675a2b4aed03a1c190ef6e1581",
+      "selection_rank": "033d3d8fb53cde7d36e64fcf4ec5536a2c0100bbebe3a7a1c9191ed2a56161e2",
+      "source_kind": "fixing_commit",
+      "title": "fix(langgraph): Remove duplicate call to ensure_config (#5768)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/0b6a9e345d3301705e884857d6710a1a84a8edaa",
+      "committed_at": "2025-07-11T01:39:59Z",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-6B253E912DAC",
+      "evidence": [
+        {
+          "evidence_id": "0b6a9e345d33-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/0b6a9e345d3301705e884857d6710a1a84a8edaa",
+          "revision": "0b6a9e345d3301705e884857d6710a1a84a8edaa"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "0b6a9e345d3301705e884857d6710a1a84a8edaa",
+      "selection_rank": "0473118a53b92f263d5886df294fc9c9ca63a5c66e55e85cfa0b810592e68988",
+      "source_kind": "fixing_commit",
+      "title": "fix(langgraph): replace _state_schema to state_schema when accessing StateGraph (#5436)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/30598cd9139cbe9e74890cd2f08657c5697703de",
+      "committed_at": "2024-08-30T01:50:14Z",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-8F1BDAD55A9B",
+      "evidence": [
+        {
+          "evidence_id": "30598cd9139c-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/30598cd9139cbe9e74890cd2f08657c5697703de",
+          "revision": "30598cd9139cbe9e74890cd2f08657c5697703de"
+        }
+      ],
+      "partition": "validation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "30598cd9139cbe9e74890cd2f08657c5697703de",
+      "selection_rank": "01af92ccd1059be17ec2b90f96a70d9aba4ab9c171a1ad0747b956dbfd450eae",
+      "source_kind": "fixing_commit",
+      "title": "docs: fix images in structured react agent (#1544)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/8daeb561946bbe2d1e507db451aefe2097f346e3",
+      "committed_at": "2024-08-14T10:08:26-04:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-9458C5809A2D",
+      "evidence": [
+        {
+          "evidence_id": "8daeb561946b-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/8daeb561946bbe2d1e507db451aefe2097f346e3",
+          "revision": "8daeb561946bbe2d1e507db451aefe2097f346e3"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "8daeb561946bbe2d1e507db451aefe2097f346e3",
+      "selection_rank": "054e00fafc671de2905461856cd96264c8bcce22dc09b642c8ddac78687b3d1e",
+      "source_kind": "fixing_commit",
+      "title": "Fix typo in documentation: corrected 'they agent's' to 'their agent's' (#1338)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/d6c6516f16efdaab726b82e26b72b6a78ed61925",
+      "committed_at": "2024-12-19T15:29:10-05:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-9588EEF71CEB",
+      "evidence": [
+        {
+          "evidence_id": "d6c6516f16ef-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/d6c6516f16efdaab726b82e26b72b6a78ed61925",
+          "revision": "d6c6516f16efdaab726b82e26b72b6a78ed61925"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "d6c6516f16efdaab726b82e26b72b6a78ed61925",
+      "selection_rank": "060079e72607605b5029b62b3e6ac2db1ba6344cee28409eecfa8954892331fe",
+      "source_kind": "fixing_commit",
+      "title": "fix: minor modification, syntax error (#1905)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/e3cb2dd23b1dd95cc1450868f501f49fa03c72bf",
+      "committed_at": "2025-07-31T22:57:44-04:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-A9CD7093EC81",
+      "evidence": [
+        {
+          "evidence_id": "e3cb2dd23b1d-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/e3cb2dd23b1dd95cc1450868f501f49fa03c72bf",
+          "revision": "e3cb2dd23b1dd95cc1450868f501f49fa03c72bf"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "e3cb2dd23b1dd95cc1450868f501f49fa03c72bf",
+      "selection_rank": "04d40f083987dfd596434d2848e640931819ac9c48ca34389cae20fb0bbb9cf1",
+      "source_kind": "fixing_commit",
+      "title": "chore(docs): fix more admonitions (#5792)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/220f9aaaabeca0a5a8d98697713f2c5fa59f58b3",
+      "committed_at": "2025-05-09T16:48:13-04:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-BDC1553450B9",
+      "evidence": [
+        {
+          "evidence_id": "220f9aaaabec-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/220f9aaaabeca0a5a8d98697713f2c5fa59f58b3",
+          "revision": "220f9aaaabeca0a5a8d98697713f2c5fa59f58b3"
+        }
+      ],
+      "partition": "validation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "220f9aaaabeca0a5a8d98697713f2c5fa59f58b3",
+      "selection_rank": "015a6aae718f797f16248ee0e6c87c1ad87ee225a50f033b0ebe696ac3fa8d50",
+      "source_kind": "fixing_commit",
+      "title": "docs: fix formatting in overview for getting started tutorial (#4639)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/460c52290218e06a3d228d58b6e8dd0837184b4a",
+      "committed_at": "2025-03-18T17:58:30-04:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-C2ABDDA05120",
+      "evidence": [
+        {
+          "evidence_id": "460c52290218-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/460c52290218e06a3d228d58b6e8dd0837184b4a",
+          "revision": "460c52290218e06a3d228d58b6e8dd0837184b4a"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "460c52290218e06a3d228d58b6e8dd0837184b4a",
+      "selection_rank": "003fa559b5762874f883ff183de852ea130acd585f9794f50ed6c57359e68713",
+      "source_kind": "fixing_commit",
+      "title": "docs: fix typo (#3856)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/a15f542a1f235a4b8622f958403971295df5fa8f",
+      "committed_at": "2025-08-13T19:33:20+01:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-D5AA932E0F0D",
+      "evidence": [
+        {
+          "evidence_id": "a15f542a1f23-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/a15f542a1f235a4b8622f958403971295df5fa8f",
+          "revision": "a15f542a1f235a4b8622f958403971295df5fa8f"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "a15f542a1f235a4b8622f958403971295df5fa8f",
+      "selection_rank": "02504293024c7029f968ec00bc93c76a57cf78141c55c0ccaab967d5e8cce166",
+      "source_kind": "fixing_commit",
+      "title": "fix: Persist resume_map values (#5898)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/217795eb7272e9a077a3e2a23a99423bd88d2991",
+      "committed_at": "2025-05-15T13:37:40-07:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-D7C1D86F1B2E",
+      "evidence": [
+        {
+          "evidence_id": "217795eb7272-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/217795eb7272e9a077a3e2a23a99423bd88d2991",
+          "revision": "217795eb7272e9a077a3e2a23a99423bd88d2991"
+        }
+      ],
+      "partition": "validation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "217795eb7272e9a077a3e2a23a99423bd88d2991",
+      "selection_rank": "033bc4305740236af6adecce242c1732b01d8d616cbd3351c1c0541d6ea791f6",
+      "source_kind": "fixing_commit",
+      "title": "docs: fix broken img (#4716)"
+    },
+    {
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/f087567853829e0c3a3e608e2cd5501a97aaefac",
+      "committed_at": "2025-09-10T14:31:07-04:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-DF5A13F34BDC",
+      "evidence": [
+        {
+          "evidence_id": "f08756785382-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/f087567853829e0c3a3e608e2cd5501a97aaefac",
+          "revision": "f087567853829e0c3a3e608e2cd5501a97aaefac"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "langchain-ai/langgraph",
+      "revision": "f087567853829e0c3a3e608e2cd5501a97aaefac",
+      "selection_rank": "01211fb53cb3a475d1d6c6deec1ce7b48e6fc82a8da279618d1beaafdcb3dd1d",
+      "source_kind": "fixing_commit",
+      "title": "fix(cli): handle Docker SemVer build metadata in version parsing #5965 (#6024)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/de757707bcaaedfb62d90a78977d79e3b983671e",
+      "committed_at": "2024-03-04T14:44:41Z",
+      "defect_id": "MICROSOFT-AUTOGEN-06029DF804F5",
+      "evidence": [
+        {
+          "evidence_id": "de757707bcaa-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/de757707bcaaedfb62d90a78977d79e3b983671e",
+          "revision": "de757707bcaaedfb62d90a78977d79e3b983671e"
+        }
+      ],
+      "partition": "validation",
+      "repository": "microsoft/autogen",
+      "revision": "de757707bcaaedfb62d90a78977d79e3b983671e",
+      "selection_rank": "010a587286236fe435a8388ff9776116c2f48603be4a013fa32dd1354afc5b9d",
+      "source_kind": "fixing_commit",
+      "title": "Upgrade quarto and include mitigation for title issue, fix links (#1851)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/c930251ebc9547c9f744ecc08965ae1cfa6803bc",
+      "committed_at": "2025-01-28T09:24:16-05:00",
+      "defect_id": "MICROSOFT-AUTOGEN-10A44C35EBC4",
+      "evidence": [
+        {
+          "evidence_id": "c930251ebc95-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/c930251ebc9547c9f744ecc08965ae1cfa6803bc",
+          "revision": "c930251ebc9547c9f744ecc08965ae1cfa6803bc"
+        }
+      ],
+      "partition": "validation",
+      "repository": "microsoft/autogen",
+      "revision": "c930251ebc9547c9f744ecc08965ae1cfa6803bc",
+      "selection_rank": "03cee8be90554c0421f9ad74ae456e8982dbfd3a8ec9c5fc57f3303a6d93fc92",
+      "source_kind": "fixing_commit",
+      "title": "fix: Increase MethodGroup type precision"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/5861bd92a6813a47a7ceaf391c4d5871d71a14ff",
+      "committed_at": "2024-08-28T18:47:39Z",
+      "defect_id": "MICROSOFT-AUTOGEN-1A55A455930E",
+      "evidence": [
+        {
+          "evidence_id": "5861bd92a681-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/5861bd92a6813a47a7ceaf391c4d5871d71a14ff",
+          "revision": "5861bd92a6813a47a7ceaf391c4d5871d71a14ff"
+        }
+      ],
+      "partition": "validation",
+      "repository": "microsoft/autogen",
+      "revision": "5861bd92a6813a47a7ceaf391c4d5871d71a14ff",
+      "selection_rank": "0802ccf393236ff53ffeaf8f832f280567b42a162585827510c14c6269e1bb58",
+      "source_kind": "fixing_commit",
+      "title": "fix: tool calling cohere (#3355)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/6c8b656588cc3b99ff1e9d5fcf2d545068f02f2b",
+      "committed_at": "2024-11-25T16:07:45-05:00",
+      "defect_id": "MICROSOFT-AUTOGEN-1EB93F23C63B",
+      "evidence": [
+        {
+          "evidence_id": "6c8b656588cc-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/6c8b656588cc3b99ff1e9d5fcf2d545068f02f2b",
+          "revision": "6c8b656588cc3b99ff1e9d5fcf2d545068f02f2b"
+        }
+      ],
+      "partition": "validation",
+      "repository": "microsoft/autogen",
+      "revision": "6c8b656588cc3b99ff1e9d5fcf2d545068f02f2b",
+      "selection_rank": "0240801dfe9f7ca117426c4a185018ef7a3985a9167eee9da9cb54eaa224a467",
+      "source_kind": "fixing_commit",
+      "title": "Fix examples in docstrings (#4356)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/aa0d835f4dd966f45bcd5d0fa354f88993ee70bc",
+      "committed_at": "2025-07-06T03:42:59Z",
+      "defect_id": "MICROSOFT-AUTOGEN-1FE3CE06F15B",
+      "evidence": [
+        {
+          "evidence_id": "aa0d835f4dd9-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/aa0d835f4dd966f45bcd5d0fa354f88993ee70bc",
+          "revision": "aa0d835f4dd966f45bcd5d0fa354f88993ee70bc"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "microsoft/autogen",
+      "revision": "aa0d835f4dd966f45bcd5d0fa354f88993ee70bc",
+      "selection_rank": "08e3fd16da617192b6565ed162e00d9c2055e9c9677e209b19f8bb3a61a4b689",
+      "source_kind": "fixing_commit",
+      "title": "Fix function calling support for Llama3.3 (#6750)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/b0f42a1bd415f1cb9759aacb8405adb11cb6115b",
+      "committed_at": "2024-02-02T16:27:13Z",
+      "defect_id": "MICROSOFT-AUTOGEN-25828CF6C797",
+      "evidence": [
+        {
+          "evidence_id": "b0f42a1bd415-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/b0f42a1bd415f1cb9759aacb8405adb11cb6115b",
+          "revision": "b0f42a1bd415f1cb9759aacb8405adb11cb6115b"
+        }
+      ],
+      "partition": "validation",
+      "repository": "microsoft/autogen",
+      "revision": "b0f42a1bd415f1cb9759aacb8405adb11cb6115b",
+      "selection_rank": "06efd85a0e0f3967a2247dab293819f49ae4b5f7822d87ace9643810613bb299",
+      "source_kind": "fixing_commit",
+      "title": "Fix tests for GPT assistant (#1505)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/83f9f3e73336fbad4d441e3db16c3a94a78d9443",
+      "committed_at": "2024-05-01T18:05:45Z",
+      "defect_id": "MICROSOFT-AUTOGEN-4AE8B72F6FF7",
+      "evidence": [
+        {
+          "evidence_id": "83f9f3e73336-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/83f9f3e73336fbad4d441e3db16c3a94a78d9443",
+          "revision": "83f9f3e73336fbad4d441e3db16c3a94a78d9443"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "microsoft/autogen",
+      "revision": "83f9f3e73336fbad4d441e3db16c3a94a78d9443",
+      "selection_rank": "0b779c2aa9866144ea8c09588b33dd0fff263a69212d6824ade71225228eed1d",
+      "source_kind": "fixing_commit",
+      "title": "Fix chroma import error (#2557)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/e83301ed187fa1695934069118e856c2331e7c19",
+      "committed_at": "2024-04-04T14:36:46Z",
+      "defect_id": "MICROSOFT-AUTOGEN-5B5000568D6B",
+      "evidence": [
+        {
+          "evidence_id": "e83301ed187f-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/e83301ed187fa1695934069118e856c2331e7c19",
+          "revision": "e83301ed187fa1695934069118e856c2331e7c19"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "microsoft/autogen",
+      "revision": "e83301ed187fa1695934069118e856c2331e7c19",
+      "selection_rank": "0983ba3c76612e0b5e23acd4c951a91159cef55580eebd7905e889e62d004252",
+      "source_kind": "fixing_commit",
+      "title": "fix logging cost flaky test (#2277)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/d999b452e8bee8178e7486cd6a41ecd1f41059cd",
+      "committed_at": "2024-02-05T15:29:25Z",
+      "defect_id": "MICROSOFT-AUTOGEN-5F876512E45E",
+      "evidence": [
+        {
+          "evidence_id": "d999b452e8be-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/d999b452e8bee8178e7486cd6a41ecd1f41059cd",
+          "revision": "d999b452e8bee8178e7486cd6a41ecd1f41059cd"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "microsoft/autogen",
+      "revision": "d999b452e8bee8178e7486cd6a41ecd1f41059cd",
+      "selection_rank": "07b544c33f3c7044de9e0658d22ff805531533d06b8b0ef7c3cb7c309ddda66d",
+      "source_kind": "fixing_commit",
+      "title": "Fix formatting of notebook contributing.md (#1540)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/e32f4193870b280537ad318fc5ec89aa13d754fe",
+      "committed_at": "2025-03-08T22:28:11-08:00",
+      "defect_id": "MICROSOFT-AUTOGEN-623C635D5A11",
+      "evidence": [
+        {
+          "evidence_id": "e32f4193870b-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/e32f4193870b280537ad318fc5ec89aa13d754fe",
+          "revision": "e32f4193870b280537ad318fc5ec89aa13d754fe"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "microsoft/autogen",
+      "revision": "e32f4193870b280537ad318fc5ec89aa13d754fe",
+      "selection_rank": "0a036948fb2205b1cd61d9b07bd93fce0a9a6f0b1a0f1676798f87d352769c91",
+      "source_kind": "fixing_commit",
+      "title": "Fix span structure for tracing (#5853)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/c620683ba640fd8e64f133cd3b374521d3e22c39",
+      "committed_at": "2025-04-01T07:44:49Z",
+      "defect_id": "MICROSOFT-AUTOGEN-6EF6213DAE38",
+      "evidence": [
+        {
+          "evidence_id": "c620683ba640-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/c620683ba640fd8e64f133cd3b374521d3e22c39",
+          "revision": "c620683ba640fd8e64f133cd3b374521d3e22c39"
+        }
+      ],
+      "partition": "validation",
+      "repository": "microsoft/autogen",
+      "revision": "c620683ba640fd8e64f133cd3b374521d3e22c39",
+      "selection_rank": "010f551a78df1e411e0a29cd0ef1b4588288bf702cfaf3a03aa2ba1b171fc65d",
+      "source_kind": "fixing_commit",
+      "title": "fix: the installation instruction had a missing step (#6166)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/20f8ba9cfae4a3c70c3131d4f14bf14ba4dc5ced",
+      "committed_at": "2024-06-21T18:52:23Z",
+      "defect_id": "MICROSOFT-AUTOGEN-78E69889C9F1",
+      "evidence": [
+        {
+          "evidence_id": "20f8ba9cfae4-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/20f8ba9cfae4a3c70c3131d4f14bf14ba4dc5ced",
+          "revision": "20f8ba9cfae4a3c70c3131d4f14bf14ba4dc5ced"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "microsoft/autogen",
+      "revision": "20f8ba9cfae4a3c70c3131d4f14bf14ba4dc5ced",
+      "selection_rank": "090be7f170d1bd0b256cc201e29f9c829af25b2015716c917a13a79844977f08",
+      "source_kind": "fixing_commit",
+      "title": "fix: created in ChatCompletion for clients (#2988)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/eec854279a7a36b0b39e37f100f91ec13bafaa26",
+      "committed_at": "2024-04-02T05:17:13Z",
+      "defect_id": "MICROSOFT-AUTOGEN-86292287626C",
+      "evidence": [
+        {
+          "evidence_id": "eec854279a7a-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/eec854279a7a36b0b39e37f100f91ec13bafaa26",
+          "revision": "eec854279a7a36b0b39e37f100f91ec13bafaa26"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "microsoft/autogen",
+      "revision": "eec854279a7a36b0b39e37f100f91ec13bafaa26",
+      "selection_rank": "068474d462765820950aaccba7ab71e96ee243b40adcfd67704c61cca15a44f8",
+      "source_kind": "fixing_commit",
+      "title": "Fix unstructured deps installation error (#2248)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/b868e32b05791ef4c7693339473414ebc6f89d24",
+      "committed_at": "2025-02-09T14:39:19+10:00",
+      "defect_id": "MICROSOFT-AUTOGEN-864AA4594BF8",
+      "evidence": [
+        {
+          "evidence_id": "b868e32b0579-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/b868e32b05791ef4c7693339473414ebc6f89d24",
+          "revision": "b868e32b05791ef4c7693339473414ebc6f89d24"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "microsoft/autogen",
+      "revision": "b868e32b05791ef4c7693339473414ebc6f89d24",
+      "selection_rank": "0358b6719da8d2b65712f11ef6b27dcff9d58f5f9559f5ede672c3b43384cba9",
+      "source_kind": "fixing_commit",
+      "title": "fix: update SK adapter stream tool call processing. (#5449)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/fef953e062bf37d95eaec299756c8a15adcce054",
+      "committed_at": "2025-03-20T11:53:53-07:00",
+      "defect_id": "MICROSOFT-AUTOGEN-8C56CF8FA3CF",
+      "evidence": [
+        {
+          "evidence_id": "fef953e062bf-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/fef953e062bf37d95eaec299756c8a15adcce054",
+          "revision": "fef953e062bf37d95eaec299756c8a15adcce054"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "microsoft/autogen",
+      "revision": "fef953e062bf37d95eaec299756c8a15adcce054",
+      "selection_rank": "050c506dac1f7eea43d26b2efdb3a39caadecc55fa91c4f053ba5511a743a960",
+      "source_kind": "fixing_commit",
+      "title": "Fix bytes in markdown converter playwright (#6044)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/db287183f2ec9a3e58021da6f6048c15f31d94b5",
+      "committed_at": "2024-10-01T21:53:25Z",
+      "defect_id": "MICROSOFT-AUTOGEN-93657DE5BA24",
+      "evidence": [
+        {
+          "evidence_id": "db287183f2ec-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/db287183f2ec9a3e58021da6f6048c15f31d94b5",
+          "revision": "db287183f2ec9a3e58021da6f6048c15f31d94b5"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "microsoft/autogen",
+      "revision": "db287183f2ec9a3e58021da6f6048c15f31d94b5",
+      "selection_rank": "0ae77c1825d834081383e9871537fb1bf772939acba0a1053ecb485e5455d29f",
+      "source_kind": "fixing_commit",
+      "title": "Disable Azure tests and fix open ai tests (#3587)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/44640e29a37abc7d69ff67a2058b18d088eafc70",
+      "committed_at": "2024-11-17T12:04:55-08:00",
+      "defect_id": "MICROSOFT-AUTOGEN-9D8F5F3B62A1",
+      "evidence": [
+        {
+          "evidence_id": "44640e29a37a-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/44640e29a37abc7d69ff67a2058b18d088eafc70",
+          "revision": "44640e29a37abc7d69ff67a2058b18d088eafc70"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "microsoft/autogen",
+      "revision": "44640e29a37abc7d69ff67a2058b18d088eafc70",
+      "selection_rank": "095f1a9bc375b01a4e808b0382e7b559fcbce7c8e9aea9a86470ac8e5bc2ccbf",
+      "source_kind": "fixing_commit",
+      "title": "Fix Import Issue in AGS, Remove InnerMessage import from agentchat.messages (#4246)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/501f8d22726e687c55052682c20c97ce62f018ac",
+      "committed_at": "2024-03-19T03:27:00Z",
+      "defect_id": "MICROSOFT-AUTOGEN-C025039423FB",
+      "evidence": [
+        {
+          "evidence_id": "501f8d22726e-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/501f8d22726e687c55052682c20c97ce62f018ac",
+          "revision": "501f8d22726e687c55052682c20c97ce62f018ac"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "microsoft/autogen",
+      "revision": "501f8d22726e687c55052682c20c97ce62f018ac",
+      "selection_rank": "04d7a37fa0b4a413b79ca5884952ffd67921d668f57a2dbc0cfbaceaa57a6515",
+      "source_kind": "fixing_commit",
+      "title": "Fix typo in conversation-patterns.ipynb (#2066)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/ac74305913e4b06f44a85e0c9097b2f4dc131312",
+      "committed_at": "2025-02-05T20:17:24-08:00",
+      "defect_id": "MICROSOFT-AUTOGEN-C03E9EB5C672",
+      "evidence": [
+        {
+          "evidence_id": "ac74305913e4-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/ac74305913e4b06f44a85e0c9097b2f4dc131312",
+          "revision": "ac74305913e4b06f44a85e0c9097b2f4dc131312"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "microsoft/autogen",
+      "revision": "ac74305913e4b06f44a85e0c9097b2f4dc131312",
+      "selection_rank": "025f03c3a34f706a2fa901fc26128d79f8660a978e5e318c9d569f392180f4c7",
+      "source_kind": "fixing_commit",
+      "title": "Ensure decriptions appear each on one line. Fix web_surfer's desc (#5390)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/0a314c17c78070402089f02c195ea755f9ef4c30",
+      "committed_at": "2025-04-04T15:00:56-07:00",
+      "defect_id": "MICROSOFT-AUTOGEN-CD83AD319253",
+      "evidence": [
+        {
+          "evidence_id": "0a314c17c780-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/0a314c17c78070402089f02c195ea755f9ef4c30",
+          "revision": "0a314c17c78070402089f02c195ea755f9ef4c30"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "microsoft/autogen",
+      "revision": "0a314c17c78070402089f02c195ea755f9ef4c30",
+      "selection_rank": "05a450639bd883d3564025c0bffcbacc576457b45fa1f663a9ac997ba3e5b33d",
+      "source_kind": "fixing_commit",
+      "title": "fix autostudio dabase jsons. (#6183)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/bfcbb630172b673f6320f8823dd514042279ca19",
+      "committed_at": "2024-03-06T15:41:40Z",
+      "defect_id": "MICROSOFT-AUTOGEN-DACBD27A78A4",
+      "evidence": [
+        {
+          "evidence_id": "bfcbb630172b-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/bfcbb630172b673f6320f8823dd514042279ca19",
+          "revision": "bfcbb630172b673f6320f8823dd514042279ca19"
+        }
+      ],
+      "partition": "validation",
+      "repository": "microsoft/autogen",
+      "revision": "bfcbb630172b673f6320f8823dd514042279ca19",
+      "selection_rank": "0947815a73e93165d9a56952a1f7128bca721b30bf49ff4b65a6e809463cdd3f",
+      "source_kind": "fixing_commit",
+      "title": "fix: update the docs link (#1879)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/811fd6926d7183b009044c1eaba3085382230086",
+      "committed_at": "2024-03-08T00:08:22Z",
+      "defect_id": "MICROSOFT-AUTOGEN-E39723653FA6",
+      "evidence": [
+        {
+          "evidence_id": "811fd6926d71-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/811fd6926d7183b009044c1eaba3085382230086",
+          "revision": "811fd6926d7183b009044c1eaba3085382230086"
+        }
+      ],
+      "partition": "derivation",
+      "repository": "microsoft/autogen",
+      "revision": "811fd6926d7183b009044c1eaba3085382230086",
+      "selection_rank": "03388a10a56ea1855907f0fc287d23703d41cb76ddb4521e09da9f583eb6c4e8",
+      "source_kind": "fixing_commit",
+      "title": "Fix threading issue for logging (#1901)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/dc55ec964bdcc39f8bacce17d75fc945ac6826e9",
+      "committed_at": "2025-02-26T11:59:07-05:00",
+      "defect_id": "MICROSOFT-AUTOGEN-EA936C1865C5",
+      "evidence": [
+        {
+          "evidence_id": "dc55ec964bdc-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/dc55ec964bdcc39f8bacce17d75fc945ac6826e9",
+          "revision": "dc55ec964bdcc39f8bacce17d75fc945ac6826e9"
+        }
+      ],
+      "partition": "validation",
+      "repository": "microsoft/autogen",
+      "revision": "dc55ec964bdcc39f8bacce17d75fc945ac6826e9",
+      "selection_rank": "045913836385335221965c5b51d2e88d64a7ddf5b3e4f2a8d6d244de80a55c80",
+      "source_kind": "fixing_commit",
+      "title": "Fix visual accessibility issues 6 and 20 (#5725)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/0df6be1fc1a82b64db078859023e9a4879fa30c0",
+      "committed_at": "2025-09-16T07:42:35Z",
+      "defect_id": "MICROSOFT-AUTOGEN-F5AED66A8629",
+      "evidence": [
+        {
+          "evidence_id": "0df6be1fc1a8-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/0df6be1fc1a82b64db078859023e9a4879fa30c0",
+          "revision": "0df6be1fc1a82b64db078859023e9a4879fa30c0"
+        }
+      ],
+      "partition": "validation",
+      "repository": "microsoft/autogen",
+      "revision": "0df6be1fc1a82b64db078859023e9a4879fa30c0",
+      "selection_rank": "08e7208c295401d3f3ef31937300e332e51db3c88d632fcb7586a90f31863cf8",
+      "source_kind": "fixing_commit",
+      "title": "fix: extra args not work to disable thinking (#7006)"
+    },
+    {
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/e10767421f62b32ca1efb1a8be183d4546cec75a",
+      "committed_at": "2025-07-06T00:57:03-07:00",
+      "defect_id": "MICROSOFT-AUTOGEN-FFBEE2BB6CEF",
+      "evidence": [
+        {
+          "evidence_id": "e10767421f62-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/e10767421f62b32ca1efb1a8be183d4546cec75a",
+          "revision": "e10767421f62b32ca1efb1a8be183d4546cec75a"
+        }
+      ],
+      "partition": "validation",
+      "repository": "microsoft/autogen",
+      "revision": "e10767421f62b32ca1efb1a8be183d4546cec75a",
+      "selection_rank": "01526171eef43df269df1e8860a2cf77a9543b2331abfe0973d511ae6704be0c",
+      "source_kind": "fixing_commit",
+      "title": "Fix GraphFlowManager termination to prevent _StopAgent from polluting conversation context (#6752)"
+    }
+  ],
+  "manifest_id": "agent-real-defects-v1",
+  "schema_version": 1
+}

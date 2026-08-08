@@ -1,0 +1,73 @@
+From cc129a0bce435642d14df34cf9474ea0cc4838e2 Mon Sep 17 00:00:00 2001
+From: "Brandon Hancock (bhancock_ai)"
+ <109994880+bhancockio@users.noreply.github.com>
+Date: Thu, 16 Jan 2025 12:47:59 -0500
+Subject: [PATCH] Fix docling issues (#1909)
+
+* Fix docling issues
+
+* update docs
+
+diff --git a/docs/concepts/knowledge.mdx b/docs/concepts/knowledge.mdx
+index 91110e19..254a56bb 100644
+--- a/docs/concepts/knowledge.mdx
++++ b/docs/concepts/knowledge.mdx
+@@ -93,6 +93,12 @@ result = crew.kickoff(inputs={"question": "What city does John live in and how o
+ 
+ Here's another example with the `CrewDoclingSource`. The CrewDoclingSource is actually quite versatile and can handle multiple file formats including TXT, PDF, DOCX, HTML, and more. 
+ 
++<Note>
++  You need to install `docling` for the following example to work: `uv add docling`
++</Note>
++
++
++
+ ```python Code
+ from crewai import LLM, Agent, Crew, Process, Task
+ from crewai.knowledge.source.crew_docling_source import CrewDoclingSource
+diff --git a/src/crewai/knowledge/source/crew_docling_source.py b/src/crewai/knowledge/source/crew_docling_source.py
+index bbfcf9b9..6ca0ae96 100644
+--- a/src/crewai/knowledge/source/crew_docling_source.py
++++ b/src/crewai/knowledge/source/crew_docling_source.py
+@@ -8,6 +8,7 @@ try:
+     from docling.exceptions import ConversionError
+     from docling_core.transforms.chunker.hierarchical_chunker import HierarchicalChunker
+     from docling_core.types.doc.document import DoclingDocument
++
+     DOCLING_AVAILABLE = True
+ except ImportError:
+     DOCLING_AVAILABLE = False
+@@ -38,8 +39,8 @@ class CrewDoclingSource(BaseKnowledgeSource):
+     file_paths: List[Union[Path, str]] = Field(default_factory=list)
+     chunks: List[str] = Field(default_factory=list)
+     safe_file_paths: List[Union[Path, str]] = Field(default_factory=list)
+-    content: List[DoclingDocument] = Field(default_factory=list)
+-    document_converter: DocumentConverter = Field(
++    content: List["DoclingDocument"] = Field(default_factory=list)
++    document_converter: "DocumentConverter" = Field(
+         default_factory=lambda: DocumentConverter(
+             allowed_formats=[
+                 InputFormat.MD,
+@@ -65,7 +66,7 @@ class CrewDoclingSource(BaseKnowledgeSource):
+         self.safe_file_paths = self.validate_content()
+         self.content = self._load_content()
+ 
+-    def _load_content(self) -> List[DoclingDocument]:
++    def _load_content(self) -> List["DoclingDocument"]:
+         try:
+             return self._convert_source_to_docling_documents()
+         except ConversionError as e:
+@@ -87,11 +88,11 @@ class CrewDoclingSource(BaseKnowledgeSource):
+             self.chunks.extend(list(new_chunks_iterable))
+         self._save_documents()
+ 
+-    def _convert_source_to_docling_documents(self) -> List[DoclingDocument]:
++    def _convert_source_to_docling_documents(self) -> List["DoclingDocument"]:
+         conv_results_iter = self.document_converter.convert_all(self.safe_file_paths)
+         return [result.document for result in conv_results_iter]
+ 
+-    def _chunk_doc(self, doc: DoclingDocument) -> Iterator[str]:
++    def _chunk_doc(self, doc: "DoclingDocument") -> Iterator[str]:
+         chunker = HierarchicalChunker()
+         for chunk in chunker.chunk(doc):
+             yield chunk.text

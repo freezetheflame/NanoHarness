@@ -1,0 +1,2279 @@
+{
+  "candidates": [
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/de5d2eaa9b12167ea14ecf59c70f59227fd63fe3",
+      "changed_files": [
+        "docs/concepts/agents.mdx"
+      ],
+      "commit_message": "Fix Cache Typo in Documentation (#1441)",
+      "committed_at": "2024-10-14T16:30:31-04:00",
+      "defect_id": "CREWAIINC-CREWAI-04B202486C03",
+      "evidence": [
+        {
+          "evidence_id": "de5d2eaa9b12-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/de5d2eaa9b12167ea14ecf59c70f59227fd63fe3",
+          "revision": "de5d2eaa9b12167ea14ecf59c70f59227fd63fe3"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-04B202486C03.patch",
+      "patch_sha256": "0f2d1a2db3932d716cf868a45134e25819ba420dae96d90256132bc9dc470425",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/1441",
+      "repository": "crewAIInc/crewAI",
+      "revision": "de5d2eaa9b12167ea14ecf59c70f59227fd63fe3",
+      "source_kind": "fixing_commit",
+      "title": "Fix Cache Typo in Documentation (#1441)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/b38f0825e7acb6e02e5306e3ba10ee0fae99a042",
+      "changed_files": [
+        "docs/how-to/Start-a-New-CrewAI-Project.md"
+      ],
+      "commit_message": "Fix broken link to the installation guide (#912)\n\nUpdated the installation guide link to use the absolute URL instead of a relative path, ensuring it correctly points to 'https://docs.crewai.com/how-to/Installing-CrewAI/'.",
+      "committed_at": "2024-07-19T01:37:54-03:00",
+      "defect_id": "CREWAIINC-CREWAI-18B7D0AAA5B0",
+      "evidence": [
+        {
+          "evidence_id": "b38f0825e7ac-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/b38f0825e7acb6e02e5306e3ba10ee0fae99a042",
+          "revision": "b38f0825e7acb6e02e5306e3ba10ee0fae99a042"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-18B7D0AAA5B0.patch",
+      "patch_sha256": "930bfe1a9ed6aa78bac0ab4f0ad7435636dc6b2383ff4dd45e113868d5cdee87",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/912",
+      "repository": "crewAIInc/crewAI",
+      "revision": "b38f0825e7acb6e02e5306e3ba10ee0fae99a042",
+      "source_kind": "fixing_commit",
+      "title": "Fix broken link to the installation guide (#912)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/f700e014c9e6494ad693a6e48a5da7594efc88ad",
+      "changed_files": [
+        "src/crewai/llm.py"
+      ],
+      "commit_message": "fix: address race condition in FilteredStream by using context managers (#2818)\n\nDuring the sys.stdout = FilteredStream(old_stdout) assignment, if any code (including logging, print, or internal library output) writes to sys.stdout immediately, and that write happens before __init__ completes, the write() method is called on a not-fully-initialized object.. hence _lock doesn’t exist yet.",
+      "committed_at": "2025-05-12T15:05:14-04:00",
+      "defect_id": "CREWAIINC-CREWAI-1E81F04FA0D3",
+      "evidence": [
+        {
+          "evidence_id": "f700e014c9e6-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/f700e014c9e6494ad693a6e48a5da7594efc88ad",
+          "revision": "f700e014c9e6494ad693a6e48a5da7594efc88ad"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-1E81F04FA0D3.patch",
+      "patch_sha256": "a0b5b608965606867e2e5c92f47fd629cba76a99d78e37be961e48b7cb4d186c",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/2818",
+      "repository": "crewAIInc/crewAI",
+      "revision": "f700e014c9e6494ad693a6e48a5da7594efc88ad",
+      "source_kind": "fixing_commit",
+      "title": "fix: address race condition in FilteredStream by using context managers (#2818)"
+    },
+    {
+      "candidate_test_files": [
+        "lib/crewai/tests/tools/test_structured_tool.py"
+      ],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/f13d307534d3a09bc7adf4af22fb1e70f5af9272",
+      "changed_files": [
+        "lib/crewai/src/crewai/tools/base_tool.py",
+        "lib/crewai/src/crewai/tools/structured_tool.py",
+        "lib/crewai/tests/tools/test_structured_tool.py"
+      ],
+      "commit_message": "fix: pass cache_function from BaseTool to CrewStructuredTool",
+      "committed_at": "2026-03-20T16:04:52-04:00",
+      "defect_id": "CREWAIINC-CREWAI-1E9135EB1AC6",
+      "evidence": [
+        {
+          "evidence_id": "f13d307534d3-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/f13d307534d3a09bc7adf4af22fb1e70f5af9272",
+          "revision": "f13d307534d3a09bc7adf4af22fb1e70f5af9272"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-1E9135EB1AC6.patch",
+      "patch_sha256": "e36938726a15af80766dffc4e7fa9925854d0161122da6b58903a01177fb1761",
+      "pull_request_locator": null,
+      "repository": "crewAIInc/crewAI",
+      "revision": "f13d307534d3a09bc7adf4af22fb1e70f5af9272",
+      "source_kind": "fixing_commit",
+      "title": "fix: pass cache_function from BaseTool to CrewStructuredTool"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/46be5e8097a4e18fd9ab05e630b784658e7da2a6",
+      "changed_files": [
+        "src/crewai/agents/crew_agent_executor.py",
+        "src/crewai/translations/en.json"
+      ],
+      "commit_message": "fix:typo error (#1732)\n\n* Update crew_agent_executor.py\r\n\r\ntypo error\r\n\r\n* Update en.json\r\n\r\ntypo error",
+      "committed_at": "2024-12-09T10:53:55-05:00",
+      "defect_id": "CREWAIINC-CREWAI-2250F67CC995",
+      "evidence": [
+        {
+          "evidence_id": "46be5e8097a4-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/46be5e8097a4e18fd9ab05e630b784658e7da2a6",
+          "revision": "46be5e8097a4e18fd9ab05e630b784658e7da2a6"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-2250F67CC995.patch",
+      "patch_sha256": "111811b39a2d61b5a7eed735e4b0a3944bf3c5c793fd5372afe806625e2647a6",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/1732",
+      "repository": "crewAIInc/crewAI",
+      "revision": "46be5e8097a4e18fd9ab05e630b784658e7da2a6",
+      "source_kind": "fixing_commit",
+      "title": "fix:typo error (#1732)"
+    },
+    {
+      "candidate_test_files": [
+        "tests/cli/test_create_crew.py"
+      ],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/b35c3e802492f03b81e07b43420fa42b10584f11",
+      "changed_files": [
+        "src/crewai/cli/utils.py",
+        "tests/cli/test_create_crew.py"
+      ],
+      "commit_message": "fix: ensure env-vars are written in upper case (#3072)\n\nWhen creating a Crew via the CLI and selecting the Azure provider, the generated .env file had environment variables in lowercase.\nThis commit ensures that all environment variables are written in uppercase.",
+      "committed_at": "2025-06-26T12:29:06-04:00",
+      "defect_id": "CREWAIINC-CREWAI-39544CABB83E",
+      "evidence": [
+        {
+          "evidence_id": "b35c3e802492-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/b35c3e802492f03b81e07b43420fa42b10584f11",
+          "revision": "b35c3e802492f03b81e07b43420fa42b10584f11"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-39544CABB83E.patch",
+      "patch_sha256": "453cc6d740ee2a1bf2b8d68a9e95cfda5f579946c0aabd6df20f7ddb7bb109cb",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/3072",
+      "repository": "crewAIInc/crewAI",
+      "revision": "b35c3e802492f03b81e07b43420fa42b10584f11",
+      "source_kind": "fixing_commit",
+      "title": "fix: ensure env-vars are written in upper case (#3072)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/f4f32b5f7fff51462e5f6c2bbd534d99929e73d9",
+      "changed_files": [
+        ".github/workflows/type-checker.yml",
+        "src/crewai/__init__.py"
+      ],
+      "commit_message": "fix: suppress Pydantic deprecation warnings in initialization (#3443)\n\n* fix: suppress Pydantic deprecation warnings in initialization\n\n- Implemented a function to filter out Pydantic deprecation warnings, enhancing the user experience by preventing unnecessary warning messages during execution.\n- Removed the previous warning filter setup to streamline the warning suppression process.\n- Updated the User-Agent header formatting for consistency.\n\n* fix type check\n\n* dropped\n\n* fix: update type-checker workflow and suppress warnings\n\n- Updated the Python version matrix in the type-checker workflow to use double quotes for consistency.\n- Added the `# type: ignore[assignment]` comment to the warning suppression assignment in `__init__.py` to address type checking issues.\n- Ensured that the mypy command in the workflow allows for untyped calls and generics, enhancing type checking flexibility.\n\n* better",
+      "committed_at": "2025-09-03T16:36:50-07:00",
+      "defect_id": "CREWAIINC-CREWAI-3A3F746A0B2C",
+      "evidence": [
+        {
+          "evidence_id": "f4f32b5f7fff-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/f4f32b5f7fff51462e5f6c2bbd534d99929e73d9",
+          "revision": "f4f32b5f7fff51462e5f6c2bbd534d99929e73d9"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-3A3F746A0B2C.patch",
+      "patch_sha256": "ea1cfdab2f5697106f2ed6b4e030476ee2b605a13f384ea61a236c5ddf435b4d",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/3443",
+      "repository": "crewAIInc/crewAI",
+      "revision": "f4f32b5f7fff51462e5f6c2bbd534d99929e73d9",
+      "source_kind": "fixing_commit",
+      "title": "fix: suppress Pydantic deprecation warnings in initialization (#3443)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/cc129a0bce435642d14df34cf9474ea0cc4838e2",
+      "changed_files": [
+        "docs/concepts/knowledge.mdx",
+        "src/crewai/knowledge/source/crew_docling_source.py"
+      ],
+      "commit_message": "Fix docling issues (#1909)\n\n* Fix docling issues\r\n\r\n* update docs",
+      "committed_at": "2025-01-16T12:47:59-05:00",
+      "defect_id": "CREWAIINC-CREWAI-509EBFDD10D0",
+      "evidence": [
+        {
+          "evidence_id": "cc129a0bce43-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/cc129a0bce435642d14df34cf9474ea0cc4838e2",
+          "revision": "cc129a0bce435642d14df34cf9474ea0cc4838e2"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-509EBFDD10D0.patch",
+      "patch_sha256": "e3bd008d8a557bcc3b720ae6b981e150f8fd49f0145814718e74584175885bfb",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/1909",
+      "repository": "crewAIInc/crewAI",
+      "revision": "cc129a0bce435642d14df34cf9474ea0cc4838e2",
+      "source_kind": "fixing_commit",
+      "title": "Fix docling issues (#1909)"
+    },
+    {
+      "candidate_test_files": [
+        "tests/crew_test.py",
+        "tests/memory/cassettes/test_save_and_search.yaml",
+        "tests/memory/short_term_memory_test.py"
+      ],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/1da7473f262181ddf17311a71bbde65053bddfd5",
+      "changed_files": [
+        ".github/workflows/black.yml",
+        "tests/crew_test.py",
+        "tests/memory/cassettes/test_save_and_search.yaml",
+        "tests/memory/short_term_memory_test.py"
+      ],
+      "commit_message": "fix: fix test actually running (#587)\n\n* fix: fix test actually running\r\n\r\n* fix: fix test to not send request to openai\r\n\r\n* fix: fix linting to remove cli files\r\n\r\n* fix: exclude only files that breaks black",
+      "committed_at": "2024-05-09T21:33:48-03:00",
+      "defect_id": "CREWAIINC-CREWAI-5261DAF3C41F",
+      "evidence": [
+        {
+          "evidence_id": "1da7473f2621-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/1da7473f262181ddf17311a71bbde65053bddfd5",
+          "revision": "1da7473f262181ddf17311a71bbde65053bddfd5"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-5261DAF3C41F.patch",
+      "patch_sha256": "7046dedfb2b1366c3aa1284d0eeeb1d316811aa0072356ffbfaaa6514867b785",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/587",
+      "repository": "crewAIInc/crewAI",
+      "revision": "1da7473f262181ddf17311a71bbde65053bddfd5",
+      "source_kind": "fixing_commit",
+      "title": "fix: fix test actually running (#587)"
+    },
+    {
+      "candidate_test_files": [
+        "lib/crewai/tests/utilities/test_lock_store.py"
+      ],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/6b262f5a6de3db915773d19df7fdbdca73fb49c2",
+      "changed_files": [
+        "lib/crewai/src/crewai/utilities/lock_store.py",
+        "lib/crewai/tests/utilities/test_lock_store.py"
+      ],
+      "commit_message": "Fix lock_store crash when redis package is not installed (#4943)\n\n* Fix lock_store crash when redis package is not installed\n\n`REDIS_URL` being set was enough to trigger a Redis lock, which would\nraise `ImportError` if the `redis` package wasn't available. Added\n`_redis_available()` to guard on both the env var and the import.\n\n* Simplify tests\n\n* Simplify tests #2",
+      "committed_at": "2026-03-18T15:05:41-03:00",
+      "defect_id": "CREWAIINC-CREWAI-55CE9DCF5420",
+      "evidence": [
+        {
+          "evidence_id": "6b262f5a6de3-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/6b262f5a6de3db915773d19df7fdbdca73fb49c2",
+          "revision": "6b262f5a6de3db915773d19df7fdbdca73fb49c2"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-55CE9DCF5420.patch",
+      "patch_sha256": "245bc4b29c7fae404261128a89e3c6164839bb6d39f433dde01d1eeafd9cccf6",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/4943",
+      "repository": "crewAIInc/crewAI",
+      "revision": "6b262f5a6de3db915773d19df7fdbdca73fb49c2",
+      "source_kind": "fixing_commit",
+      "title": "Fix lock_store crash when redis package is not installed (#4943)"
+    },
+    {
+      "candidate_test_files": [
+        "tests/cli/cli_test.py"
+      ],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/f89c2bfb7e5479a07df32e0b8eb593c2f40cdd3e",
+      "changed_files": [
+        "src/crewai/cli/reset_memories_command.py",
+        "src/crewai/cli/utils.py",
+        "src/crewai/crew.py",
+        "src/crewai/knowledge/knowledge.py",
+        "tests/cli/cli_test.py"
+      ],
+      "commit_message": "Fix crewai reset-memories when Embedding dimension mismatch (#2737)\n\n* fix: support to reset memories after changing Crew's embedder\n\nThe sources must not be added while initializing the Knowledge otherwise we could not reset it\n\n* chore: improve reset memory feedback\n\nPreviously, even when no memories were actually erased, we logged that they had been. From now on, the log will specify which memory has been reset.\n\n* feat: improve get_crew discovery from a single file\n\nCrew instances can now be discovered from any function or method with a return type annotation of -> Crew, as well as from module-level attributes assigned to a Crew instance. Additionally, crews can be retrieved from within a Flow\n\n* refactor: make add_sources a public method from Knowledge",
+      "committed_at": "2025-05-02T12:40:42-04:00",
+      "defect_id": "CREWAIINC-CREWAI-64B8519A37DD",
+      "evidence": [
+        {
+          "evidence_id": "f89c2bfb7e54-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/f89c2bfb7e5479a07df32e0b8eb593c2f40cdd3e",
+          "revision": "f89c2bfb7e5479a07df32e0b8eb593c2f40cdd3e"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-64B8519A37DD.patch",
+      "patch_sha256": "493a01ed5d48deff481668d878e44e451792864845a659ac7280259b1b6b9948",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/2737",
+      "repository": "crewAIInc/crewAI",
+      "revision": "f89c2bfb7e5479a07df32e0b8eb593c2f40cdd3e",
+      "source_kind": "fixing_commit",
+      "title": "Fix crewai reset-memories when Embedding dimension mismatch (#2737)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/5abf9763735bb60c5a7b5ebc6da9d2faafcbf35f",
+      "changed_files": [
+        "lib/crewai-tools/src/crewai_tools/adapters/crewai_rag_adapter.py"
+      ],
+      "commit_message": "fix: allow adding RAG source content from valid URLs (#3831)",
+      "committed_at": "2025-11-04T07:58:40-05:00",
+      "defect_id": "CREWAIINC-CREWAI-767929542075",
+      "evidence": [
+        {
+          "evidence_id": "5abf9763735b-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/5abf9763735bb60c5a7b5ebc6da9d2faafcbf35f",
+          "revision": "5abf9763735bb60c5a7b5ebc6da9d2faafcbf35f"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-767929542075.patch",
+      "patch_sha256": "38a90c0ec1e5c7f3906b060acdf61dd338c39299f0b14e18695a8533e2cb7318",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/3831",
+      "repository": "crewAIInc/crewAI",
+      "revision": "5abf9763735bb60c5a7b5ebc6da9d2faafcbf35f",
+      "source_kind": "fixing_commit",
+      "title": "fix: allow adding RAG source content from valid URLs (#3831)"
+    },
+    {
+      "candidate_test_files": [
+        "lib/crewai/tests/agents/test_agent_executor.py",
+        "lib/crewai/tests/agents/test_native_tool_calling.py",
+        "lib/crewai/tests/cassettes/TestCrewMultimodalBedrock.test_image_file[bedrock-anthropic.claude-3-haiku-20240307-v1-0].yaml",
+        "lib/crewai/tests/cassettes/TestCrewMultimodalBedrock.test_image_file[bedrock-us.anthropic.claude-sonnet-4-6].yaml",
+        "lib/crewai/tests/cassettes/TestCrewMultimodalBedrock.test_pdf_file[bedrock-anthropic.claude-3-haiku-20240307-v1-0].yaml",
+        "lib/crewai/tests/cassettes/TestCrewMultimodalBedrock.test_pdf_file[bedrock-us.anthropic.claude-sonnet-4-6].yaml",
+        "lib/crewai/tests/cassettes/agents/TestBedrockNativeToolCalling.test_bedrock_agent_kickoff_with_tools_mocked.yaml",
+        "lib/crewai/tests/cassettes/agents/TestBedrockNativeToolCalling.test_bedrock_parallel_native_tool_calling_test_agent_kickoff.yaml",
+        "lib/crewai/tests/cassettes/agents/TestBedrockNativeToolCalling.test_bedrock_parallel_native_tool_calling_test_crew.yaml",
+        "lib/crewai/tests/cassettes/llms/TestBedrockMultimodalIntegration.test_analyze_pdf.yaml",
+        "lib/crewai/tests/cassettes/llms/TestBedrockMultimodalIntegration.test_describe_image.yaml",
+        "lib/crewai/tests/cassettes/llms/anthropic/test_anthropic_agent_kickoff_structured_output_with_tools.yaml",
+        "lib/crewai/tests/cassettes/llms/bedrock/test_bedrock_agent_kickoff_structured_output_with_tools.yaml",
+        "lib/crewai/tests/cassettes/llms/bedrock/test_bedrock_agent_kickoff_structured_output_without_tools.yaml",
+        "lib/crewai/tests/cassettes/llms/bedrock/test_bedrock_async_basic_call.yaml",
+        "lib/crewai/tests/cassettes/llms/bedrock/test_bedrock_async_conversation.yaml",
+        "lib/crewai/tests/cassettes/llms/bedrock/test_bedrock_async_multiple_calls.yaml",
+        "lib/crewai/tests/cassettes/llms/bedrock/test_bedrock_async_with_max_tokens.yaml",
+        "lib/crewai/tests/cassettes/llms/bedrock/test_bedrock_async_with_parameters.yaml",
+        "lib/crewai/tests/cassettes/llms/bedrock/test_bedrock_async_with_system_message.yaml",
+        "lib/crewai/tests/cassettes/llms/bedrock/test_bedrock_async_with_temperature.yaml",
+        "lib/crewai/tests/cassettes/llms/google/test_gemini_agent_kickoff_structured_output_with_tools.yaml",
+        "lib/crewai/tests/cassettes/llms/google/test_gemini_crew_structured_output_with_tools.yaml",
+        "lib/crewai/tests/llms/anthropic/test_anthropic.py",
+        "lib/crewai/tests/llms/bedrock/test_bedrock.py",
+        "lib/crewai/tests/llms/bedrock/test_bedrock_async.py",
+        "lib/crewai/tests/llms/google/test_google.py",
+        "lib/crewai/tests/llms/test_multimodal_integration.py",
+        "lib/crewai/tests/test_crew_multimodal.py"
+      ],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/a1033e4bfee1cf61b9ef1daab0d4855d544bdc3b",
+      "changed_files": [
+        "conftest.py",
+        "lib/crewai/src/crewai/agent/core.py",
+        "lib/crewai/src/crewai/agents/crew_agent_executor.py",
+        "lib/crewai/src/crewai/experimental/agent_executor.py",
+        "lib/crewai/src/crewai/lite_agent.py",
+        "lib/crewai/tests/agents/test_agent_executor.py",
+        "lib/crewai/tests/agents/test_native_tool_calling.py",
+        "lib/crewai/tests/cassettes/TestCrewMultimodalBedrock.test_image_file[bedrock-anthropic.claude-3-haiku-20240307-v1-0].yaml",
+        "lib/crewai/tests/cassettes/TestCrewMultimodalBedrock.test_image_file[bedrock-us.anthropic.claude-sonnet-4-6].yaml",
+        "lib/crewai/tests/cassettes/TestCrewMultimodalBedrock.test_pdf_file[bedrock-anthropic.claude-3-haiku-20240307-v1-0].yaml",
+        "lib/crewai/tests/cassettes/TestCrewMultimodalBedrock.test_pdf_file[bedrock-us.anthropic.claude-sonnet-4-6].yaml",
+        "lib/crewai/tests/cassettes/agents/TestBedrockNativeToolCalling.test_bedrock_agent_kickoff_with_tools_mocked.yaml",
+        "lib/crewai/tests/cassettes/agents/TestBedrockNativeToolCalling.test_bedrock_parallel_native_tool_calling_test_agent_kickoff.yaml",
+        "lib/crewai/tests/cassettes/agents/TestBedrockNativeToolCalling.test_bedrock_parallel_native_tool_calling_test_crew.yaml",
+        "lib/crewai/tests/cassettes/llms/TestBedrockMultimodalIntegration.test_analyze_pdf.yaml",
+        "lib/crewai/tests/cassettes/llms/TestBedrockMultimodalIntegration.test_describe_image.yaml",
+        "lib/crewai/tests/cassettes/llms/anthropic/test_anthropic_agent_kickoff_structured_output_with_tools.yaml",
+        "lib/crewai/tests/cassettes/llms/bedrock/test_bedrock_agent_kickoff_structured_output_with_tools.yaml",
+        "lib/crewai/tests/cassettes/llms/bedrock/test_bedrock_agent_kickoff_structured_output_without_tools.yaml",
+        "lib/crewai/tests/cassettes/llms/bedrock/test_bedrock_async_basic_call.yaml",
+        "lib/crewai/tests/cassettes/llms/bedrock/test_bedrock_async_conversation.yaml",
+        "lib/crewai/tests/cassettes/llms/bedrock/test_bedrock_async_multiple_calls.yaml",
+        "lib/crewai/tests/cassettes/llms/bedrock/test_bedrock_async_with_max_tokens.yaml",
+        "lib/crewai/tests/cassettes/llms/bedrock/test_bedrock_async_with_parameters.yaml",
+        "lib/crewai/tests/cassettes/llms/bedrock/test_bedrock_async_with_system_message.yaml",
+        "lib/crewai/tests/cassettes/llms/bedrock/test_bedrock_async_with_temperature.yaml",
+        "lib/crewai/tests/cassettes/llms/google/test_gemini_agent_kickoff_structured_output_with_tools.yaml",
+        "lib/crewai/tests/cassettes/llms/google/test_gemini_crew_structured_output_with_tools.yaml",
+        "lib/crewai/tests/llms/anthropic/test_anthropic.py",
+        "lib/crewai/tests/llms/bedrock/test_bedrock.py",
+        "lib/crewai/tests/llms/bedrock/test_bedrock_async.py",
+        "lib/crewai/tests/llms/google/test_google.py",
+        "lib/crewai/tests/llms/test_multimodal_integration.py",
+        "lib/crewai/tests/test_crew_multimodal.py"
+      ],
+      "commit_message": "Fix structured output leaks in tool-calling loops (#5897)\n\n* Fix structured output leaks in tool-calling loops\n\n* addressing comments\n\n* drop scripts\n\n* Update Gemini agent tests to include structured output with thoughts and bump model version to 2.5-flash\n\n* merge\n\n* Update Anthropic test cases to use new model and tool structure\n\n- Changed the model from \"claude-3-5-haiku-20241022\" to \"claude-sonnet-4-6\" in the test setup.\n- Updated the request and response formats in the YAML test cassette to reflect the new tool structure and improved content formatting.\n- Adjusted the expected response body to match the new output format from the assistant, including changes in tool usage and response details.\n- Increased rate limit values in the response headers for better testing scenarios.\n\n* adjusted bedrock cassettes\n\n* adjusting cassettes for bedrock\n\n* fix test\n\n* Update VCR configuration to use 'host' instead of 'bedrock_host' for request matching",
+      "committed_at": "2026-05-27T13:20:53-07:00",
+      "defect_id": "CREWAIINC-CREWAI-7FA995D027A5",
+      "evidence": [
+        {
+          "evidence_id": "a1033e4bfee1-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/a1033e4bfee1cf61b9ef1daab0d4855d544bdc3b",
+          "revision": "a1033e4bfee1cf61b9ef1daab0d4855d544bdc3b"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-7FA995D027A5.patch",
+      "patch_sha256": "72213f8647a4ba2c49979d195b19aad2d0ea57079c6be0e18dd5ed6c28b9d98e",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/5897",
+      "repository": "crewAIInc/crewAI",
+      "revision": "a1033e4bfee1cf61b9ef1daab0d4855d544bdc3b",
+      "source_kind": "fixing_commit",
+      "title": "Fix structured output leaks in tool-calling loops (#5897)"
+    },
+    {
+      "candidate_test_files": [
+        "lib/crewai/tests/cli/test_token_manager.py",
+        "lib/crewai/tests/cli/tools/test_main.py"
+      ],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/beef71264674727469760d8b88a60a5a153fe360",
+      "changed_files": [
+        "lib/crewai/src/crewai/cli/shared/token_manager.py",
+        "lib/crewai/tests/cli/test_token_manager.py",
+        "lib/crewai/tests/cli/tools/test_main.py"
+      ],
+      "commit_message": "fix: ensure token store file ops do not deadlock\n\n* fix: ensure token store file ops do not deadlock\n* chore: update test method reference",
+      "committed_at": "2025-12-08T19:04:21-05:00",
+      "defect_id": "CREWAIINC-CREWAI-86560271EDF6",
+      "evidence": [
+        {
+          "evidence_id": "beef71264674-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/beef71264674727469760d8b88a60a5a153fe360",
+          "revision": "beef71264674727469760d8b88a60a5a153fe360"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-86560271EDF6.patch",
+      "patch_sha256": "c7899f9ebf47710b512e599fc3521cee83b9ea168173586925e0f0a64be8df50",
+      "pull_request_locator": null,
+      "repository": "crewAIInc/crewAI",
+      "revision": "beef71264674727469760d8b88a60a5a153fe360",
+      "source_kind": "fixing_commit",
+      "title": "fix: ensure token store file ops do not deadlock"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/5a8649a97f9ff0c92e791b8f28c95f06c040603e",
+      "changed_files": [
+        "docs/concepts/flows.mdx"
+      ],
+      "commit_message": "fix unstructured example flow (#2052)",
+      "committed_at": "2025-02-07T10:38:15-05:00",
+      "defect_id": "CREWAIINC-CREWAI-A70EE6E80215",
+      "evidence": [
+        {
+          "evidence_id": "5a8649a97f9f-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/5a8649a97f9ff0c92e791b8f28c95f06c040603e",
+          "revision": "5a8649a97f9ff0c92e791b8f28c95f06c040603e"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-A70EE6E80215.patch",
+      "patch_sha256": "1b385a5e9165b94b9458a2dad57d4f76f04b15e9a5a0ded784e50975b160b6be",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/2052",
+      "repository": "crewAIInc/crewAI",
+      "revision": "5a8649a97f9ff0c92e791b8f28c95f06c040603e",
+      "source_kind": "fixing_commit",
+      "title": "fix unstructured example flow (#2052)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/c50d62b82f037bf7a11ffaf18f92c70495bb9d3e",
+      "changed_files": [
+        "src/crewai/utilities/crew_json_encoder.py"
+      ],
+      "commit_message": "fix: JSON encoding date objects (#1374)",
+      "committed_at": "2024-10-02T16:06:10-04:00",
+      "defect_id": "CREWAIINC-CREWAI-A7BAD35DD871",
+      "evidence": [
+        {
+          "evidence_id": "c50d62b82f03-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/c50d62b82f037bf7a11ffaf18f92c70495bb9d3e",
+          "revision": "c50d62b82f037bf7a11ffaf18f92c70495bb9d3e"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-A7BAD35DD871.patch",
+      "patch_sha256": "c9d0f8c7210fd2412b0289093ec8d2145527b2dde9ce34460223907eb61e0361",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/1374",
+      "repository": "crewAIInc/crewAI",
+      "revision": "c50d62b82f037bf7a11ffaf18f92c70495bb9d3e",
+      "source_kind": "fixing_commit",
+      "title": "fix: JSON encoding date objects (#1374)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/beddc7218900e396723e1d0b8dc7b7624b627bd7",
+      "changed_files": [
+        "docs/concepts/tasks.mdx",
+        "src/crewai/__init__.py"
+      ],
+      "commit_message": "fix llm guardrail import and docs",
+      "committed_at": "2025-05-22T21:48:13-07:00",
+      "defect_id": "CREWAIINC-CREWAI-A8C087332C76",
+      "evidence": [
+        {
+          "evidence_id": "beddc7218900-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/beddc7218900e396723e1d0b8dc7b7624b627bd7",
+          "revision": "beddc7218900e396723e1d0b8dc7b7624b627bd7"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-A8C087332C76.patch",
+      "patch_sha256": "8d4dfa9d86c4a2e16ded59b89cde0880b73e5df867034aa425f00496a1a813c0",
+      "pull_request_locator": null,
+      "repository": "crewAIInc/crewAI",
+      "revision": "beddc7218900e396723e1d0b8dc7b7624b627bd7",
+      "source_kind": "fixing_commit",
+      "title": "fix llm guardrail import and docs"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/25fcf39cc1030b841dc5b8c3f855a7784c5fa8e4",
+      "changed_files": [
+        "lib/crewai/src/crewai/agents/crew_agent_executor.py"
+      ],
+      "commit_message": "fix: preserve Bedrock tool call arguments by removing truthy default\n\nfunc_info.get('arguments', '{}') returns '{}' (truthy) when no\n'function' wrapper exists (Bedrock format), causing the or-fallback\nto tool_call.get('input', {}) to never execute. The actual Bedrock\narguments are silently discarded.\n\nRemove the default so get('arguments') returns None (falsy) when\nthere's no function wrapper, allowing the or-chain to correctly\nfall through to Bedrock's 'input' field.\n\nFixes #5275",
+      "committed_at": "2026-04-12T15:50:56+08:00",
+      "defect_id": "CREWAIINC-CREWAI-B357A08423FA",
+      "evidence": [
+        {
+          "evidence_id": "25fcf39cc103-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/25fcf39cc1030b841dc5b8c3f855a7784c5fa8e4",
+          "revision": "25fcf39cc1030b841dc5b8c3f855a7784c5fa8e4"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-B357A08423FA.patch",
+      "patch_sha256": "0dc94f0134521a0ad43ba73d7526af12fd30c9c3cb3cd7e0c8f56539959cabd0",
+      "pull_request_locator": null,
+      "repository": "crewAIInc/crewAI",
+      "revision": "25fcf39cc1030b841dc5b8c3f855a7784c5fa8e4",
+      "source_kind": "fixing_commit",
+      "title": "fix: preserve Bedrock tool call arguments by removing truthy default"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/81bd81e5f5e78be0485a771af74fe13fa5c8a1fd",
+      "changed_files": [
+        "src/crewai/agents/agent_adapters/openai_agents/openai_adapter.py"
+      ],
+      "commit_message": "fix: handle model parameter in OpenAI adapter initialization (#3510)",
+      "committed_at": "2025-09-12T17:31:53-04:00",
+      "defect_id": "CREWAIINC-CREWAI-B54077DEA910",
+      "evidence": [
+        {
+          "evidence_id": "81bd81e5f5e7-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/81bd81e5f5e78be0485a771af74fe13fa5c8a1fd",
+          "revision": "81bd81e5f5e78be0485a771af74fe13fa5c8a1fd"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-B54077DEA910.patch",
+      "patch_sha256": "b3def5d87a02d56e9d6fa6479140bdfa9788dc678f607390ea9af60e496f2b21",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/3510",
+      "repository": "crewAIInc/crewAI",
+      "revision": "81bd81e5f5e78be0485a771af74fe13fa5c8a1fd",
+      "source_kind": "fixing_commit",
+      "title": "fix: handle model parameter in OpenAI adapter initialization (#3510)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/02718e291b6cf2b4cedb2f2d923ce7ffc5aa9963",
+      "changed_files": [
+        "src/crewai/crew.py",
+        "src/crewai/task.py"
+      ],
+      "commit_message": "fix task cloning error (#1416)",
+      "committed_at": "2024-10-10T12:00:28-04:00",
+      "defect_id": "CREWAIINC-CREWAI-D57AA34C799B",
+      "evidence": [
+        {
+          "evidence_id": "02718e291b6c-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/02718e291b6cf2b4cedb2f2d923ce7ffc5aa9963",
+          "revision": "02718e291b6cf2b4cedb2f2d923ce7ffc5aa9963"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-D57AA34C799B.patch",
+      "patch_sha256": "5283cab91786ba426f143c9b2f7f1a0345b96f8a6ea1d3544e8358fdb331a7cb",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/1416",
+      "repository": "crewAIInc/crewAI",
+      "revision": "02718e291b6cf2b4cedb2f2d923ce7ffc5aa9963",
+      "source_kind": "fixing_commit",
+      "title": "fix task cloning error (#1416)"
+    },
+    {
+      "candidate_test_files": [
+        "lib/crewai/tests/agents/test_async_agent_executor.py"
+      ],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/4c74dc0f86a27af64624b21abc81e9eab4bb5e85",
+      "changed_files": [
+        "lib/crewai/src/crewai/agents/crew_agent_executor.py",
+        "lib/crewai/tests/agents/test_async_agent_executor.py"
+      ],
+      "commit_message": "fix(executor): reset messages and iterations between invocations\n\nCrewAgentExecutor is reused across sequential tasks but invoke/ainvoke\nonly appended to self.messages and never reset self.iterations, so\ntask 2 inherited task 1's history and iteration count.",
+      "committed_at": "2026-04-29T02:10:17+08:00",
+      "defect_id": "CREWAIINC-CREWAI-DDB20ED36374",
+      "evidence": [
+        {
+          "evidence_id": "4c74dc0f86a2-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/4c74dc0f86a27af64624b21abc81e9eab4bb5e85",
+          "revision": "4c74dc0f86a27af64624b21abc81e9eab4bb5e85"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-DDB20ED36374.patch",
+      "patch_sha256": "4a96199d870b45514dc326408fef5478267353b90a1d3593814a049f2ab73871",
+      "pull_request_locator": null,
+      "repository": "crewAIInc/crewAI",
+      "revision": "4c74dc0f86a27af64624b21abc81e9eab4bb5e85",
+      "source_kind": "fixing_commit",
+      "title": "fix(executor): reset messages and iterations between invocations"
+    },
+    {
+      "candidate_test_files": [
+        "tests/rag/chromadb/test_client.py",
+        "tests/rag/chromadb/test_utils.py"
+      ],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/1dbe8aab52b9acbf1647bbc0ecf91e7bd318e5f0",
+      "changed_files": [
+        "src/crewai/knowledge/storage/knowledge_storage.py",
+        "src/crewai/memory/storage/rag_storage.py",
+        "src/crewai/rag/chromadb/client.py",
+        "src/crewai/rag/chromadb/factory.py",
+        "src/crewai/rag/chromadb/utils.py",
+        "src/crewai/rag/config/base.py",
+        "src/crewai/rag/core/base_client.py",
+        "src/crewai/rag/embeddings/factory.py",
+        "src/crewai/rag/qdrant/client.py",
+        "src/crewai/rag/qdrant/factory.py",
+        "tests/rag/chromadb/test_client.py",
+        "tests/rag/chromadb/test_utils.py"
+      ],
+      "commit_message": "fix: add batch_size support to prevent embedder token limit errors\n\n- add batch_size field to baseragconfig (default=100)  \n- update chromadb/qdrant clients and factories to use batch_size  \n- extract and filter batch_size from embedder config in knowledgestorage  \n- fix large csv files exceeding embedder token limits (#3574)  \n- remove unneeded conditional for type  \n\nCo-authored-by: Vini Brasil <vini@hey.com>",
+      "committed_at": "2025-09-24T00:05:43-04:00",
+      "defect_id": "CREWAIINC-CREWAI-E2AB332A0BAA",
+      "evidence": [
+        {
+          "evidence_id": "1dbe8aab52b9-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/1dbe8aab52b9acbf1647bbc0ecf91e7bd318e5f0",
+          "revision": "1dbe8aab52b9acbf1647bbc0ecf91e7bd318e5f0"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-E2AB332A0BAA.patch",
+      "patch_sha256": "1bd93c1e9554be9e3cf5162e4343d32afadd450c8c977b34969abb833787259c",
+      "pull_request_locator": null,
+      "repository": "crewAIInc/crewAI",
+      "revision": "1dbe8aab52b9acbf1647bbc0ecf91e7bd318e5f0",
+      "source_kind": "fixing_commit",
+      "title": "fix: add batch_size support to prevent embedder token limit errors"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/7122a29a20a32f3867787cc19031c67cda1b5ca3",
+      "changed_files": [
+        "src/crewai/llm.py"
+      ],
+      "commit_message": "fix mistral issues (#2308)",
+      "committed_at": "2025-03-10T12:08:43-04:00",
+      "defect_id": "CREWAIINC-CREWAI-E356CA9140AB",
+      "evidence": [
+        {
+          "evidence_id": "7122a29a20a3-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/7122a29a20a32f3867787cc19031c67cda1b5ca3",
+          "revision": "7122a29a20a32f3867787cc19031c67cda1b5ca3"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-E356CA9140AB.patch",
+      "patch_sha256": "7ff83ebf430f65f1896a72b891cf56be24c260125a6c022f7b3bd8530c6e2475",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/2308",
+      "repository": "crewAIInc/crewAI",
+      "revision": "7122a29a20a32f3867787cc19031c67cda1b5ca3",
+      "source_kind": "fixing_commit",
+      "title": "fix mistral issues (#2308)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/baf91d8f0a15103d39e3cb87aafbb3d31229b600",
+      "changed_files": [
+        "docs/ar/installation.mdx",
+        "docs/en/installation.mdx",
+        "docs/ko/installation.mdx",
+        "docs/pt-BR/installation.mdx"
+      ],
+      "commit_message": "fix: update broken enterprise link on installation page (OSS-36) (#5443)\n\n* fix: update broken enterprise link on installation page (OSS-36)\n\nThe 'Explore Enterprise Options' card on the installation page linked to\nhttps://crewai.com/enterprise which returns a 404. Updated the href to\nhttps://crewai.com/amp across all locales (en, pt-BR, ko, ar).\n\n* fix: use HubSpot form link for enterprise options card\n\nUpdated per team feedback — the enterprise card should link to the\nHubSpot demo form instead of crewai.com/amp.\n\n---------\n\nCo-authored-by: Lorenze Jay <63378463+lorenzejay@users.noreply.github.com>",
+      "committed_at": "2026-04-16T11:01:59-07:00",
+      "defect_id": "CREWAIINC-CREWAI-EB022D82C64B",
+      "evidence": [
+        {
+          "evidence_id": "baf91d8f0a15-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/baf91d8f0a15103d39e3cb87aafbb3d31229b600",
+          "revision": "baf91d8f0a15103d39e3cb87aafbb3d31229b600"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-EB022D82C64B.patch",
+      "patch_sha256": "58d6fe511ccedb01dd5fbb9ae45ae5de0ee15670a2a8a91b40a298c9a45a5b72",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/5443",
+      "repository": "crewAIInc/crewAI",
+      "revision": "baf91d8f0a15103d39e3cb87aafbb3d31229b600",
+      "source_kind": "fixing_commit",
+      "title": "fix: update broken enterprise link on installation page (OSS-36) (#5443)"
+    },
+    {
+      "candidate_test_files": [
+        "lib/crewai/tests/test_flow_usage_metrics.py"
+      ],
+      "canonical_locator": "https://github.com/crewAIInc/crewAI/commit/887adafd2c569606816f3a8d356128ff6af9ffef",
+      "changed_files": [
+        "docs/ar/concepts/flows.mdx",
+        "docs/en/concepts/flows.mdx",
+        "docs/ko/concepts/flows.mdx",
+        "docs/pt-BR/concepts/flows.mdx",
+        "lib/crewai/src/crewai/flow/runtime/__init__.py",
+        "lib/crewai/src/crewai/llms/base_llm.py",
+        "lib/crewai/src/crewai/types/usage_metrics.py",
+        "lib/crewai/tests/test_flow_usage_metrics.py"
+      ],
+      "commit_message": "fix: aggregate token usage across all LLM calls (#6122)\n\n* feat: aggregate LLM token usage at the flow level\n\nIntroduces `flow.usage_metrics`, a snapshot of every LLMCallCompletedEvent\nemitted under the flow's `current_flow_id` for the duration of one kickoff\n(or resume) call. Aggregation happens on the singleton event bus so it\ncovers crews, direct `LLM.call`s, and nested listener calls — solving the\nmismatch where the SDK reported only the last crew's usage while the\nEnterprise UI showed the correct full total.\n\nCo-authored-by: Cursor <cursoragent@cursor.com>\n\n* refactor: centralize provider key normalization in UsageMetrics\n\nAdd UsageMetrics.from_provider_dict to normalize raw LLM usage dicts\nacross providers (LiteLLM, native Anthropic, native Gemini, OpenAI\nnested cached). BaseLLM._track_token_usage_internal and the flow-level\naggregator now share this single source of truth, so `flow.usage_metrics`\nagrees with per-LLM totals on every provider — including the native\nAnthropic path that emits `input_tokens`/`output_tokens` instead of\n`prompt_tokens`/`completion_tokens`.\n\n* fix: flush event bus before reading aggregated usage_metrics\n\n`crewai_event_bus.emit` dispatches LLMCallCompletedEvent handlers on a\nThreadPoolExecutor (fire-and-forget), so a flow whose last LLM call\ncompletes right before kickoff_async/resume_async returns can detach\nthe usage listener while that handler is still queued, leaving its\ntokens off `flow.usage_metrics`. Match `Crew.kickoff()` and call\n`crewai_event_bus.flush()` in both finally blocks so every handler\ndrains before the listener is detached.\n\n---------\n\nCo-authored-by: Cursor <cursoragent@cursor.com>",
+      "committed_at": "2026-06-12T12:55:22-04:00",
+      "defect_id": "CREWAIINC-CREWAI-EEDC3C0811C8",
+      "evidence": [
+        {
+          "evidence_id": "887adafd2c56-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/crewAIInc/crewAI/commit/887adafd2c569606816f3a8d356128ff6af9ffef",
+          "revision": "887adafd2c569606816f3a8d356128ff6af9ffef"
+        }
+      ],
+      "patch_path": "patches/CREWAIINC-CREWAI-EEDC3C0811C8.patch",
+      "patch_sha256": "2c4de6b00b46ccca5415a779aa6f7ce75cf861514b9b8536ec32a33fb0a8b3dc",
+      "pull_request_locator": "https://github.com/crewAIInc/crewAI/pull/6122",
+      "repository": "crewAIInc/crewAI",
+      "revision": "887adafd2c569606816f3a8d356128ff6af9ffef",
+      "source_kind": "fixing_commit",
+      "title": "fix: aggregate token usage across all LLM calls (#6122)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/freezetheflame/NanoHarness/commit/43fd031f3d89becdd6b2c293d4ca84f1ad04ca65",
+      "changed_files": [
+        "nanoharness/components/context/simple_context.py"
+      ],
+      "commit_message": "fix input error in llm request json",
+      "committed_at": "2026-05-14T09:15:06+08:00",
+      "defect_id": "FREEZETHEFLAME-NANOHARNESS-35B5B7782B53",
+      "evidence": [
+        {
+          "evidence_id": "43fd031f3d89-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/freezetheflame/NanoHarness/commit/43fd031f3d89becdd6b2c293d4ca84f1ad04ca65",
+          "revision": "43fd031f3d89becdd6b2c293d4ca84f1ad04ca65"
+        }
+      ],
+      "patch_path": "patches/FREEZETHEFLAME-NANOHARNESS-35B5B7782B53.patch",
+      "patch_sha256": "512e7ab6046ab830fe1fe614254e0c2c4d3465225fcd6a99684b13b66d857211",
+      "pull_request_locator": null,
+      "repository": "freezetheflame/NanoHarness",
+      "revision": "43fd031f3d89becdd6b2c293d4ca84f1ad04ca65",
+      "source_kind": "fixing_commit",
+      "title": "fix input error in llm request json"
+    },
+    {
+      "candidate_test_files": [
+        "examples/coding_agent/tests/conftest.py",
+        "examples/coding_agent/tests/test_example_smoke.py",
+        "tests/test_memory.py"
+      ],
+      "canonical_locator": "https://github.com/freezetheflame/NanoHarness/commit/ddf582b12ff151f56d7ebab89eac9046275e7f1e",
+      "changed_files": [
+        ".gitignore",
+        "README.md",
+        "README_CN.md",
+        "examples/chat_bot/nanoharness/__init__.py",
+        "examples/chat_bot/nanoharness/components/__init__.py",
+        "examples/chat_bot/nanoharness/components/context/__init__.py",
+        "examples/chat_bot/nanoharness/components/context/simple_context.py",
+        "examples/chat_bot/nanoharness/components/evaluator/__init__.py",
+        "examples/chat_bot/nanoharness/components/evaluator/trace_evaluator.py",
+        "examples/chat_bot/nanoharness/components/hooks/__init__.py",
+        "examples/chat_bot/nanoharness/components/hooks/simple_hooks.py",
+        "examples/chat_bot/nanoharness/components/llm/__init__.py",
+        "examples/chat_bot/nanoharness/components/llm/anthropic_adapter.py",
+        "examples/chat_bot/nanoharness/components/llm/litellm_adapter.py",
+        "examples/chat_bot/nanoharness/components/llm/openai_adapter.py",
+        "examples/chat_bot/nanoharness/components/llm/vllm_adapter.py",
+        "examples/chat_bot/nanoharness/components/mcp/__init__.py",
+        "examples/chat_bot/nanoharness/components/mcp/client.py",
+        "examples/chat_bot/nanoharness/components/mcp/registry.py",
+        "examples/chat_bot/nanoharness/components/memory/__init__.py",
+        "examples/chat_bot/nanoharness/components/memory/simple_memory.py",
+        "examples/chat_bot/nanoharness/components/permissions/__init__.py",
+        "examples/chat_bot/nanoharness/components/permissions/rule_permission.py",
+        "examples/chat_bot/nanoharness/components/permissions/sandbox.py",
+        "examples/chat_bot/nanoharness/components/state/__init__.py",
+        "examples/chat_bot/nanoharness/components/state/json_store.py",
+        "examples/chat_bot/nanoharness/components/tools/__init__.py",
+        "examples/chat_bot/nanoharness/components/tools/dict_registry.py",
+        "examples/chat_bot/nanoharness/components/tools/script_tools.py",
+        "examples/chat_bot/nanoharness/core/__init__.py",
+        "examples/chat_bot/nanoharness/core/base.py",
+        "examples/chat_bot/nanoharness/core/engine.py",
+        "examples/chat_bot/nanoharness/core/prompt.py",
+        "examples/chat_bot/nanoharness/core/schema.py",
+        "examples/chat_bot/nanoharness/utils/__init__.py",
+        "examples/chat_bot/nanoharness/utils/logger.py",
+        "examples/chat_bot/nanoharness/utils/token_counter.py",
+        "examples/coding_agent/.gitignore",
+        "examples/coding_agent/FORK_NOTES.md",
+        "examples/coding_agent/README.md",
+        "examples/coding_agent/app/builder.py",
+        "examples/coding_agent/app/hooks.py",
+        "examples/coding_agent/app/ui.py",
+        "examples/coding_agent/main.py",
+        "examples/coding_agent/nanoharness",
+        "examples/coding_agent/nanoharness/__init__.py",
+        "examples/coding_agent/nanoharness/components/__init__.py",
+        "examples/coding_agent/nanoharness/components/context/__init__.py",
+        "examples/coding_agent/nanoharness/components/context/simple_context.py",
+        "examples/coding_agent/nanoharness/components/evaluator/__init__.py",
+        "examples/coding_agent/nanoharness/components/evaluator/trace_evaluator.py",
+        "examples/coding_agent/nanoharness/components/hooks/__init__.py",
+        "examples/coding_agent/nanoharness/components/hooks/simple_hooks.py",
+        "examples/coding_agent/nanoharness/components/llm/__init__.py",
+        "examples/coding_agent/nanoharness/components/llm/anthropic_adapter.py",
+        "examples/coding_agent/nanoharness/components/llm/litellm_adapter.py",
+        "examples/coding_agent/nanoharness/components/llm/openai_adapter.py",
+        "examples/coding_agent/nanoharness/components/llm/vllm_adapter.py",
+        "examples/coding_agent/nanoharness/components/mcp/__init__.py",
+        "examples/coding_agent/nanoharness/components/mcp/client.py",
+        "examples/coding_agent/nanoharness/components/mcp/registry.py",
+        "examples/coding_agent/nanoharness/components/memory/__init__.py",
+        "examples/coding_agent/nanoharness/components/memory/simple_memory.py",
+        "examples/coding_agent/nanoharness/components/permissions/__init__.py",
+        "examples/coding_agent/nanoharness/components/permissions/rule_permission.py",
+        "examples/coding_agent/nanoharness/components/permissions/sandbox.py",
+        "examples/coding_agent/nanoharness/components/state/__init__.py",
+        "examples/coding_agent/nanoharness/components/state/json_store.py",
+        "examples/coding_agent/nanoharness/components/tools/__init__.py",
+        "examples/coding_agent/nanoharness/components/tools/dict_registry.py",
+        "examples/coding_agent/nanoharness/components/tools/script_tools.py",
+        "examples/coding_agent/nanoharness/core/__init__.py",
+        "examples/coding_agent/nanoharness/core/base.py",
+        "examples/coding_agent/nanoharness/core/engine.py",
+        "examples/coding_agent/nanoharness/core/prompt.py",
+        "examples/coding_agent/nanoharness/core/schema.py",
+        "examples/coding_agent/nanoharness/utils/__init__.py",
+        "examples/coding_agent/nanoharness/utils/logger.py",
+        "examples/coding_agent/nanoharness/utils/token_counter.py",
+        "examples/coding_agent/tests/conftest.py",
+        "examples/coding_agent/tests/test_example_smoke.py",
+        "main.py",
+        "nanoharness/components/mcp/client.py",
+        "nanoharness/components/mcp/registry.py",
+        "nanoharness/components/memory/__init__.py",
+        "nanoharness/components/memory/simple_memory.py",
+        "nanoharness/components/memory/tool_mixin.py",
+        "nanoharness/components/permissions/rule_permission.py",
+        "nanoharness/components/state/json_store.py",
+        "nanoharness/components/tools/script_tools.py",
+        "nanoharness/core/base.py",
+        "nanoharness/core/engine.py",
+        "nanoharness/core/prompt.py",
+        "tests/test_memory.py"
+      ],
+      "commit_message": "fix coding agent example",
+      "committed_at": "2026-04-18T22:37:21+08:00",
+      "defect_id": "FREEZETHEFLAME-NANOHARNESS-ECE647477872",
+      "evidence": [
+        {
+          "evidence_id": "ddf582b12ff1-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/freezetheflame/NanoHarness/commit/ddf582b12ff151f56d7ebab89eac9046275e7f1e",
+          "revision": "ddf582b12ff151f56d7ebab89eac9046275e7f1e"
+        }
+      ],
+      "patch_path": "patches/FREEZETHEFLAME-NANOHARNESS-ECE647477872.patch",
+      "patch_sha256": "3dfa3a43a0f45af33f085dfa5cc75bb8a7b788c213046a590aa4b357c1cfe7f5",
+      "pull_request_locator": null,
+      "repository": "freezetheflame/NanoHarness",
+      "revision": "ddf582b12ff151f56d7ebab89eac9046275e7f1e",
+      "source_kind": "fixing_commit",
+      "title": "fix coding agent example"
+    },
+    {
+      "candidate_test_files": [
+        "libs/langgraph/tests/test_pregel.py",
+        "libs/langgraph/tests/test_pregel_async.py"
+      ],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/3c75e414e5d4472ba5e6c747675cc23804ab23e8",
+      "changed_files": [
+        "libs/langgraph/langgraph/pregel/main.py",
+        "libs/langgraph/tests/test_pregel.py",
+        "libs/langgraph/tests/test_pregel_async.py"
+      ],
+      "commit_message": "fix(langgraph): do not apply pending writes when updating state (#6389)\n\nPR #6195 fixed `bulk_update_state` to populate `task.result` by calling\n`prepare_next_tasks` to discover task IDs. Before #6195,\nprepare_next_tasks was gated by the condition `CONFIG_KEY_CHECKPOINT_ID\nnot in config[CONF]` - so it only ran if we were resuming from an empty\ncheckpoint. This check was removed in order to properly populate task\nresults. However, the removal of this check inadvertently applied\npending writes during manual state updates which caused issues when\nforking:\n\n- When you fork from a checkpoint by calling `update_state(config,\nnew_values, as_node=\"mynode\")`, pending writes from the original\nexecution were being applied\n- This caused stale data to leak into forked threads (eg. old tool call\nresults appearing in forked execution)\n\nChanges\n\nRemoved pending writes application from `bulk_update_state` and\n`abulk_update_state`:\n- Still call `prepare_next_tasks` to discover task IDs, but skip the\ncode that applies null writes and regular pending writes\n\nTests\n\n- Added `test_fork_does_not_apply_pending_writes` for sync and async\nwhich verifies forking doesn't include stale pending writes from\noriginal execution",
+      "committed_at": "2025-11-04T14:38:40-08:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-0182B80F458A",
+      "evidence": [
+        {
+          "evidence_id": "3c75e414e5d4-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/3c75e414e5d4472ba5e6c747675cc23804ab23e8",
+          "revision": "3c75e414e5d4472ba5e6c747675cc23804ab23e8"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-0182B80F458A.patch",
+      "patch_sha256": "51a2eebb6f46fae458622bab2d8657792b24d2b7922115d06d422c5783b68b8f",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/6389",
+      "repository": "langchain-ai/langgraph",
+      "revision": "3c75e414e5d4472ba5e6c747675cc23804ab23e8",
+      "source_kind": "fixing_commit",
+      "title": "fix(langgraph): do not apply pending writes when updating state (#6389)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/df191731918482c5eaf2934a2df0c9cb3571db0c",
+      "changed_files": [
+        "README.md",
+        "libs/langgraph/README.md"
+      ],
+      "commit_message": "fix: update readme (#6570)\n\nremove usage of deprecated `create_react_agent` and generally\nredirecting to docs bc they're so good now :)",
+      "committed_at": "2025-12-10T19:02:36Z",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-06C154D70011",
+      "evidence": [
+        {
+          "evidence_id": "df1917319184-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/df191731918482c5eaf2934a2df0c9cb3571db0c",
+          "revision": "df191731918482c5eaf2934a2df0c9cb3571db0c"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-06C154D70011.patch",
+      "patch_sha256": "c85d5eeb659584df666bd688e6b92c9a68e9387b83161365e8d8cfb55fecb7fe",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/6570",
+      "repository": "langchain-ai/langgraph",
+      "revision": "df191731918482c5eaf2934a2df0c9cb3571db0c",
+      "source_kind": "fixing_commit",
+      "title": "fix: update readme (#6570)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/520de30350e8e15ae21bb5017898a6416b2f573b",
+      "changed_files": [
+        "libs/langgraph/langgraph/pregel/remote.py"
+      ],
+      "commit_message": "langgraph: fix interrupt deserialization in RemoteGraph (#4040)",
+      "committed_at": "2025-03-26T16:42:21-04:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-085B26BD19F0",
+      "evidence": [
+        {
+          "evidence_id": "520de30350e8-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/520de30350e8e15ae21bb5017898a6416b2f573b",
+          "revision": "520de30350e8e15ae21bb5017898a6416b2f573b"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-085B26BD19F0.patch",
+      "patch_sha256": "97c6b7fd971f52812002cbbe5de756374846e03453026132f77c7c9d14e69db8",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/4040",
+      "repository": "langchain-ai/langgraph",
+      "revision": "520de30350e8e15ae21bb5017898a6416b2f573b",
+      "source_kind": "fixing_commit",
+      "title": "langgraph: fix interrupt deserialization in RemoteGraph (#4040)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/36b6cd1493c01c8e6a32f611a1ec2c26c2e8f902",
+      "changed_files": [
+        "libs/checkpoint/langgraph/store/memory/__init__.py",
+        "libs/checkpoint/pyproject.toml"
+      ],
+      "commit_message": "fix: Handle empty store similarity (numpy) (#2602)",
+      "committed_at": "2024-12-02T18:20:19-08:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-0C116E758515",
+      "evidence": [
+        {
+          "evidence_id": "36b6cd1493c0-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/36b6cd1493c01c8e6a32f611a1ec2c26c2e8f902",
+          "revision": "36b6cd1493c01c8e6a32f611a1ec2c26c2e8f902"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-0C116E758515.patch",
+      "patch_sha256": "bbf98ae920e65f6602cf6b1b8409fe93f94d41796e5622da43b585e3d339fbca",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/2602",
+      "repository": "langchain-ai/langgraph",
+      "revision": "36b6cd1493c01c8e6a32f611a1ec2c26c2e8f902",
+      "source_kind": "fixing_commit",
+      "title": "fix: Handle empty store similarity (numpy) (#2602)"
+    },
+    {
+      "candidate_test_files": [
+        "tests/__snapshots__/test_pregel.ambr",
+        "tests/test_pregel.py"
+      ],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/470718381407f1d8a7d23ab684eac370e138f2c6",
+      "changed_files": [
+        "langgraph/graph/graph.py",
+        "tests/__snapshots__/test_pregel.ambr",
+        "tests/test_pregel.py"
+      ],
+      "commit_message": "Merge pull request #336 from langchain-ai/nc/22apr/fix-repeat-conditions\n\nFix issue when drawing graphs w repeat conditions",
+      "committed_at": "2024-04-22T09:56:30-07:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-1D85698F2DE2",
+      "evidence": [
+        {
+          "evidence_id": "470718381407-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/470718381407f1d8a7d23ab684eac370e138f2c6",
+          "revision": "470718381407f1d8a7d23ab684eac370e138f2c6"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-1D85698F2DE2.patch",
+      "patch_sha256": "6ebc99a6572d397059d2c40febb5e344cb62437fde778ce5aaf4516256097e15",
+      "pull_request_locator": null,
+      "repository": "langchain-ai/langgraph",
+      "revision": "470718381407f1d8a7d23ab684eac370e138f2c6",
+      "source_kind": "fixing_commit",
+      "title": "Merge pull request #336 from langchain-ai/nc/22apr/fix-repeat-conditions"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/c87f9ab6b12be70e8421fa9fa3cd995b037454e3",
+      "changed_files": [
+        "docs/docs/tutorials/introduction.ipynb"
+      ],
+      "commit_message": "Fix sentence fragment (#2566)",
+      "committed_at": "2024-11-27T22:31:03-08:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-2CCC5002E185",
+      "evidence": [
+        {
+          "evidence_id": "c87f9ab6b12b-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/c87f9ab6b12be70e8421fa9fa3cd995b037454e3",
+          "revision": "c87f9ab6b12be70e8421fa9fa3cd995b037454e3"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-2CCC5002E185.patch",
+      "patch_sha256": "f25d6094ade6ac77ea92d4227ee9c40d418a589237414b5a9813e51604451717",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/2566",
+      "repository": "langchain-ai/langgraph",
+      "revision": "c87f9ab6b12be70e8421fa9fa3cd995b037454e3",
+      "source_kind": "fixing_commit",
+      "title": "Fix sentence fragment (#2566)"
+    },
+    {
+      "candidate_test_files": [
+        "tests/test_pregel.py",
+        "tests/test_pregel_async.py"
+      ],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/151a38d6e93ef4f4655ca921f9dbe29f8a9669a9",
+      "changed_files": [
+        "langgraph/pregel/__init__.py",
+        "langgraph/pregel/io.py",
+        "tests/test_pregel.py",
+        "tests/test_pregel_async.py"
+      ],
+      "commit_message": "Merge pull request #320 from langchain-ai/nc/17apr/fix-stream-events\n\nFix astream_events modifying output format unexpectedly",
+      "committed_at": "2024-04-17T15:38:20-07:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-2F6D38B47498",
+      "evidence": [
+        {
+          "evidence_id": "151a38d6e93e-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/151a38d6e93ef4f4655ca921f9dbe29f8a9669a9",
+          "revision": "151a38d6e93ef4f4655ca921f9dbe29f8a9669a9"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-2F6D38B47498.patch",
+      "patch_sha256": "eedd986adb9055f15b141a36df482fd41fc488d1e7c58558abd66cd99657b10a",
+      "pull_request_locator": null,
+      "repository": "langchain-ai/langgraph",
+      "revision": "151a38d6e93ef4f4655ca921f9dbe29f8a9669a9",
+      "source_kind": "fixing_commit",
+      "title": "Merge pull request #320 from langchain-ai/nc/17apr/fix-stream-events"
+    },
+    {
+      "candidate_test_files": [
+        "libs/langgraph/tests/test_large_cases.py"
+      ],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/be088801baa2a5271e035db91d64dc72a727fbc7",
+      "changed_files": [
+        "libs/langgraph/tests/test_large_cases.py"
+      ],
+      "commit_message": "fix(langgraph): fix assertion in test (#5606)",
+      "committed_at": "2025-07-21T14:25:37-04:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-32E290AB59E2",
+      "evidence": [
+        {
+          "evidence_id": "be088801baa2-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/be088801baa2a5271e035db91d64dc72a727fbc7",
+          "revision": "be088801baa2a5271e035db91d64dc72a727fbc7"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-32E290AB59E2.patch",
+      "patch_sha256": "1e29fa10721823e215c4d5a8614e6cf9ffc2beeba5b29fe9545cbba5c7392e11",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/5606",
+      "repository": "langchain-ai/langgraph",
+      "revision": "be088801baa2a5271e035db91d64dc72a727fbc7",
+      "source_kind": "fixing_commit",
+      "title": "fix(langgraph): fix assertion in test (#5606)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/a1b34efdb00002cd31838cf92aa84a66a7fa3cb8",
+      "changed_files": [
+        "libs/checkpoint-postgres/langgraph/store/postgres/base.py"
+      ],
+      "commit_message": "fix(checkpoint-postgres): ensure vector extension is created only if not exists (#6154)\n\nThank you for contributing to LangGraph! Follow these steps to mark your\npull request as ready for review. **If any of these steps are not\ncompleted, your PR will not be considered for review.**\n\n- [x] **PR title**: Follows the format: {TYPE}({SCOPE}): {DESCRIPTION}\n  - Examples:\n    - feat(core): add multi-tenant support\n    - fix(cli): resolve flag parsing error\n    - docs(openai): update API usage examples\n  - Allowed `{TYPE}` values:\n- feat, fix, docs, style, refactor, perf, test, build, ci, chore,\nrevert, release\n  - Allowed `{SCOPE}` values (optional):\n- langgraph, docs, cli, checkpoint, checkpoint-postgres,\ncheckpoint-sqlite, prebuilt, scheduler-kafka, sdk-py\n- Once you've written the title, please delete this checklist item; do\nnot include it in the PR.\n\n- **Description:** Azure Postgres SQL server has a limitation when doing\ncreate extension vector is not exists, even though it manually created\nbefore on a schema.\n- **Issue:** Even though `CREATE EXTENSION vector` is executed manually\nbefore, the permission issue arises. Putting it in an if else block\nsolves the issue and its not a breaking change.\n```\nBecause vector isn't a trusted extension, only members of \"azure_pg_admin\" are allowed to use CREATE EXTENSION vector\nHINT: to learn how to allow an extension or see the list of allowed extensions, please refer to https://go.microsoft.com/fwlink/?linkid=2301063\n```\n\nCo-authored-by: Josh Rogers <josh@langchain.dev>",
+      "committed_at": "2025-11-07T11:42:15-05:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-37CF01E19507",
+      "evidence": [
+        {
+          "evidence_id": "a1b34efdb000-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/a1b34efdb00002cd31838cf92aa84a66a7fa3cb8",
+          "revision": "a1b34efdb00002cd31838cf92aa84a66a7fa3cb8"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-37CF01E19507.patch",
+      "patch_sha256": "3b246923461a8039b7d29ab4700b2567bf5bae1a77891fbb983d0a3ff3243c8d",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/6154",
+      "repository": "langchain-ai/langgraph",
+      "revision": "a1b34efdb00002cd31838cf92aa84a66a7fa3cb8",
+      "source_kind": "fixing_commit",
+      "title": "fix(checkpoint-postgres): ensure vector extension is created only if not exists (#6154)"
+    },
+    {
+      "candidate_test_files": [
+        "libs/prebuilt/tests/test_react_agent.py"
+      ],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/19ca6b416bd317346f4d0f5b472dea3fd39af0f0",
+      "changed_files": [
+        "libs/prebuilt/langgraph/prebuilt/chat_agent_executor.py",
+        "libs/prebuilt/tests/test_react_agent.py"
+      ],
+      "commit_message": "fix: `post_model_hook` should inject state + store into tool calls if necessary (#4842)",
+      "committed_at": "2025-05-27T17:42:20Z",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-3A0A8FCFB120",
+      "evidence": [
+        {
+          "evidence_id": "19ca6b416bd3-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/19ca6b416bd317346f4d0f5b472dea3fd39af0f0",
+          "revision": "19ca6b416bd317346f4d0f5b472dea3fd39af0f0"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-3A0A8FCFB120.patch",
+      "patch_sha256": "eb2581c397b26176d70801bb011c93935dcc3ec6a20f870077af45100d82d7c9",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/4842",
+      "repository": "langchain-ai/langgraph",
+      "revision": "19ca6b416bd317346f4d0f5b472dea3fd39af0f0",
+      "source_kind": "fixing_commit",
+      "title": "fix: `post_model_hook` should inject state + store into tool calls if necessary (#4842)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/e3a30a9b69ca7ca83740c420280c04fbdbeec45c",
+      "changed_files": [
+        "docs/docs/tutorials/multi_agent/hierarchical_agent_teams.ipynb"
+      ],
+      "commit_message": "docs: fix prompt (#2467)",
+      "committed_at": "2024-11-19T09:42:20-05:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-472044FDBEB7",
+      "evidence": [
+        {
+          "evidence_id": "e3a30a9b69ca-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/e3a30a9b69ca7ca83740c420280c04fbdbeec45c",
+          "revision": "e3a30a9b69ca7ca83740c420280c04fbdbeec45c"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-472044FDBEB7.patch",
+      "patch_sha256": "5940c8838dd49732a88c600883fe96783e27de3ae374d4e878bd0ba2dd6e5716",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/2467",
+      "repository": "langchain-ai/langgraph",
+      "revision": "e3a30a9b69ca7ca83740c420280c04fbdbeec45c",
+      "source_kind": "fixing_commit",
+      "title": "docs: fix prompt (#2467)"
+    },
+    {
+      "candidate_test_files": [
+        "libs/prebuilt/tests/test_tool_node.py"
+      ],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/57b314c5d7d0046a89d31db77ccbfc9c5e57be09",
+      "changed_files": [
+        "libs/prebuilt/langgraph/prebuilt/tool_node.py",
+        "libs/prebuilt/tests/test_tool_node.py"
+      ],
+      "commit_message": "fix: tool node injection bug (#7391)\n\nensuring that injected args can only be injected by LC code, not LLMs :)\n\nthis does not appear to be an actual security concern because it falls\noutside of documented usage, the tool node doesn't inject arbitrary args",
+      "committed_at": "2026-04-02T11:19:24-04:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-58B8EA28E2D3",
+      "evidence": [
+        {
+          "evidence_id": "57b314c5d7d0-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/57b314c5d7d0046a89d31db77ccbfc9c5e57be09",
+          "revision": "57b314c5d7d0046a89d31db77ccbfc9c5e57be09"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-58B8EA28E2D3.patch",
+      "patch_sha256": "9705f52a785b9d51661c37320d3985022c7921865fd4b3f4c57c9fb3e5635628",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/7391",
+      "repository": "langchain-ai/langgraph",
+      "revision": "57b314c5d7d0046a89d31db77ccbfc9c5e57be09",
+      "source_kind": "fixing_commit",
+      "title": "fix: tool node injection bug (#7391)"
+    },
+    {
+      "candidate_test_files": [
+        "libs/checkpoint/tests/test_memory.py"
+      ],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/b6cc0228616c71586a1e9b29225a8ed4d4f32c38",
+      "changed_files": [
+        "libs/checkpoint/langgraph/checkpoint/memory/__init__.py",
+        "libs/checkpoint/tests/test_memory.py"
+      ],
+      "commit_message": "fix(checkpoint): InMemorySaver context managers should return self in… (#6529)\n\nh/t to @lexi-k for openening. merged here to check/fix CI\n\nCo-authored-by: lexi-k <69981673+lexi-k@users.noreply.github.com>",
+      "committed_at": "2025-12-02T11:47:41-08:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-5EE53C71D22E",
+      "evidence": [
+        {
+          "evidence_id": "b6cc0228616c-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/b6cc0228616c71586a1e9b29225a8ed4d4f32c38",
+          "revision": "b6cc0228616c71586a1e9b29225a8ed4d4f32c38"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-5EE53C71D22E.patch",
+      "patch_sha256": "6bd49575a1335481e9451d3e6aa04ef620a200c94668bc8947ffe9e6c1b9bb88",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/6529",
+      "repository": "langchain-ai/langgraph",
+      "revision": "b6cc0228616c71586a1e9b29225a8ed4d4f32c38",
+      "source_kind": "fixing_commit",
+      "title": "fix(checkpoint): InMemorySaver context managers should return self in… (#6529)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/3dac1894cc051cf3e75851ce206aa1a1fae6d13d",
+      "changed_files": [
+        "libs/sdk-js/package.json",
+        "libs/sdk-js/src/react/stream.tsx"
+      ],
+      "commit_message": "fix(react): handle non-concatenable messages (#3536)",
+      "committed_at": "2025-02-20T21:28:02+01:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-68228EF073F3",
+      "evidence": [
+        {
+          "evidence_id": "3dac1894cc05-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/3dac1894cc051cf3e75851ce206aa1a1fae6d13d",
+          "revision": "3dac1894cc051cf3e75851ce206aa1a1fae6d13d"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-68228EF073F3.patch",
+      "patch_sha256": "72acb7026be1e81767425c5fd56a652b8ff48d959019b52e5e2bdb1a4b549cef",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/3536",
+      "repository": "langchain-ai/langgraph",
+      "revision": "3dac1894cc051cf3e75851ce206aa1a1fae6d13d",
+      "source_kind": "fixing_commit",
+      "title": "fix(react): handle non-concatenable messages (#3536)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/18887e9f86a6d8675a2b4aed03a1c190ef6e1581",
+      "changed_files": [
+        "libs/langgraph/langgraph/pregel/main.py"
+      ],
+      "commit_message": "fix(langgraph): Remove duplicate call to ensure_config (#5768)",
+      "committed_at": "2025-07-31T09:15:03-04:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-68483D6E7574",
+      "evidence": [
+        {
+          "evidence_id": "18887e9f86a6-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/18887e9f86a6d8675a2b4aed03a1c190ef6e1581",
+          "revision": "18887e9f86a6d8675a2b4aed03a1c190ef6e1581"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-68483D6E7574.patch",
+      "patch_sha256": "2224436638c1b5a03e93a4b73448f029c159a168698ddd1e99421cfe13fdc4bd",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/5768",
+      "repository": "langchain-ai/langgraph",
+      "revision": "18887e9f86a6d8675a2b4aed03a1c190ef6e1581",
+      "source_kind": "fixing_commit",
+      "title": "fix(langgraph): Remove duplicate call to ensure_config (#5768)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/0b6a9e345d3301705e884857d6710a1a84a8edaa",
+      "changed_files": [
+        "libs/langgraph/langgraph/graph/state.py"
+      ],
+      "commit_message": "fix(langgraph): replace _state_schema to state_schema when accessing StateGraph (#5436)",
+      "committed_at": "2025-07-11T01:39:59Z",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-6B253E912DAC",
+      "evidence": [
+        {
+          "evidence_id": "0b6a9e345d33-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/0b6a9e345d3301705e884857d6710a1a84a8edaa",
+          "revision": "0b6a9e345d3301705e884857d6710a1a84a8edaa"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-6B253E912DAC.patch",
+      "patch_sha256": "7a8d34322374b38cab969b9d8e5b66c666301d942337bc1aafaad718f597ab62",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/5436",
+      "repository": "langchain-ai/langgraph",
+      "revision": "0b6a9e345d3301705e884857d6710a1a84a8edaa",
+      "source_kind": "fixing_commit",
+      "title": "fix(langgraph): replace _state_schema to state_schema when accessing StateGraph (#5436)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/30598cd9139cbe9e74890cd2f08657c5697703de",
+      "changed_files": [
+        "examples/react-agent-structured-output.ipynb"
+      ],
+      "commit_message": "docs: fix images in structured react agent (#1544)",
+      "committed_at": "2024-08-30T01:50:14Z",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-8F1BDAD55A9B",
+      "evidence": [
+        {
+          "evidence_id": "30598cd9139c-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/30598cd9139cbe9e74890cd2f08657c5697703de",
+          "revision": "30598cd9139cbe9e74890cd2f08657c5697703de"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-8F1BDAD55A9B.patch",
+      "patch_sha256": "835f7d9ab66b33559fa696e11c02826437ce12124213d8e8482eb9282a3d5d26",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/1544",
+      "repository": "langchain-ai/langgraph",
+      "revision": "30598cd9139cbe9e74890cd2f08657c5697703de",
+      "source_kind": "fixing_commit",
+      "title": "docs: fix images in structured react agent (#1544)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/8daeb561946bbe2d1e507db451aefe2097f346e3",
+      "changed_files": [
+        "examples/introduction.ipynb"
+      ],
+      "commit_message": "Fix typo in documentation: corrected 'they agent's' to 'their agent's' (#1338)",
+      "committed_at": "2024-08-14T10:08:26-04:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-9458C5809A2D",
+      "evidence": [
+        {
+          "evidence_id": "8daeb561946b-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/8daeb561946bbe2d1e507db451aefe2097f346e3",
+          "revision": "8daeb561946bbe2d1e507db451aefe2097f346e3"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-9458C5809A2D.patch",
+      "patch_sha256": "e496788ef7813fecdd33f7a6d0ebdc9318d0b0933945a86ac323ec94916c55d8",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/1338",
+      "repository": "langchain-ai/langgraph",
+      "revision": "8daeb561946bbe2d1e507db451aefe2097f346e3",
+      "source_kind": "fixing_commit",
+      "title": "Fix typo in documentation: corrected 'they agent's' to 'their agent's' (#1338)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/d6c6516f16efdaab726b82e26b72b6a78ed61925",
+      "changed_files": [
+        "docs/docs/tutorials/llm-compiler/LLMCompiler.ipynb"
+      ],
+      "commit_message": "fix: minor modification, syntax error (#1905)",
+      "committed_at": "2024-12-19T15:29:10-05:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-9588EEF71CEB",
+      "evidence": [
+        {
+          "evidence_id": "d6c6516f16ef-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/d6c6516f16efdaab726b82e26b72b6a78ed61925",
+          "revision": "d6c6516f16efdaab726b82e26b72b6a78ed61925"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-9588EEF71CEB.patch",
+      "patch_sha256": "a9f748cefe3e76f9ad1f8cfc1608582a637bbac2d85e5e3b82530bf86f78f890",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/1905",
+      "repository": "langchain-ai/langgraph",
+      "revision": "d6c6516f16efdaab726b82e26b72b6a78ed61925",
+      "source_kind": "fixing_commit",
+      "title": "fix: minor modification, syntax error (#1905)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/e3cb2dd23b1dd95cc1450868f501f49fa03c72bf",
+      "changed_files": [
+        "docs/docs/concepts/auth.md",
+        "docs/docs/concepts/low_level.md",
+        "docs/docs/how-tos/auth/custom_auth.md"
+      ],
+      "commit_message": "chore(docs): fix more admonitions (#5792)\n\nFix more admonitions",
+      "committed_at": "2025-07-31T22:57:44-04:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-A9CD7093EC81",
+      "evidence": [
+        {
+          "evidence_id": "e3cb2dd23b1d-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/e3cb2dd23b1dd95cc1450868f501f49fa03c72bf",
+          "revision": "e3cb2dd23b1dd95cc1450868f501f49fa03c72bf"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-A9CD7093EC81.patch",
+      "patch_sha256": "6212b43fa31cf21eca88b85dbfb12a8a9db8de212b0ce3dde68896ba1a54abac",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/5792",
+      "repository": "langchain-ai/langgraph",
+      "revision": "e3cb2dd23b1dd95cc1450868f501f49fa03c72bf",
+      "source_kind": "fixing_commit",
+      "title": "chore(docs): fix more admonitions (#5792)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/220f9aaaabeca0a5a8d98697713f2c5fa59f58b3",
+      "changed_files": [
+        "docs/docs/concepts/why-langgraph.md"
+      ],
+      "commit_message": "docs: fix formatting in overview for getting started tutorial (#4639)",
+      "committed_at": "2025-05-09T16:48:13-04:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-BDC1553450B9",
+      "evidence": [
+        {
+          "evidence_id": "220f9aaaabec-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/220f9aaaabeca0a5a8d98697713f2c5fa59f58b3",
+          "revision": "220f9aaaabeca0a5a8d98697713f2c5fa59f58b3"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-BDC1553450B9.patch",
+      "patch_sha256": "88aced3f60fc4f051bc3e78068980b9c043c7d48106af71fcba71f3da5509128",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/4639",
+      "repository": "langchain-ai/langgraph",
+      "revision": "220f9aaaabeca0a5a8d98697713f2c5fa59f58b3",
+      "source_kind": "fixing_commit",
+      "title": "docs: fix formatting in overview for getting started tutorial (#4639)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/460c52290218e06a3d228d58b6e8dd0837184b4a",
+      "changed_files": [
+        "docs/docs/concepts/agentic_concepts.md"
+      ],
+      "commit_message": "docs: fix typo (#3856)\n\nAdded \"a\" to make paragraph correct.\n\nCo-authored-by: Eugene Yurtsev <eyurtsev@gmail.com>",
+      "committed_at": "2025-03-18T17:58:30-04:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-C2ABDDA05120",
+      "evidence": [
+        {
+          "evidence_id": "460c52290218-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/460c52290218e06a3d228d58b6e8dd0837184b4a",
+          "revision": "460c52290218e06a3d228d58b6e8dd0837184b4a"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-C2ABDDA05120.patch",
+      "patch_sha256": "14ddfbf31fa3c0278ebe51e3d372ac80bb06d695ee33c0a9354e362af14e335a",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/3856",
+      "repository": "langchain-ai/langgraph",
+      "revision": "460c52290218e06a3d228d58b6e8dd0837184b4a",
+      "source_kind": "fixing_commit",
+      "title": "docs: fix typo (#3856)"
+    },
+    {
+      "candidate_test_files": [
+        "libs/langgraph/tests/conftest.py",
+        "libs/langgraph/tests/test_pregel.py"
+      ],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/a15f542a1f235a4b8622f958403971295df5fa8f",
+      "changed_files": [
+        "libs/langgraph/langgraph/types.py",
+        "libs/langgraph/tests/conftest.py",
+        "libs/langgraph/tests/test_pregel.py"
+      ],
+      "commit_message": "fix: Persist resume_map values (#5898)\n\nThank you for contributing to LangGraph! Follow these steps to mark your\npull request as ready for review. **If any of these steps are not\ncompleted, your PR will not be considered for review.**\n\n- [ ] **PR title**: Follows the format: {TYPE}({SCOPE}): {DESCRIPTION}\n  - Examples:\n    - feat(core): add multi-tenant support\n    - fix(cli): resolve flag parsing error\n    - docs(openai): update API usage examples\n  - Allowed `{TYPE}` values:\n- feat, fix, docs, style, refactor, perf, test, build, ci, chore,\nrevert, release\n  - Allowed `{SCOPE}` values (optional):\n- langgraph, docs, cli, checkpoint, checkpoint-postgres,\ncheckpoint-sqlite, prebuilt, scheduler-kafka, sdk-py\n- Once you've written the title, please delete this checklist item; do\nnot include it in the PR.\n\n- [ ] **PR message**: ***Delete this entire checklist*** and replace\nwith\n- **Description:** a description of the change. Include a [closing\nkeyword](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword)\nif applicable.\n  - **Issue:** the issue # it fixes, if applicable\n  - **Dependencies:** any dependencies required for this change\n- **Twitter handle:** if your PR gets announced, and you'd like a\nmention, we'll gladly shout you out!\n\n- [ ] **Add tests and docs**: If you're adding a new integration, you\nmust include:\n1. A test for the integration, preferably unit tests that do not rely on\nnetwork access,\n2. An example notebook showing its use. It lives in\n`docs/docs/integrations` directory.\n\n- [ ] **Lint and test**: Run `make format`, `make lint` and `make test`\nfrom the root of the package(s) you've modified. We will not consider a\nPR unless these three are passing in CI. See [contribution\nguidelines](https://github.com/langchain-ai/langgraph/blob/main/CONTRIBUTING.md)\nfor more.\n\nAdditional guidelines:\n\n- Make sure optional dependencies are imported within a function.\n- Please do not add dependencies to `pyproject.toml` files (even\noptional ones) unless they are **required** for unit tests.\n- Most PRs should not touch more than one package.\n- Changes should be backwards compatible.",
+      "committed_at": "2025-08-13T19:33:20+01:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-D5AA932E0F0D",
+      "evidence": [
+        {
+          "evidence_id": "a15f542a1f23-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/a15f542a1f235a4b8622f958403971295df5fa8f",
+          "revision": "a15f542a1f235a4b8622f958403971295df5fa8f"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-D5AA932E0F0D.patch",
+      "patch_sha256": "ce6639dd38fa5d7bf5e28238b3afdb868a73a31fe9efff27815a161116de0f47",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/5898",
+      "repository": "langchain-ai/langgraph",
+      "revision": "a15f542a1f235a4b8622f958403971295df5fa8f",
+      "source_kind": "fixing_commit",
+      "title": "fix: Persist resume_map values (#5898)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/217795eb7272e9a077a3e2a23a99423bd88d2991",
+      "changed_files": [
+        "docs/docs/cloud/deployment/img/langgraph-studio.png",
+        "docs/docs/cloud/deployment/img/langgraph_studio.png",
+        "docs/docs/tutorials/sql-agent.ipynb"
+      ],
+      "commit_message": "docs: fix broken img (#4716)",
+      "committed_at": "2025-05-15T13:37:40-07:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-D7C1D86F1B2E",
+      "evidence": [
+        {
+          "evidence_id": "217795eb7272-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/217795eb7272e9a077a3e2a23a99423bd88d2991",
+          "revision": "217795eb7272e9a077a3e2a23a99423bd88d2991"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-D7C1D86F1B2E.patch",
+      "patch_sha256": "52f02e3831cfed709fb0718b3ea8e1d9e4296b7e5f581d4eb77cee28fca2675c",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/4716",
+      "repository": "langchain-ai/langgraph",
+      "revision": "217795eb7272e9a077a3e2a23a99423bd88d2991",
+      "source_kind": "fixing_commit",
+      "title": "docs: fix broken img (#4716)"
+    },
+    {
+      "candidate_test_files": [
+        "libs/cli/tests/unit_tests/test_docker.py"
+      ],
+      "canonical_locator": "https://github.com/langchain-ai/langgraph/commit/f087567853829e0c3a3e608e2cd5501a97aaefac",
+      "changed_files": [
+        "libs/cli/langgraph_cli/docker.py",
+        "libs/cli/tests/unit_tests/test_docker.py"
+      ],
+      "commit_message": "fix(cli): handle Docker SemVer build metadata in version parsing #5965 (#6024)\n\nDescription:\nCorrects _parse_version to support Docker versions with SemVer build\nmetadata (e.g., 28.1.1+1), resolving #5965. Adds comprehensive unit\ntests for version parsing, including normal, v-prefixed, prerelease,\nbuild metadata, combined prerelease/build metadata, and edge cases with\nmissing components.\n\nIssue:\nCloses #5965\n\nDependencies:\nNone\n\n---------\n\nCo-authored-by: Sydney Runkle <54324534+sydney-runkle@users.noreply.github.com>",
+      "committed_at": "2025-09-10T14:31:07-04:00",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-DF5A13F34BDC",
+      "evidence": [
+        {
+          "evidence_id": "f08756785382-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/langchain-ai/langgraph/commit/f087567853829e0c3a3e608e2cd5501a97aaefac",
+          "revision": "f087567853829e0c3a3e608e2cd5501a97aaefac"
+        }
+      ],
+      "patch_path": "patches/LANGCHAIN-AI-LANGGRAPH-DF5A13F34BDC.patch",
+      "patch_sha256": "06d7caad871e2ad0b9e9bb557d4861b75d8991c185b4c092d3b97d497dfdcd77",
+      "pull_request_locator": "https://github.com/langchain-ai/langgraph/pull/6024",
+      "repository": "langchain-ai/langgraph",
+      "revision": "f087567853829e0c3a3e608e2cd5501a97aaefac",
+      "source_kind": "fixing_commit",
+      "title": "fix(cli): handle Docker SemVer build metadata in version parsing #5965 (#6024)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/de757707bcaaedfb62d90a78977d79e3b983671e",
+      "changed_files": [
+        ".devcontainer/Dockerfile",
+        ".devcontainer/dev/Dockerfile",
+        ".github/workflows/deploy-website.yml",
+        "website/process_notebooks.py"
+      ],
+      "commit_message": "Upgrade quarto and include mitigation for title issue, fix links (#1851)\n\n* Upgrade quarto and include mitigation for title issue, fix links\n\n* repo_root\n\n* dont run quarto independently\n\n* test paths\n\n* test\n\n* resolve intermediate parents\n\n* remove print",
+      "committed_at": "2024-03-04T14:44:41Z",
+      "defect_id": "MICROSOFT-AUTOGEN-06029DF804F5",
+      "evidence": [
+        {
+          "evidence_id": "de757707bcaa-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/de757707bcaaedfb62d90a78977d79e3b983671e",
+          "revision": "de757707bcaaedfb62d90a78977d79e3b983671e"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-06029DF804F5.patch",
+      "patch_sha256": "f2da40ff2747799323d13885c5060097cabb588ca9e1ee37a841c51a0bfeb55b",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/1851",
+      "repository": "microsoft/autogen",
+      "revision": "de757707bcaaedfb62d90a78977d79e3b983671e",
+      "source_kind": "fixing_commit",
+      "title": "Upgrade quarto and include mitigation for title issue, fix links (#1851)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/c930251ebc9547c9f744ecc08965ae1cfa6803bc",
+      "changed_files": [
+        "dotnet/src/Microsoft.AutoGen/Core/InProcessRuntime.cs"
+      ],
+      "commit_message": "fix: Increase MethodGroup type precision\n\n* Fixes stackoverflow when calling InMemoryRutnime.RegisterAgentFactoryAsync()",
+      "committed_at": "2025-01-28T09:24:16-05:00",
+      "defect_id": "MICROSOFT-AUTOGEN-10A44C35EBC4",
+      "evidence": [
+        {
+          "evidence_id": "c930251ebc95-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/c930251ebc9547c9f744ecc08965ae1cfa6803bc",
+          "revision": "c930251ebc9547c9f744ecc08965ae1cfa6803bc"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-10A44C35EBC4.patch",
+      "patch_sha256": "58401bd28cc6fb123fd643e80d2f5ee013a55286b0446197b4f2a46de5773c79",
+      "pull_request_locator": null,
+      "repository": "microsoft/autogen",
+      "revision": "c930251ebc9547c9f744ecc08965ae1cfa6803bc",
+      "source_kind": "fixing_commit",
+      "title": "fix: Increase MethodGroup type precision"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/5861bd92a6813a47a7ceaf391c4d5871d71a14ff",
+      "changed_files": [
+        "autogen/oai/cohere.py",
+        "website/docs/topics/non-openai-models/cloud-cohere.ipynb"
+      ],
+      "commit_message": "fix: tool calling cohere (#3355)\n\n* Add support for tool calling cohere\n\n* update tool calling code\n\n* make client name configurable with default\n\n* formatting nits\n\n* update docs\n\n---------\n\nCo-authored-by: Mark Sze <66362098+marklysze@users.noreply.github.com>\nCo-authored-by: Li Jiang <bnujli@gmail.com>",
+      "committed_at": "2024-08-28T18:47:39Z",
+      "defect_id": "MICROSOFT-AUTOGEN-1A55A455930E",
+      "evidence": [
+        {
+          "evidence_id": "5861bd92a681-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/5861bd92a6813a47a7ceaf391c4d5871d71a14ff",
+          "revision": "5861bd92a6813a47a7ceaf391c4d5871d71a14ff"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-1A55A455930E.patch",
+      "patch_sha256": "4e983b68bd2e1c7222dbf07084da42bae6aa94eafdf92b743c8e41cd928e67de",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/3355",
+      "repository": "microsoft/autogen",
+      "revision": "5861bd92a6813a47a7ceaf391c4d5871d71a14ff",
+      "source_kind": "fixing_commit",
+      "title": "fix: tool calling cohere (#3355)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/6c8b656588cc3b99ff1e9d5fcf2d545068f02f2b",
+      "changed_files": [
+        "python/packages/autogen-agentchat/src/autogen_agentchat/agents/_code_executor_agent.py",
+        "python/packages/autogen-agentchat/src/autogen_agentchat/base/_termination.py",
+        "python/packages/autogen-agentchat/src/autogen_agentchat/task/_terminations.py",
+        "python/packages/autogen-agentchat/src/autogen_agentchat/teams/_group_chat/_selector_group_chat.py",
+        "python/packages/autogen-core/src/autogen_core/base/_agent_runtime.py",
+        "python/packages/autogen-core/src/autogen_core/components/_default_subscription.py",
+        "python/packages/autogen-core/src/autogen_core/components/_routed_agent.py",
+        "python/packages/autogen-core/src/autogen_core/components/_type_subscription.py",
+        "python/packages/autogen-core/src/autogen_core/components/code_executor/_impl/local_commandline_code_executor.py",
+        "python/packages/autogen-core/src/autogen_core/components/tools/_function_tool.py",
+        "python/packages/autogen-ext/src/autogen_ext/agents/_openai_assistant_agent.py",
+        "python/packages/autogen-ext/src/autogen_ext/models/_openai/_openai_client.py",
+        "python/packages/autogen-ext/src/autogen_ext/models/_reply_chat_completion_client.py"
+      ],
+      "commit_message": "Fix examples in docstrings (#4356)\n\n* Fix examples in docstrings\r\n\r\n* formatting\r\n\r\n* Update python/packages/autogen-ext/src/autogen_ext/models/_reply_chat_completion_client.py\r\n\r\nCo-authored-by: Eric Zhu <ekzhu@users.noreply.github.com>\r\n\r\n* Update python/packages/autogen-ext/src/autogen_ext/models/_reply_chat_completion_client.py\r\n\r\nCo-authored-by: Eric Zhu <ekzhu@users.noreply.github.com>\r\n\r\n* Update python/packages/autogen-ext/src/autogen_ext/agents/_openai_assistant_agent.py\r\n\r\nCo-authored-by: Eric Zhu <ekzhu@users.noreply.github.com>\r\n\r\n* Update python/packages/autogen-ext/src/autogen_ext/agents/_openai_assistant_agent.py\r\n\r\nCo-authored-by: Eric Zhu <ekzhu@users.noreply.github.com>\r\n\r\n* Update python/packages/autogen-ext/src/autogen_ext/models/_reply_chat_completion_client.py\r\n\r\nCo-authored-by: Eric Zhu <ekzhu@users.noreply.github.com>\r\n\r\n* Update python/packages/autogen-ext/src/autogen_ext/models/_reply_chat_completion_client.py\r\n\r\nCo-authored-by: Eric Zhu <ekzhu@users.noreply.github.com>\r\n\r\n* Formattinggp\r\n\r\n---------\r\n\r\nCo-authored-by: Eric Zhu <ekzhu@users.noreply.github.com>",
+      "committed_at": "2024-11-25T16:07:45-05:00",
+      "defect_id": "MICROSOFT-AUTOGEN-1EB93F23C63B",
+      "evidence": [
+        {
+          "evidence_id": "6c8b656588cc-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/6c8b656588cc3b99ff1e9d5fcf2d545068f02f2b",
+          "revision": "6c8b656588cc3b99ff1e9d5fcf2d545068f02f2b"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-1EB93F23C63B.patch",
+      "patch_sha256": "756ce21b766c697c248ea23405173b0ac6b30cf52417998c6cb41fcf0be4da3f",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/4356",
+      "repository": "microsoft/autogen",
+      "revision": "6c8b656588cc3b99ff1e9d5fcf2d545068f02f2b",
+      "source_kind": "fixing_commit",
+      "title": "Fix examples in docstrings (#4356)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/aa0d835f4dd966f45bcd5d0fa354f88993ee70bc",
+      "changed_files": [
+        "python/packages/autogen-ext/src/autogen_ext/models/ollama/_model_info.py"
+      ],
+      "commit_message": "Fix function calling support for Llama3.3 (#6750)\n\n\n\n## Why are these changes needed?\nThis PR fixes incorrect model metadata for llama3.3.\nThe function_calling capability was previously set to False, but\n[llama3.3 supports function\ncalling.](https://www.llama.com/docs/model-cards-and-prompt-formats/llama3_3/)\nwith [ollama](https://ollama.com/library/llama3.3).\n\n<!-- Please give a short summary of the change and the problem this\nsolves. -->\n\n## Related issue number\n\n<!-- For example: \"Closes #1234\" -->\n\n## Checks\n\n- [x] I've included any doc changes needed for\n<https://microsoft.github.io/autogen/>. See\n<https://github.com/microsoft/autogen/blob/main/CONTRIBUTING.md> to\nbuild and test documentation locally.\n- [x] I've added tests (if relevant) corresponding to the changes\nintroduced in this PR.\n- [x] I've made sure all auto checks have passed.\n\nCo-authored-by: mh <>",
+      "committed_at": "2025-07-06T03:42:59Z",
+      "defect_id": "MICROSOFT-AUTOGEN-1FE3CE06F15B",
+      "evidence": [
+        {
+          "evidence_id": "aa0d835f4dd9-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/aa0d835f4dd966f45bcd5d0fa354f88993ee70bc",
+          "revision": "aa0d835f4dd966f45bcd5d0fa354f88993ee70bc"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-1FE3CE06F15B.patch",
+      "patch_sha256": "216975faf4f4272b37cc29176369f55fd234f195a754521b54cdcb8c377255d8",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/6750",
+      "repository": "microsoft/autogen",
+      "revision": "aa0d835f4dd966f45bcd5d0fa354f88993ee70bc",
+      "source_kind": "fixing_commit",
+      "title": "Fix function calling support for Llama3.3 (#6750)"
+    },
+    {
+      "candidate_test_files": [
+        "test/agentchat/contrib/test_gpt_assistant.py"
+      ],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/b0f42a1bd415f1cb9759aacb8405adb11cb6115b",
+      "changed_files": [
+        "autogen/oai/client.py",
+        "autogen/oai/completion.py",
+        "test/agentchat/contrib/test_gpt_assistant.py",
+        "website/blog/2023-07-14-Local-LLMs/index.md"
+      ],
+      "commit_message": "Fix tests for GPT assistant (#1505)\n\n* fixed tests for gpt assistant\n\n* fixed tests for gpt assistant\n\n* api_type openai\n\n* tests updated\n\n---------\n\nCo-authored-by: Chi Wang <wang.chi@microsoft.com>",
+      "committed_at": "2024-02-02T16:27:13Z",
+      "defect_id": "MICROSOFT-AUTOGEN-25828CF6C797",
+      "evidence": [
+        {
+          "evidence_id": "b0f42a1bd415-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/b0f42a1bd415f1cb9759aacb8405adb11cb6115b",
+          "revision": "b0f42a1bd415f1cb9759aacb8405adb11cb6115b"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-25828CF6C797.patch",
+      "patch_sha256": "f7fdefa3629fac8e69973866c77f18fd9df197563f5df05fc56b6b7f9f3aaf34",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/1505",
+      "repository": "microsoft/autogen",
+      "revision": "b0f42a1bd415f1cb9759aacb8405adb11cb6115b",
+      "source_kind": "fixing_commit",
+      "title": "Fix tests for GPT assistant (#1505)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/83f9f3e73336fbad4d441e3db16c3a94a78d9443",
+      "changed_files": [
+        "setup.py"
+      ],
+      "commit_message": "Fix chroma import error (#2557)\n\n* Fix chroma import error\n\n* fix format",
+      "committed_at": "2024-05-01T18:05:45Z",
+      "defect_id": "MICROSOFT-AUTOGEN-4AE8B72F6FF7",
+      "evidence": [
+        {
+          "evidence_id": "83f9f3e73336-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/83f9f3e73336fbad4d441e3db16c3a94a78d9443",
+          "revision": "83f9f3e73336fbad4d441e3db16c3a94a78d9443"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-4AE8B72F6FF7.patch",
+      "patch_sha256": "396485768538a3c1ed5260370174f58b3e8f25726660582e94e95cf658887c89",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/2557",
+      "repository": "microsoft/autogen",
+      "revision": "83f9f3e73336fbad4d441e3db16c3a94a78d9443",
+      "source_kind": "fixing_commit",
+      "title": "Fix chroma import error (#2557)"
+    },
+    {
+      "candidate_test_files": [
+        "test/agentchat/test_agent_logging.py"
+      ],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/e83301ed187fa1695934069118e856c2331e7c19",
+      "changed_files": [
+        "test/agentchat/test_agent_logging.py"
+      ],
+      "commit_message": "fix logging cost flaky test (#2277)",
+      "committed_at": "2024-04-04T14:36:46Z",
+      "defect_id": "MICROSOFT-AUTOGEN-5B5000568D6B",
+      "evidence": [
+        {
+          "evidence_id": "e83301ed187f-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/e83301ed187fa1695934069118e856c2331e7c19",
+          "revision": "e83301ed187fa1695934069118e856c2331e7c19"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-5B5000568D6B.patch",
+      "patch_sha256": "e22153192ddde1638869bff2d71d506cd32b4bfbc7242a1ea2811505f79c50ba",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/2277",
+      "repository": "microsoft/autogen",
+      "revision": "e83301ed187fa1695934069118e856c2331e7c19",
+      "source_kind": "fixing_commit",
+      "title": "fix logging cost flaky test (#2277)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/d999b452e8bee8178e7486cd6a41ecd1f41059cd",
+      "changed_files": [
+        "notebook/contributing.md"
+      ],
+      "commit_message": "Fix formatting of notebook contributing.md (#1540)",
+      "committed_at": "2024-02-05T15:29:25Z",
+      "defect_id": "MICROSOFT-AUTOGEN-5F876512E45E",
+      "evidence": [
+        {
+          "evidence_id": "d999b452e8be-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/d999b452e8bee8178e7486cd6a41ecd1f41059cd",
+          "revision": "d999b452e8bee8178e7486cd6a41ecd1f41059cd"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-5F876512E45E.patch",
+      "patch_sha256": "272c46496900473e9d3d0530f59e4f7ff0a58de09d27a4df474fdc0b4631ab0d",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/1540",
+      "repository": "microsoft/autogen",
+      "revision": "d999b452e8bee8178e7486cd6a41ecd1f41059cd",
+      "source_kind": "fixing_commit",
+      "title": "Fix formatting of notebook contributing.md (#1540)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/e32f4193870b280537ad318fc5ec89aa13d754fe",
+      "changed_files": [
+        "python/packages/autogen-core/src/autogen_core/_single_threaded_agent_runtime.py",
+        "python/packages/autogen-core/src/autogen_core/_telemetry/_propagation.py",
+        "python/packages/autogen-core/src/autogen_core/_telemetry/_tracing.py"
+      ],
+      "commit_message": "Fix span structure for tracing (#5853)\n\nResolves #5697",
+      "committed_at": "2025-03-08T22:28:11-08:00",
+      "defect_id": "MICROSOFT-AUTOGEN-623C635D5A11",
+      "evidence": [
+        {
+          "evidence_id": "e32f4193870b-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/e32f4193870b280537ad318fc5ec89aa13d754fe",
+          "revision": "e32f4193870b280537ad318fc5ec89aa13d754fe"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-623C635D5A11.patch",
+      "patch_sha256": "a18afbd2fd614e2e01af121a5ccd0e33f6c321569ff0664921bb16488ea99277",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/5853",
+      "repository": "microsoft/autogen",
+      "revision": "e32f4193870b280537ad318fc5ec89aa13d754fe",
+      "source_kind": "fixing_commit",
+      "title": "Fix span structure for tracing (#5853)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/c620683ba640fd8e64f133cd3b374521d3e22c39",
+      "changed_files": [
+        "python/packages/autogen-core/docs/src/user-guide/autogenstudio-user-guide/installation.md"
+      ],
+      "commit_message": "fix: the installation instruction had a missing step (#6166)\n\n## Why are these changes needed?\n\nFollowing the [guide\ninstructions](https://microsoft.github.io/autogen/stable//user-guide/autogenstudio-user-guide/installation.html#a-install-from-source-manually)\nthe user will execute the commands in the wrong directory.\n\n## Related issue number\n\nCloses #6165",
+      "committed_at": "2025-04-01T07:44:49Z",
+      "defect_id": "MICROSOFT-AUTOGEN-6EF6213DAE38",
+      "evidence": [
+        {
+          "evidence_id": "c620683ba640-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/c620683ba640fd8e64f133cd3b374521d3e22c39",
+          "revision": "c620683ba640fd8e64f133cd3b374521d3e22c39"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-6EF6213DAE38.patch",
+      "patch_sha256": "7421c8bdd7aa03ed1c7dffea448282e301bd83b9a628c6452e69d75d446914b5",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/6166",
+      "repository": "microsoft/autogen",
+      "revision": "c620683ba640fd8e64f133cd3b374521d3e22c39",
+      "source_kind": "fixing_commit",
+      "title": "fix: the installation instruction had a missing step (#6166)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/20f8ba9cfae4a3c70c3131d4f14bf14ba4dc5ced",
+      "changed_files": [
+        "autogen/oai/anthropic.py",
+        "autogen/oai/gemini.py",
+        "autogen/oai/mistral.py",
+        "autogen/oai/together.py"
+      ],
+      "commit_message": "fix: created in ChatCompletion for clients (#2988)",
+      "committed_at": "2024-06-21T18:52:23Z",
+      "defect_id": "MICROSOFT-AUTOGEN-78E69889C9F1",
+      "evidence": [
+        {
+          "evidence_id": "20f8ba9cfae4-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/20f8ba9cfae4a3c70c3131d4f14bf14ba4dc5ced",
+          "revision": "20f8ba9cfae4a3c70c3131d4f14bf14ba4dc5ced"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-78E69889C9F1.patch",
+      "patch_sha256": "410179823d037e6f503620dba8ec0ce16de18e7633eb519ed75391e380972ce1",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/2988",
+      "repository": "microsoft/autogen",
+      "revision": "20f8ba9cfae4a3c70c3131d4f14bf14ba4dc5ced",
+      "source_kind": "fixing_commit",
+      "title": "fix: created in ChatCompletion for clients (#2988)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/eec854279a7a36b0b39e37f100f91ec13bafaa26",
+      "changed_files": [
+        ".github/workflows/contrib-tests.yml"
+      ],
+      "commit_message": "Fix unstructured deps installation error (#2248)",
+      "committed_at": "2024-04-02T05:17:13Z",
+      "defect_id": "MICROSOFT-AUTOGEN-86292287626C",
+      "evidence": [
+        {
+          "evidence_id": "eec854279a7a-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/eec854279a7a36b0b39e37f100f91ec13bafaa26",
+          "revision": "eec854279a7a36b0b39e37f100f91ec13bafaa26"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-86292287626C.patch",
+      "patch_sha256": "10d1b1808e95fa660b649089b63bc657bd760002c76361f54c9273d236172b23",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/2248",
+      "repository": "microsoft/autogen",
+      "revision": "eec854279a7a36b0b39e37f100f91ec13bafaa26",
+      "source_kind": "fixing_commit",
+      "title": "Fix unstructured deps installation error (#2248)"
+    },
+    {
+      "candidate_test_files": [
+        "python/packages/autogen-ext/tests/models/test_sk_chat_completion_adapter.py"
+      ],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/b868e32b05791ef4c7693339473414ebc6f89d24",
+      "changed_files": [
+        "python/packages/autogen-ext/src/autogen_ext/models/semantic_kernel/_sk_chat_completion_adapter.py",
+        "python/packages/autogen-ext/tests/models/test_sk_chat_completion_adapter.py"
+      ],
+      "commit_message": "fix: update SK adapter stream tool call processing. (#5449)\n\n<!-- Thank you for your contribution! Please review\r\nhttps://microsoft.github.io/autogen/docs/Contribute before opening a\r\npull request. -->\r\n\r\n<!-- Please add a reviewer to the assignee section when you create a PR.\r\nIf you don't have the access to it, we will shortly find a reviewer and\r\nassign them to your PR. -->\r\n\r\n## Why are these changes needed?\r\n\r\n<!-- Please give a short summary of the change and the problem this\r\nsolves. -->\r\n\r\nThe current stream processing of SK model adapter returns on the first\r\nfunction call chunk but this behavior is incorrect end ends up returning\r\nwith an incomplete function call. The observed behavior is that the\r\nfunction name and arguments are split into different chunks and this\r\nupdate correctly processes the chunks in this way.\r\n\r\n## Related issue number\r\n\r\n<!-- For example: \"Closes #1234\" -->\r\n\r\nFixes the reply in #5420 \r\n\r\n## Checks\r\n\r\n- [ ] I've included any doc changes needed for\r\nhttps://microsoft.github.io/autogen/. See\r\nhttps://microsoft.github.io/autogen/docs/Contribute#documentation to\r\nbuild and test documentation locally.\r\n- [ ] I've added tests (if relevant) corresponding to the changes\r\nintroduced in this PR.\r\n- [ ] I've made sure all auto checks have passed.\r\n\r\n---------\r\n\r\nCo-authored-by: Leonardo Pinheiro <lpinheiro@microsoft.com>",
+      "committed_at": "2025-02-09T14:39:19+10:00",
+      "defect_id": "MICROSOFT-AUTOGEN-864AA4594BF8",
+      "evidence": [
+        {
+          "evidence_id": "b868e32b0579-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/b868e32b05791ef4c7693339473414ebc6f89d24",
+          "revision": "b868e32b05791ef4c7693339473414ebc6f89d24"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-864AA4594BF8.patch",
+      "patch_sha256": "bd30b55e5ce1c6d1cd626a3737dbf18481780c24c6a9f254566b8763a5130b65",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/5449",
+      "repository": "microsoft/autogen",
+      "revision": "b868e32b05791ef4c7693339473414ebc6f89d24",
+      "source_kind": "fixing_commit",
+      "title": "fix: update SK adapter stream tool call processing. (#5449)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/fef953e062bf37d95eaec299756c8a15adcce054",
+      "changed_files": [
+        "python/packages/autogen-ext/src/autogen_ext/agents/web_surfer/playwright_controller.py"
+      ],
+      "commit_message": "Fix bytes in markdown converter playwright (#6044)\n\nFix error:\n\nTypeError: Input stream must be opened in bytes mode, not in text mode.\n\nMarkdown converter takes binary stream",
+      "committed_at": "2025-03-20T11:53:53-07:00",
+      "defect_id": "MICROSOFT-AUTOGEN-8C56CF8FA3CF",
+      "evidence": [
+        {
+          "evidence_id": "fef953e062bf-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/fef953e062bf37d95eaec299756c8a15adcce054",
+          "revision": "fef953e062bf37d95eaec299756c8a15adcce054"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-8C56CF8FA3CF.patch",
+      "patch_sha256": "a65df60b0cb63ec98260aef7066064b51fde5b846075f9623a51839c7e579e7a",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/6044",
+      "repository": "microsoft/autogen",
+      "revision": "fef953e062bf37d95eaec299756c8a15adcce054",
+      "source_kind": "fixing_commit",
+      "title": "Fix bytes in markdown converter playwright (#6044)"
+    },
+    {
+      "candidate_test_files": [
+        "test/agentchat/contrib/agent_eval/test_agent_eval.py",
+        "test/agentchat/contrib/capabilities/chat_with_teachable_agent.py",
+        "test/agentchat/contrib/capabilities/test_image_generation_capability.py",
+        "test/agentchat/contrib/capabilities/test_teachable_agent.py",
+        "test/agentchat/contrib/retrievechat/test_pgvector_retrievechat.py",
+        "test/agentchat/contrib/retrievechat/test_qdrant_retrievechat.py",
+        "test/agentchat/contrib/retrievechat/test_retrievechat.py",
+        "test/agentchat/contrib/test_agent_optimizer.py",
+        "test/agentchat/contrib/test_gpt_assistant.py",
+        "test/agentchat/contrib/test_web_surfer.py",
+        "test/agentchat/test_tool_calls.py",
+        "test/io/test_websockets.py",
+        "test/oai/_test_completion.py",
+        "test/oai/test_client.py",
+        "test/oai/test_client_stream.py"
+      ],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/db287183f2ec9a3e58021da6f6048c15f31d94b5",
+      "changed_files": [
+        "autogen/agentchat/contrib/vectordb/pgvectordb.py",
+        "notebook/agentchat_MathChat.ipynb",
+        "notebook/agentchat_auto_feedback_from_code_execution.ipynb",
+        "notebook/agentchat_cost_token_tracking.ipynb",
+        "notebook/agentchat_function_call_currency_calculator.ipynb",
+        "notebook/agentchat_groupchat_finite_state_machine.ipynb",
+        "notebook/agentchat_groupchat_stateflow.ipynb",
+        "test/agentchat/contrib/agent_eval/test_agent_eval.py",
+        "test/agentchat/contrib/capabilities/chat_with_teachable_agent.py",
+        "test/agentchat/contrib/capabilities/test_image_generation_capability.py",
+        "test/agentchat/contrib/capabilities/test_teachable_agent.py",
+        "test/agentchat/contrib/retrievechat/test_pgvector_retrievechat.py",
+        "test/agentchat/contrib/retrievechat/test_qdrant_retrievechat.py",
+        "test/agentchat/contrib/retrievechat/test_retrievechat.py",
+        "test/agentchat/contrib/test_agent_optimizer.py",
+        "test/agentchat/contrib/test_gpt_assistant.py",
+        "test/agentchat/contrib/test_web_surfer.py",
+        "test/agentchat/test_tool_calls.py",
+        "test/io/test_websockets.py",
+        "test/oai/_test_completion.py",
+        "test/oai/test_client.py",
+        "test/oai/test_client_stream.py"
+      ],
+      "commit_message": "Disable Azure tests and fix open ai tests (#3587)\n\n* Disable Azure tests\n\n* fix calculator notebook\n\n* use gpt-4o-mini for tests\n\n* use gpt-4o\n\n* use gpt-4o\n\n* fix formatting\n\n* Fix models used in contrib tests\n\n* Fix retrieval test\n\n* WIP\n\n* Skip\n\n* Fix format\n\n* Fix formatting",
+      "committed_at": "2024-10-01T21:53:25Z",
+      "defect_id": "MICROSOFT-AUTOGEN-93657DE5BA24",
+      "evidence": [
+        {
+          "evidence_id": "db287183f2ec-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/db287183f2ec9a3e58021da6f6048c15f31d94b5",
+          "revision": "db287183f2ec9a3e58021da6f6048c15f31d94b5"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-93657DE5BA24.patch",
+      "patch_sha256": "82328f70cadd585229a402b9e70466f755ab463ea2590492fce840e169f2a46a",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/3587",
+      "repository": "microsoft/autogen",
+      "revision": "db287183f2ec9a3e58021da6f6048c15f31d94b5",
+      "source_kind": "fixing_commit",
+      "title": "Disable Azure tests and fix open ai tests (#3587)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/44640e29a37abc7d69ff67a2058b18d088eafc70",
+      "changed_files": [
+        "python/packages/autogen-studio/README.md",
+        "python/packages/autogen-studio/autogenstudio/teammanager.py",
+        "python/packages/autogen-studio/autogenstudio/version.py",
+        "python/packages/autogen-studio/autogenstudio/web/managers/connection.py",
+        "python/packages/autogen-studio/frontend/src/components/views/playground/chat/agentflow/edge.tsx",
+        "python/uv.lock"
+      ],
+      "commit_message": "Fix Import Issue in AGS, Remove InnerMessage import from agentchat.messages (#4246)\n\n* fix import issue related to agentchat update #4245\r\n\r\n* update uv lock file",
+      "committed_at": "2024-11-17T12:04:55-08:00",
+      "defect_id": "MICROSOFT-AUTOGEN-9D8F5F3B62A1",
+      "evidence": [
+        {
+          "evidence_id": "44640e29a37a-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/44640e29a37abc7d69ff67a2058b18d088eafc70",
+          "revision": "44640e29a37abc7d69ff67a2058b18d088eafc70"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-9D8F5F3B62A1.patch",
+      "patch_sha256": "4151c6db0094d1ed72d80a7c4eab541755b7456915ed6dbfd9500d2fa6621ad5",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/4246",
+      "repository": "microsoft/autogen",
+      "revision": "44640e29a37abc7d69ff67a2058b18d088eafc70",
+      "source_kind": "fixing_commit",
+      "title": "Fix Import Issue in AGS, Remove InnerMessage import from agentchat.messages (#4246)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/501f8d22726e687c55052682c20c97ce62f018ac",
+      "changed_files": [
+        "website/docs/tutorial/conversation-patterns.ipynb"
+      ],
+      "commit_message": "Fix typo in conversation-patterns.ipynb (#2066)",
+      "committed_at": "2024-03-19T03:27:00Z",
+      "defect_id": "MICROSOFT-AUTOGEN-C025039423FB",
+      "evidence": [
+        {
+          "evidence_id": "501f8d22726e-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/501f8d22726e687c55052682c20c97ce62f018ac",
+          "revision": "501f8d22726e687c55052682c20c97ce62f018ac"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-C025039423FB.patch",
+      "patch_sha256": "497d58ede2275b7a9d49042a7e4b0b78c52084bfbac5e8b97f0d7e877d9484af",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/2066",
+      "repository": "microsoft/autogen",
+      "revision": "501f8d22726e687c55052682c20c97ce62f018ac",
+      "source_kind": "fixing_commit",
+      "title": "Fix typo in conversation-patterns.ipynb (#2066)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/ac74305913e4b06f44a85e0c9097b2f4dc131312",
+      "changed_files": [
+        "python/packages/autogen-agentchat/src/autogen_agentchat/teams/_group_chat/_magentic_one/_magentic_one_orchestrator.py",
+        "python/packages/autogen-ext/src/autogen_ext/agents/web_surfer/_multimodal_web_surfer.py"
+      ],
+      "commit_message": "Ensure decriptions appear each on one line. Fix web_surfer's desc (#5390)\n\nSome agent descriptions were split over multiple lines in the M1\r\norchestrator. This PR ensures that each description appears on one, and\r\nonly one, line. This makes it easier for smaller models to understand.",
+      "committed_at": "2025-02-05T20:17:24-08:00",
+      "defect_id": "MICROSOFT-AUTOGEN-C03E9EB5C672",
+      "evidence": [
+        {
+          "evidence_id": "ac74305913e4-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/ac74305913e4b06f44a85e0c9097b2f4dc131312",
+          "revision": "ac74305913e4b06f44a85e0c9097b2f4dc131312"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-C03E9EB5C672.patch",
+      "patch_sha256": "ee6eb3a35b06ff3d190be1a220e366f018755ad521972ecbc6d4c3bd3f54f2d5",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/5390",
+      "repository": "microsoft/autogen",
+      "revision": "ac74305913e4b06f44a85e0c9097b2f4dc131312",
+      "source_kind": "fixing_commit",
+      "title": "Ensure decriptions appear each on one line. Fix web_surfer's desc (#5390)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/0a314c17c78070402089f02c195ea755f9ef4c30",
+      "changed_files": [
+        "python/packages/autogen-studio/autogenstudio/database/db_manager.py"
+      ],
+      "commit_message": "fix autostudio dabase jsons. (#6183)\n\n\nSigned-off-by: zhanluxianshen <zhanluxianshen@163.com>\nCo-authored-by: Victor Dibia <victordibia@microsoft.com>",
+      "committed_at": "2025-04-04T15:00:56-07:00",
+      "defect_id": "MICROSOFT-AUTOGEN-CD83AD319253",
+      "evidence": [
+        {
+          "evidence_id": "0a314c17c780-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/0a314c17c78070402089f02c195ea755f9ef4c30",
+          "revision": "0a314c17c78070402089f02c195ea755f9ef4c30"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-CD83AD319253.patch",
+      "patch_sha256": "f4816e2a0455aae3b24979b33430f47e777773b26854867da2933e26ce0c7540",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/6183",
+      "repository": "microsoft/autogen",
+      "revision": "0a314c17c78070402089f02c195ea755f9ef4c30",
+      "source_kind": "fixing_commit",
+      "title": "fix autostudio dabase jsons. (#6183)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/bfcbb630172b673f6320f8823dd514042279ca19",
+      "changed_files": [
+        "README.md"
+      ],
+      "commit_message": "fix: update the docs link (#1879)",
+      "committed_at": "2024-03-06T15:41:40Z",
+      "defect_id": "MICROSOFT-AUTOGEN-DACBD27A78A4",
+      "evidence": [
+        {
+          "evidence_id": "bfcbb630172b-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/bfcbb630172b673f6320f8823dd514042279ca19",
+          "revision": "bfcbb630172b673f6320f8823dd514042279ca19"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-DACBD27A78A4.patch",
+      "patch_sha256": "f4044d90e3cfa3c58fd922f2a26ee049137dc4077d55082501ea434a27c5de17",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/1879",
+      "repository": "microsoft/autogen",
+      "revision": "bfcbb630172b673f6320f8823dd514042279ca19",
+      "source_kind": "fixing_commit",
+      "title": "fix: update the docs link (#1879)"
+    },
+    {
+      "candidate_test_files": [
+        "test/test_logging.py"
+      ],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/811fd6926d7183b009044c1eaba3085382230086",
+      "changed_files": [
+        "autogen/logger/base_logger.py",
+        "autogen/logger/logger_utils.py",
+        "autogen/logger/sqlite_logger.py",
+        "autogen/runtime_logging.py",
+        "test/test_logging.py"
+      ],
+      "commit_message": "Fix threading issue for logging (#1901)\n\n* fix mypy errors for logging\n\n* cleanup\n\n* formatting\n\n* fix threading issue in logging\n\n* remove kwarg\n\n---------\n\nCo-authored-by: Eric Zhu <ekzhu@users.noreply.github.com>",
+      "committed_at": "2024-03-08T00:08:22Z",
+      "defect_id": "MICROSOFT-AUTOGEN-E39723653FA6",
+      "evidence": [
+        {
+          "evidence_id": "811fd6926d71-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/811fd6926d7183b009044c1eaba3085382230086",
+          "revision": "811fd6926d7183b009044c1eaba3085382230086"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-E39723653FA6.patch",
+      "patch_sha256": "3b5ffd405f2b0e54b4914a3c61876dab8d713cb0972a3e9dde2f0dcfeed0d07a",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/1901",
+      "repository": "microsoft/autogen",
+      "revision": "811fd6926d7183b009044c1eaba3085382230086",
+      "source_kind": "fixing_commit",
+      "title": "Fix threading issue for logging (#1901)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/dc55ec964bdcc39f8bacce17d75fc945ac6826e9",
+      "changed_files": [
+        "python/packages/autogen-core/docs/src/_static/custom.css"
+      ],
+      "commit_message": "Fix visual accessibility issues 6 and 20 (#5725)\n\n<!-- Thank you for your contribution! Please review\nhttps://microsoft.github.io/autogen/docs/Contribute before opening a\npull request. -->\n\n<!-- Please add a reviewer to the assignee section when you create a PR.\nIf you don't have the access to it, we will shortly find a reviewer and\nassign them to your PR. -->\n\n## Why are these changes needed?\n\nFixes visual accessibility issues `(6) Luminosity contrast ratio of\nfocus indicator on 'Venv' control is less than 3:1.` and `(20) \"Only\ncolor is used to indicate the focus indicator on the 'Venv', and 'conda'\nTab controls.\"`\n\n## Related issue number\n\n#5633 \n\nbefore:\n<img width=\"162\" alt=\"image\"\nsrc=\"https://github.com/user-attachments/assets/ac317e82-c82e-4d3b-910b-e9eb5d087340\"\n/>\n\n![image](https://github.com/user-attachments/assets/2971043a-8b5b-4521-8135-c411c0ecab1f)\n\nafter:\n<img width=\"160\" alt=\"image\"\nsrc=\"https://github.com/user-attachments/assets/8053ae77-4d62-491b-9d78-657646ed71a6\"\n/>\n\n![image](https://github.com/user-attachments/assets/5c3ac2c3-4813-461b-8958-4665860574a0)",
+      "committed_at": "2025-02-26T11:59:07-05:00",
+      "defect_id": "MICROSOFT-AUTOGEN-EA936C1865C5",
+      "evidence": [
+        {
+          "evidence_id": "dc55ec964bdc-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/dc55ec964bdcc39f8bacce17d75fc945ac6826e9",
+          "revision": "dc55ec964bdcc39f8bacce17d75fc945ac6826e9"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-EA936C1865C5.patch",
+      "patch_sha256": "bd560f4eae6913a7ac0ab913327282e12659e887d57251042634ace4389eebfc",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/5725",
+      "repository": "microsoft/autogen",
+      "revision": "dc55ec964bdcc39f8bacce17d75fc945ac6826e9",
+      "source_kind": "fixing_commit",
+      "title": "Fix visual accessibility issues 6 and 20 (#5725)"
+    },
+    {
+      "candidate_test_files": [],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/0df6be1fc1a82b64db078859023e9a4879fa30c0",
+      "changed_files": [
+        "python/packages/autogen-ext/src/autogen_ext/models/openai/_openai_client.py"
+      ],
+      "commit_message": "fix: extra args not work to disable thinking (#7006)",
+      "committed_at": "2025-09-16T07:42:35Z",
+      "defect_id": "MICROSOFT-AUTOGEN-F5AED66A8629",
+      "evidence": [
+        {
+          "evidence_id": "0df6be1fc1a8-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/0df6be1fc1a82b64db078859023e9a4879fa30c0",
+          "revision": "0df6be1fc1a82b64db078859023e9a4879fa30c0"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-F5AED66A8629.patch",
+      "patch_sha256": "43ab42604eb94bc9336cde3ab4d6cb48ee8700736a3ec29a73e5aafc2e400953",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/7006",
+      "repository": "microsoft/autogen",
+      "revision": "0df6be1fc1a82b64db078859023e9a4879fa30c0",
+      "source_kind": "fixing_commit",
+      "title": "fix: extra args not work to disable thinking (#7006)"
+    },
+    {
+      "candidate_test_files": [
+        "python/packages/autogen-agentchat/tests/test_group_chat_graph.py"
+      ],
+      "canonical_locator": "https://github.com/microsoft/autogen/commit/e10767421f62b32ca1efb1a8be183d4546cec75a",
+      "changed_files": [
+        "python/packages/autogen-agentchat/src/autogen_agentchat/teams/_group_chat/_graph/_digraph_group_chat.py",
+        "python/packages/autogen-agentchat/tests/test_group_chat_graph.py"
+      ],
+      "commit_message": "Fix GraphFlowManager termination to prevent _StopAgent from polluting conversation context (#6752)\n\nCo-authored-by: copilot-swe-agent[bot] <198982749+Copilot@users.noreply.github.com>\nCo-authored-by: ekzhu <320302+ekzhu@users.noreply.github.com>\nCo-authored-by: Eric Zhu <ekzhu@users.noreply.github.com>",
+      "committed_at": "2025-07-06T00:57:03-07:00",
+      "defect_id": "MICROSOFT-AUTOGEN-FFBEE2BB6CEF",
+      "evidence": [
+        {
+          "evidence_id": "e10767421f62-fix",
+          "kind": "fixing_change",
+          "locator": "https://github.com/microsoft/autogen/commit/e10767421f62b32ca1efb1a8be183d4546cec75a",
+          "revision": "e10767421f62b32ca1efb1a8be183d4546cec75a"
+        }
+      ],
+      "patch_path": "patches/MICROSOFT-AUTOGEN-FFBEE2BB6CEF.patch",
+      "patch_sha256": "243e45f612bc18da9ef7935b97055900134b521fbc38ec51ce33e6b6f7da0b50",
+      "pull_request_locator": "https://github.com/microsoft/autogen/pull/6752",
+      "repository": "microsoft/autogen",
+      "revision": "e10767421f62b32ca1efb1a8be183d4546cec75a",
+      "source_kind": "fixing_commit",
+      "title": "Fix GraphFlowManager termination to prevent _StopAgent from polluting conversation context (#6752)"
+    }
+  ],
+  "corpus_id": "agent-real-defects-v1",
+  "manual_version": "1.0",
+  "schema_version": 1
+}

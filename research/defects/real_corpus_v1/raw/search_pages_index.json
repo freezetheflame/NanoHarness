@@ -1,0 +1,411 @@
+{
+  "file_count": 81,
+  "files": [
+    {
+      "bytes": 823362,
+      "path": "crewAIInc__crewAI/queries/fixing-commit-terms/page-0001.json",
+      "sha256": "e1735658d1e3436e5354e6a76afb8fdf7045f59d0493fd7f7ef952592ee10a93"
+    },
+    {
+      "bytes": 813106,
+      "path": "crewAIInc__crewAI/queries/fixing-commit-terms/page-0002.json",
+      "sha256": "6932f9358b2419332679bdbd83a0c12efbd4608b56ae3333a95fee55c378e973"
+    },
+    {
+      "bytes": 816676,
+      "path": "crewAIInc__crewAI/queries/fixing-commit-terms/page-0003.json",
+      "sha256": "f25d6c8d9c51727f366f24c57fb84d6fc7f9c9024d59c5abc1a27fb9b131205a"
+    },
+    {
+      "bytes": 838634,
+      "path": "crewAIInc__crewAI/queries/fixing-commit-terms/page-0004.json",
+      "sha256": "9871919376db61332e0ce9880407510f15b566cbf3913e105acf208594587ed6"
+    },
+    {
+      "bytes": 785245,
+      "path": "crewAIInc__crewAI/queries/fixing-commit-terms/page-0005.json",
+      "sha256": "b18560d950be5ce0f91456480a406e7db551aecedcbf3fbea037d2538d5ff470"
+    },
+    {
+      "bytes": 853188,
+      "path": "crewAIInc__crewAI/queries/fixing-commit-terms/page-0006.json",
+      "sha256": "016f7065fc6abb5d4a591b1a152f504ecb53f766747d5adbae6145e95b55df1e"
+    },
+    {
+      "bytes": 793391,
+      "path": "crewAIInc__crewAI/queries/fixing-commit-terms/page-0007.json",
+      "sha256": "66aca2274a376691350e00d5dd0f55af8a1f14b6e7d7156058ec2612a357af17"
+    },
+    {
+      "bytes": 795975,
+      "path": "crewAIInc__crewAI/queries/fixing-commit-terms/page-0008.json",
+      "sha256": "6a574a299e7562f989dca6be7451cffa88db12fdb8cd04f5cb553718480a49e2"
+    },
+    {
+      "bytes": 781629,
+      "path": "crewAIInc__crewAI/queries/fixing-commit-terms/page-0009.json",
+      "sha256": "0e69de5f67039dc146be62dd5f56ab64f48ed4ba828a153c0b7d3adb59ee3b08"
+    },
+    {
+      "bytes": 530937,
+      "path": "crewAIInc__crewAI/queries/fixing-commit-terms/page-0010.json",
+      "sha256": "ab6a195da9ae3aa5636b4c25fa9e25a17d1f4ecd82f350fb48f54f82bd61f9e7"
+    },
+    {
+      "bytes": 794846,
+      "path": "crewAIInc__crewAI/queries/issue-defect-terms/page-0001.json",
+      "sha256": "c3ebed73d4c9dbf7f1a51df05a3dd61769ca9c72fdf8ba9598c8dfe5ab59bb04"
+    },
+    {
+      "bytes": 659829,
+      "path": "crewAIInc__crewAI/queries/issue-defect-terms/page-0002.json",
+      "sha256": "a40d99013b11f148475472480f18019a826de3a1c9fa32c9a783eddd12b198bd"
+    },
+    {
+      "bytes": 888241,
+      "path": "crewAIInc__crewAI/queries/issue-label-bug/page-0001.json",
+      "sha256": "6ea3271be03073ad54b47fe24333a27c18fb96f31c5e171572a36be4c8931211"
+    },
+    {
+      "bytes": 675005,
+      "path": "crewAIInc__crewAI/queries/issue-label-bug/page-0002.json",
+      "sha256": "35210bd59ad9389c3b50d2d2a3ee64ed098f973941f4ff0fe2e44e7c34cb0699"
+    },
+    {
+      "bytes": 754221,
+      "path": "crewAIInc__crewAI/queries/issue-label-bug/page-0003.json",
+      "sha256": "36f4eeb6d92551272bff956c8453ea537c92eb5a4899f7a9d05eec57d55d26a8"
+    },
+    {
+      "bytes": 755627,
+      "path": "crewAIInc__crewAI/queries/issue-label-bug/page-0004.json",
+      "sha256": "4b06eacb0021028273d1b08cfc935c227705aa5dadb13c16cf999243c4e218eb"
+    },
+    {
+      "bytes": 703086,
+      "path": "crewAIInc__crewAI/queries/issue-label-bug/page-0005.json",
+      "sha256": "7ec9d1fe7e697fd2d450b4636196ca82bcb2d2384a7f523fe9bf2a85eccf30be"
+    },
+    {
+      "bytes": 706745,
+      "path": "crewAIInc__crewAI/queries/issue-label-bug/page-0006.json",
+      "sha256": "37576354aac26e0f879a674ebd5d6480b6007ad48e4c8b5ef85d7e498013ea86"
+    },
+    {
+      "bytes": 786042,
+      "path": "crewAIInc__crewAI/queries/issue-label-bug/page-0007.json",
+      "sha256": "e5feabfcb146a5f45e268b6c70746bd2d5324e56a2ebda03e4587e246572ce79"
+    },
+    {
+      "bytes": 704128,
+      "path": "crewAIInc__crewAI/queries/issue-label-bug/page-0008.json",
+      "sha256": "8f5ada0b34795cfc1fccbcc1223a7dfedd542181145d56f56a7a0bd8964100f7"
+    },
+    {
+      "bytes": 79,
+      "path": "crewAIInc__crewAI/queries/issue-label-regression/page-0001.json",
+      "sha256": "c9938edecb99d754b2d039ac9eec320a94c769b6a6417921e2dcbef9e2fe01a0"
+    },
+    {
+      "bytes": 55,
+      "path": "freezetheflame__NanoHarness/queries/fixing-commit-terms/page-0001.json",
+      "sha256": "4af480b8ee5b87b369a76c49bd22c9a783908272ebffbe97898f8ab0f0772a5f"
+    },
+    {
+      "bytes": 79,
+      "path": "freezetheflame__NanoHarness/queries/issue-defect-terms/page-0001.json",
+      "sha256": "c9938edecb99d754b2d039ac9eec320a94c769b6a6417921e2dcbef9e2fe01a0"
+    },
+    {
+      "bytes": 79,
+      "path": "freezetheflame__NanoHarness/queries/issue-label-bug/page-0001.json",
+      "sha256": "c9938edecb99d754b2d039ac9eec320a94c769b6a6417921e2dcbef9e2fe01a0"
+    },
+    {
+      "bytes": 79,
+      "path": "freezetheflame__NanoHarness/queries/issue-label-regression/page-0001.json",
+      "sha256": "c9938edecb99d754b2d039ac9eec320a94c769b6a6417921e2dcbef9e2fe01a0"
+    },
+    {
+      "bytes": 79,
+      "path": "freezetheflame__NanoHarness/queries/merged-pr-boundary-defect-terms/page-0001.json",
+      "sha256": "c9938edecb99d754b2d039ac9eec320a94c769b6a6417921e2dcbef9e2fe01a0"
+    },
+    {
+      "bytes": 79,
+      "path": "freezetheflame__NanoHarness/queries/merged-pr-core-defect-terms/page-0001.json",
+      "sha256": "c9938edecb99d754b2d039ac9eec320a94c769b6a6417921e2dcbef9e2fe01a0"
+    },
+    {
+      "bytes": 79,
+      "path": "freezetheflame__NanoHarness/queries/merged-pr-runtime-defect-terms/page-0001.json",
+      "sha256": "c9938edecb99d754b2d039ac9eec320a94c769b6a6417921e2dcbef9e2fe01a0"
+    },
+    {
+      "bytes": 1812322,
+      "path": "langchain-ai__langgraph/queries/fixing-commit-terms/page-0001.json",
+      "sha256": "90d39065d769a180bd8037f965fb1616dad195e900a21aad5eacf1d575f0dbbb"
+    },
+    {
+      "bytes": 1885779,
+      "path": "langchain-ai__langgraph/queries/fixing-commit-terms/page-0002.json",
+      "sha256": "1f76c15f40744a49d574c16ac9b7b54c321e4e82b2d803c42a1f88a40e98b138"
+    },
+    {
+      "bytes": 1988856,
+      "path": "langchain-ai__langgraph/queries/fixing-commit-terms/page-0003.json",
+      "sha256": "97a694021cb2b2b4fe40bcafbdffc54a07305a7c88f4b4344bddcd6746c9d2e4"
+    },
+    {
+      "bytes": 1364734,
+      "path": "langchain-ai__langgraph/queries/fixing-commit-terms/page-0004.json",
+      "sha256": "a7197f80d5672c2ca550c711892f268adf4bb664a82fe84b0de4ee93aa427684"
+    },
+    {
+      "bytes": 859120,
+      "path": "langchain-ai__langgraph/queries/fixing-commit-terms/page-0005.json",
+      "sha256": "7070c36ee7e636228f9170d002f3dc046a10c3c6e9e8efa6de59a63391b9eb2b"
+    },
+    {
+      "bytes": 810268,
+      "path": "langchain-ai__langgraph/queries/fixing-commit-terms/page-0006.json",
+      "sha256": "b0c7a6c0e44ada42e6359926741a6de284a65120635a5add45d3be9d4cf6da69"
+    },
+    {
+      "bytes": 800693,
+      "path": "langchain-ai__langgraph/queries/fixing-commit-terms/page-0007.json",
+      "sha256": "80e92dad5beed8072d01b4181539ea86f2d9cba74b6456b1098d95037485235c"
+    },
+    {
+      "bytes": 790578,
+      "path": "langchain-ai__langgraph/queries/fixing-commit-terms/page-0008.json",
+      "sha256": "9c6dcb7b054e8d61f0e59f2acc7c309f8a69d744d35d0d462363b76e196058ec"
+    },
+    {
+      "bytes": 760737,
+      "path": "langchain-ai__langgraph/queries/fixing-commit-terms/page-0009.json",
+      "sha256": "c4beb9310155473946f228d4c49a3f576190c79475e0f09c2478f704aa3edec0"
+    },
+    {
+      "bytes": 762357,
+      "path": "langchain-ai__langgraph/queries/fixing-commit-terms/page-0010.json",
+      "sha256": "4cea62b7b1f4412118a015f8c450df3140959defb68e056b2bc8a9e605d4ff07"
+    },
+    {
+      "bytes": 771859,
+      "path": "langchain-ai__langgraph/queries/issue-defect-terms/page-0001.json",
+      "sha256": "5a01d51e035dc636481692fbdd064a0002ce9310c84654a693b4e548d3945d96"
+    },
+    {
+      "bytes": 907183,
+      "path": "langchain-ai__langgraph/queries/issue-defect-terms/page-0002.json",
+      "sha256": "82c0303f0dbe70d4755a2985945313270898b12f8c5bf10a5e59f179f3484d91"
+    },
+    {
+      "bytes": 982716,
+      "path": "langchain-ai__langgraph/queries/issue-defect-terms/page-0003.json",
+      "sha256": "c4783705409fb3c7b27a5d41849e7d05a16e6d45c3fe199e2ad852bfbd05da91"
+    },
+    {
+      "bytes": 919988,
+      "path": "langchain-ai__langgraph/queries/issue-defect-terms/page-0004.json",
+      "sha256": "6213f65087b624a13f3aa2d4d7a255426de670fee8827bf4636fbffca3de62a5"
+    },
+    {
+      "bytes": 833880,
+      "path": "langchain-ai__langgraph/queries/issue-defect-terms/page-0005.json",
+      "sha256": "9e5f30b8e2077cdb5be9b934ca04cbfd157a8584e3d773fd4723ca427196b4f0"
+    },
+    {
+      "bytes": 974727,
+      "path": "langchain-ai__langgraph/queries/issue-defect-terms/page-0006.json",
+      "sha256": "fcf298e8c88e6321f8f0079b3224fd296edabd4e28d23f7026bfda8ff7107762"
+    },
+    {
+      "bytes": 999195,
+      "path": "langchain-ai__langgraph/queries/issue-defect-terms/page-0007.json",
+      "sha256": "e3b4920843cce446df345e8e3e00192e97cd50298f250c2692fb3f14217c98f0"
+    },
+    {
+      "bytes": 1051768,
+      "path": "langchain-ai__langgraph/queries/issue-defect-terms/page-0008.json",
+      "sha256": "869540b2f4dced3be8ef2fb56c2c3518d885655e3a5779fc9fe8eb6d8e14041d"
+    },
+    {
+      "bytes": 896314,
+      "path": "langchain-ai__langgraph/queries/issue-label-bug/page-0001.json",
+      "sha256": "9eba7dc6fab4498ca8a889e21a2086280ab35f17074c71ff67b9013cda257be9"
+    },
+    {
+      "bytes": 1100768,
+      "path": "langchain-ai__langgraph/queries/issue-label-bug/page-0002.json",
+      "sha256": "2ce456b31ff935044fb3db3a511a338cee6031709f35626a38442f85bc123a9b"
+    },
+    {
+      "bytes": 469895,
+      "path": "langchain-ai__langgraph/queries/issue-label-bug/page-0003.json",
+      "sha256": "f05deeffbd93d9b99de44b90551e9d86206b41a3a91e664f349d3028cafd47b7"
+    },
+    {
+      "bytes": 79,
+      "path": "langchain-ai__langgraph/queries/issue-label-regression/page-0001.json",
+      "sha256": "c9938edecb99d754b2d039ac9eec320a94c769b6a6417921e2dcbef9e2fe01a0"
+    },
+    {
+      "bytes": 1591808,
+      "path": "langchain-ai__langgraph/queries/merged-pr-core-defect-terms/page-0001.json",
+      "sha256": "b3e8692012062d312cbc7482b28b22d3ac64c61f75390bd4c8c6c93d2330b6b2"
+    },
+    {
+      "bytes": 1526734,
+      "path": "langchain-ai__langgraph/queries/merged-pr-core-defect-terms/page-0002.json",
+      "sha256": "c525001d02f62798882951278d6555b8608579dd11225271556fc1d00702aae4"
+    },
+    {
+      "bytes": 1506196,
+      "path": "langchain-ai__langgraph/queries/merged-pr-core-defect-terms/page-0003.json",
+      "sha256": "64b524c87abcdc52f683e3ec8db7df109813f1e89ae28f96d4efb6be0b181091"
+    },
+    {
+      "bytes": 620355,
+      "path": "langchain-ai__langgraph/queries/merged-pr-core-defect-terms/page-0004.json",
+      "sha256": "6d5801f35559b8a8e459b6664fd3b23f02ba8e206f35addf37f1ae1c3fd9f14e"
+    },
+    {
+      "bytes": 357349,
+      "path": "langchain-ai__langgraph/queries/merged-pr-core-defect-terms/page-0005.json",
+      "sha256": "0c7e0a1d5c907858fd9110bc686fb17c43cbbf070e2c5a04245cf3bda019c9a2"
+    },
+    {
+      "bytes": 322942,
+      "path": "langchain-ai__langgraph/queries/merged-pr-core-defect-terms/page-0006.json",
+      "sha256": "cd0d22e94e3cab7bf1d9462534ee16685f480ecedc2ba24e591fdc6a86cf28e8"
+    },
+    {
+      "bytes": 344510,
+      "path": "langchain-ai__langgraph/queries/merged-pr-core-defect-terms/page-0007.json",
+      "sha256": "24b6ee3303287db7de62e343ffe1519ad62121a860a7f4131efd39102a9794b9"
+    },
+    {
+      "bytes": 326116,
+      "path": "langchain-ai__langgraph/queries/merged-pr-core-defect-terms/page-0008.json",
+      "sha256": "8c253b26b40b56ca898157992a038686371e1a9dc745911c09dc9c2a58d335e9"
+    },
+    {
+      "bytes": 320937,
+      "path": "langchain-ai__langgraph/queries/merged-pr-core-defect-terms/page-0009.json",
+      "sha256": "1816b1f514755ad167caf2f06a8e14efc7b67e7d3700e4ae534905e8e5790901"
+    },
+    {
+      "bytes": 319516,
+      "path": "langchain-ai__langgraph/queries/merged-pr-core-defect-terms/page-0010.json",
+      "sha256": "80e530da00c4fa9271856925290936607a75c2bae35738a138eca212ca0f22ad"
+    },
+    {
+      "bytes": 785313,
+      "path": "microsoft__autogen/queries/fixing-commit-terms/page-0001.json",
+      "sha256": "3506b8d7962e78e2f267db5d185c69ab22ebb09d5f41099c465f2b791412c5db"
+    },
+    {
+      "bytes": 819670,
+      "path": "microsoft__autogen/queries/fixing-commit-terms/page-0002.json",
+      "sha256": "df99095be6b25f8eb8958e75d768b5b6ec69b60f196a75b12c670eec45159a1e"
+    },
+    {
+      "bytes": 849299,
+      "path": "microsoft__autogen/queries/fixing-commit-terms/page-0003.json",
+      "sha256": "80821bb8ad42fb0412c7000b0b2f016952677d37bb6d9ccbdcf3bb9b22b62509"
+    },
+    {
+      "bytes": 804596,
+      "path": "microsoft__autogen/queries/fixing-commit-terms/page-0004.json",
+      "sha256": "8505bf9bb741482103a27d9307f51e9ca27fc7b00807482baae6eaaa37f0e148"
+    },
+    {
+      "bytes": 773131,
+      "path": "microsoft__autogen/queries/fixing-commit-terms/page-0005.json",
+      "sha256": "72ab5c2d2ff0c5077b05b86633c02053512bb39c53123f011322d49e0b891682"
+    },
+    {
+      "bytes": 776936,
+      "path": "microsoft__autogen/queries/fixing-commit-terms/page-0006.json",
+      "sha256": "7ab17f75c6b2d289e91724704029baa8f5b26e7b52f0879f7ad834cf6d7683f0"
+    },
+    {
+      "bytes": 765439,
+      "path": "microsoft__autogen/queries/fixing-commit-terms/page-0007.json",
+      "sha256": "bd598798589bd0b8e0b76ade56c01d745c01eb7c2a3896e132ad894351fa76c6"
+    },
+    {
+      "bytes": 755634,
+      "path": "microsoft__autogen/queries/fixing-commit-terms/page-0008.json",
+      "sha256": "894e531703fb5e347c6f87cde4f77a64b762abef3cdd3ec66757d125ec2ae7a5"
+    },
+    {
+      "bytes": 774016,
+      "path": "microsoft__autogen/queries/fixing-commit-terms/page-0009.json",
+      "sha256": "769de01aa946a460b543734aeae81504acf8cbe20fcdc6cb513d4e5d15c76743"
+    },
+    {
+      "bytes": 195472,
+      "path": "microsoft__autogen/queries/fixing-commit-terms/page-0010.json",
+      "sha256": "4fa2d2336250f9aaa5f8e99ae7d9d974e7ed63e059bc2027e57242af71857000"
+    },
+    {
+      "bytes": 584042,
+      "path": "microsoft__autogen/queries/issue-defect-terms/page-0001.json",
+      "sha256": "cb0a93831c0d92a0b49514764d1bc5a61ff76f072123476d67286a59eceaa5b1"
+    },
+    {
+      "bytes": 649388,
+      "path": "microsoft__autogen/queries/issue-defect-terms/page-0002.json",
+      "sha256": "cf61c38a8b8b9044ce6e93aeead844ee5573eb76b2c022d70db76794f19dafa7"
+    },
+    {
+      "bytes": 660411,
+      "path": "microsoft__autogen/queries/issue-defect-terms/page-0003.json",
+      "sha256": "24a1fc173f917ce83ce7dede3170e830ed7cb93eaa92689299400949c37aea34"
+    },
+    {
+      "bytes": 705701,
+      "path": "microsoft__autogen/queries/issue-defect-terms/page-0004.json",
+      "sha256": "f6a99de5cae4a6be26c244e445495535d88587ba2f979117243bf0f314161c15"
+    },
+    {
+      "bytes": 854085,
+      "path": "microsoft__autogen/queries/issue-defect-terms/page-0005.json",
+      "sha256": "6e2843ab1b155d29abf2ba2aff301f03e1edda75744fa1990527c5390088731e"
+    },
+    {
+      "bytes": 677068,
+      "path": "microsoft__autogen/queries/issue-defect-terms/page-0006.json",
+      "sha256": "f78c833edd390f59912c497bc54d9d3ed8de32d0c85279623f38175e8dc49d89"
+    },
+    {
+      "bytes": 601122,
+      "path": "microsoft__autogen/queries/issue-defect-terms/page-0007.json",
+      "sha256": "0f2e544f26fffa25777c6b2c4da4114ce1b034a0e0bfe2ceb38264a1ddb10374"
+    },
+    {
+      "bytes": 574185,
+      "path": "microsoft__autogen/queries/issue-defect-terms/page-0008.json",
+      "sha256": "1229d6e5610075385b705f5a55c0a9cece04a05a2e0cb74aee0d4cc855c89c2b"
+    },
+    {
+      "bytes": 151248,
+      "path": "microsoft__autogen/queries/issue-defect-terms/page-0009.json",
+      "sha256": "52c23ca01110758a7d32e741dc0a15d7d6b13297d75a0e4269ed003257d925b3"
+    },
+    {
+      "bytes": 79,
+      "path": "microsoft__autogen/queries/issue-label-bug/page-0001.json",
+      "sha256": "c9938edecb99d754b2d039ac9eec320a94c769b6a6417921e2dcbef9e2fe01a0"
+    },
+    {
+      "bytes": 79,
+      "path": "microsoft__autogen/queries/issue-label-regression/page-0001.json",
+      "sha256": "c9938edecb99d754b2d039ac9eec320a94c769b6a6417921e2dcbef9e2fe01a0"
+    }
+  ],
+  "schema_version": 1
+}

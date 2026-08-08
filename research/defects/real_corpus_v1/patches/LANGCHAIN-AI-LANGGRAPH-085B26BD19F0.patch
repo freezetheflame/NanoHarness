@@ -1,0 +1,33 @@
+From 520de30350e8e15ae21bb5017898a6416b2f573b Mon Sep 17 00:00:00 2001
+From: Vadym Barda <vadym@langchain.dev>
+Date: Wed, 26 Mar 2025 16:42:21 -0400
+Subject: [PATCH] langgraph: fix interrupt deserialization in RemoteGraph
+ (#4040)
+
+
+diff --git a/libs/langgraph/langgraph/pregel/remote.py b/libs/langgraph/langgraph/pregel/remote.py
+index 64fb4edb..f58d0a4d 100644
+--- a/libs/langgraph/langgraph/pregel/remote.py
++++ b/libs/langgraph/langgraph/pregel/remote.py
+@@ -654,7 +654,9 @@ class RemoteGraph(PregelProtocol):
+             # raise interrupt or errors
+             if chunk.event.startswith("updates"):
+                 if isinstance(chunk.data, dict) and INTERRUPT in chunk.data:
+-                    raise GraphInterrupt(chunk.data[INTERRUPT])
++                    raise GraphInterrupt(
++                        [Interrupt(**i) for i in chunk.data[INTERRUPT]]
++                    )
+             elif chunk.event.startswith("error"):
+                 raise RemoteException(chunk.data)
+             # filter for what was actually requested
+@@ -746,7 +748,9 @@ class RemoteGraph(PregelProtocol):
+             # raise interrupt or errors
+             if chunk.event.startswith("updates"):
+                 if isinstance(chunk.data, dict) and INTERRUPT in chunk.data:
+-                    raise GraphInterrupt(chunk.data[INTERRUPT])
++                    raise GraphInterrupt(
++                        [Interrupt(**i) for i in chunk.data[INTERRUPT]]
++                    )
+             elif chunk.event.startswith("error"):
+                 raise RemoteException(chunk.data)
+             # filter for what was actually requested

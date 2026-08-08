@@ -1,0 +1,27 @@
+From c50d62b82f037bf7a11ffaf18f92c70495bb9d3e Mon Sep 17 00:00:00 2001
+From: Guilherme de Amorim <ggimenezjr@gmail.com>
+Date: Wed, 2 Oct 2024 17:06:10 -0300
+Subject: [PATCH] fix: JSON encoding date objects (#1374)
+
+
+diff --git a/src/crewai/utilities/crew_json_encoder.py b/src/crewai/utilities/crew_json_encoder.py
+index 0df5f546..3cab07ff 100644
+--- a/src/crewai/utilities/crew_json_encoder.py
++++ b/src/crewai/utilities/crew_json_encoder.py
+@@ -1,4 +1,4 @@
+-from datetime import datetime
++from datetime import datetime, date
+ import json
+ from uuid import UUID
+ from pydantic import BaseModel
+@@ -11,8 +11,9 @@ class CrewJSONEncoder(json.JSONEncoder):
+         elif isinstance(obj, UUID):
+             return str(obj)
+ 
+-        elif isinstance(obj, datetime):
++        elif isinstance(obj, datetime) or isinstance(obj, date):
+             return obj.isoformat()
++
+         return super().default(obj)
+ 
+     def _handle_pydantic_model(self, obj):

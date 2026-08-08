@@ -1,0 +1,20 @@
+{
+  "complete": true,
+  "errors": [],
+  "manifest_id": "agent-real-defects-v1",
+  "repositories": [
+    {
+      "default_branch": "main",
+      "pinned_commit": "5931a5f0b313feff24e2516a586c55601b868ac1",
+      "queries": [
+        {
+          "item_count": 1000,
+          "query": "repo:langchain-ai/langgraph is:pr is:merged merged:2024-01-01..2026-06-30 (bug OR fix OR regression OR crash) in:title,body",
+          "query_id": "merged-pr-core-defect-terms"
+        }
+      ],
+      "repository": "langchain-ai/langgraph",
+      "repository_id": 676672661
+    }
+  ]
+}

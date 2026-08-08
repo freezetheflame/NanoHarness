@@ -1,0 +1,22 @@
+From 460c52290218e06a3d228d58b6e8dd0837184b4a Mon Sep 17 00:00:00 2001
+From: Max Meadowcroft <maxmeadowcroft61@gmail.com>
+Date: Tue, 18 Mar 2025 14:58:30 -0700
+Subject: [PATCH] docs: fix typo (#3856)
+
+Added "a" to make paragraph correct.
+
+Co-authored-by: Eugene Yurtsev <eyurtsev@gmail.com>
+
+diff --git a/docs/docs/concepts/agentic_concepts.md b/docs/docs/concepts/agentic_concepts.md
+index a6a997c0..b34b758d 100644
+--- a/docs/docs/concepts/agentic_concepts.md
++++ b/docs/docs/concepts/agentic_concepts.md
+@@ -14,7 +14,7 @@ As a result, there are many different types of [agent architectures](https://blo
+ 
+ ## Router
+ 
+-A router allows an LLM to select a single step from a specified set of options. This is an agent architecture that exhibits a relatively limited level of control because the LLM usually focuses on making a single decision and produces a specific output from limited set of pre-defined options. Routers typically employ a few different concepts to achieve this.
++A router allows an LLM to select a single step from a specified set of options. This is an agent architecture that exhibits a relatively limited level of control because the LLM usually focuses on making a single decision and produces a specific output from a limited set of pre-defined options. Routers typically employ a few different concepts to achieve this.
+ 
+ ### Structured Output
+ 

@@ -1,0 +1,48 @@
+From e3cb2dd23b1dd95cc1450868f501f49fa03c72bf Mon Sep 17 00:00:00 2001
+From: Eugene Yurtsev <eyurtsev@gmail.com>
+Date: Thu, 31 Jul 2025 22:57:44 -0400
+Subject: [PATCH] chore(docs): fix more admonitions (#5792)
+
+Fix more admonitions
+
+diff --git a/docs/docs/concepts/auth.md b/docs/docs/concepts/auth.md
+index beb46e2f..09526f22 100644
+--- a/docs/docs/concepts/auth.md
++++ b/docs/docs/concepts/auth.md
+@@ -35,7 +35,8 @@ LangGraph Platform provides different security defaults:
+ - Can be customized with your auth handler
+ 
+ !!! note "Custom auth"
+-Custom auth **is supported** for all plans in LangGraph Platform.
++
++   Custom auth **is supported** for all plans in LangGraph Platform.
+ 
+ ### Self-Hosted
+ 
+diff --git a/docs/docs/concepts/low_level.md b/docs/docs/concepts/low_level.md
+index 5dfa87e0..f6a42bbb 100644
+--- a/docs/docs/concepts/low_level.md
++++ b/docs/docs/concepts/low_level.md
+@@ -701,7 +701,8 @@ graph.addConditionalEdges("nodeA", routingFunction, {
+ :::
+ 
+ !!! tip
+-Use [`Command`](#command) instead of conditional edges if you want to combine state updates and routing in a single function.
++
++    Use [`Command`](#command) instead of conditional edges if you want to combine state updates and routing in a single function.
+ 
+ ### Entry Point
+ 
+diff --git a/docs/docs/how-tos/auth/custom_auth.md b/docs/docs/how-tos/auth/custom_auth.md
+index 43a1389b..e7d0f2f2 100644
+--- a/docs/docs/how-tos/auth/custom_auth.md
++++ b/docs/docs/how-tos/auth/custom_auth.md
+@@ -145,7 +145,7 @@ def my_node(state, config):
+ By default, if you add custom authorization on your resources, this will also apply to interactions made from the Studio. If you want, you can handle logged-in Studio users differently by checking [is_studio_user()](../../reference/functions/sdk_auth.isStudioUser.html).
+ 
+ !!! note
+-`is_studio_user` was added in version 0.1.73 of the langgraph-sdk. If you're on an older version, you can still check whether `isinstance(ctx.user, StudioUser)`.
++    `is_studio_user` was added in version 0.1.73 of the langgraph-sdk. If you're on an older version, you can still check whether `isinstance(ctx.user, StudioUser)`.
+ 
+ ```python
+ from langgraph_sdk.auth import is_studio_user, Auth

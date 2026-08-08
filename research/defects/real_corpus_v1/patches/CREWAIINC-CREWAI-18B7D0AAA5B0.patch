@@ -1,0 +1,27 @@
+From b38f0825e7acb6e02e5306e3ba10ee0fae99a042 Mon Sep 17 00:00:00 2001
+From: ariel <70391401+aricol-labs@users.noreply.github.com>
+Date: Fri, 19 Jul 2024 06:37:54 +0200
+Subject: [PATCH] Fix broken link to the installation guide (#912)
+
+Updated the installation guide link to use the absolute URL instead of a relative path, ensuring it correctly points to 'https://docs.crewai.com/how-to/Installing-CrewAI/'.
+
+diff --git a/docs/how-to/Start-a-New-CrewAI-Project.md b/docs/how-to/Start-a-New-CrewAI-Project.md
+index b34a4cf7..1a6bbf6f 100644
+--- a/docs/how-to/Start-a-New-CrewAI-Project.md
++++ b/docs/how-to/Start-a-New-CrewAI-Project.md
+@@ -9,7 +9,7 @@ Welcome to the ultimate guide for starting a new CrewAI project. This document w
+ 
+ ## Prerequisites
+ 
+-We assume you have already installed CrewAI. If not, please refer to the [installation guide](how-to/Installing-CrewAI.md) to install CrewAI and its dependencies.
++We assume you have already installed CrewAI. If not, please refer to the [installation guide](https://docs.crewai.com/how-to/Installing-CrewAI/) to install CrewAI and its dependencies.
+ 
+ ## Creating a New Project
+ 
+@@ -134,4 +134,4 @@ This will initialize your crew of AI agents and begin task execution as defined
+ 
+ ## Deploying Your Project
+ 
+-The easiest way to deploy your crew is through [CrewAI+](https://www.crewai.com/crewaiplus), where you can deploy your crew in a few clicks.
+\ No newline at end of file
++The easiest way to deploy your crew is through [CrewAI+](https://www.crewai.com/crewaiplus), where you can deploy your crew in a few clicks.

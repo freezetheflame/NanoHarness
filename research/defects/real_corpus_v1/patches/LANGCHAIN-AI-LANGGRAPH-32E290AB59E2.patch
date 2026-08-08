@@ -1,0 +1,16 @@
+From be088801baa2a5271e035db91d64dc72a727fbc7 Mon Sep 17 00:00:00 2001
+From: Sydney Runkle <54324534+sydney-runkle@users.noreply.github.com>
+Date: Mon, 21 Jul 2025 14:25:37 -0400
+Subject: [PATCH] fix(langgraph): fix assertion in test (#5606)
+
+
+diff --git a/libs/langgraph/tests/test_large_cases.py b/libs/langgraph/tests/test_large_cases.py
+index 7ff1343d..62cf5ffa 100644
+--- a/libs/langgraph/tests/test_large_cases.py
++++ b/libs/langgraph/tests/test_large_cases.py
+@@ -6981,4 +6981,4 @@ def test_subgraph_to_end_does_not_warn() -> None:
+     graph = builder.compile()
+ 
+     response = graph.invoke({"x": "hello"})
+-    print(response)
++    assert response == {"x": "hello!"}

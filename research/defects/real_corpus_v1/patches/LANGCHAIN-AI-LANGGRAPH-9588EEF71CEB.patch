@@ -1,0 +1,19 @@
+From d6c6516f16efdaab726b82e26b72b6a78ed61925 Mon Sep 17 00:00:00 2001
+From: JasonJ <72191212+JasonJ2021@users.noreply.github.com>
+Date: Fri, 20 Dec 2024 04:29:10 +0800
+Subject: [PATCH] fix: minor modification, syntax error (#1905)
+
+
+diff --git a/docs/docs/tutorials/llm-compiler/LLMCompiler.ipynb b/docs/docs/tutorials/llm-compiler/LLMCompiler.ipynb
+index ed58aa76..72dd7c03 100644
+--- a/docs/docs/tutorials/llm-compiler/LLMCompiler.ipynb
++++ b/docs/docs/tutorials/llm-compiler/LLMCompiler.ipynb
+@@ -870,7 +870,7 @@
+     "                # No deps or all deps satisfied\n",
+     "                # can schedule now\n",
+     "                schedule_task.invoke(dict(task=task, observations=observations))\n",
+-    "                # futures.append(executor.submit(schedule_task.invoke dict(task=task, observations=observations)))\n",
++    "                # futures.append(executor.submit(schedule_task.invoke, dict(task=task, observations=observations)))\n",
+     "\n",
+     "        # All tasks have been submitted or enqueued\n",
+     "        # Wait for them to complete\n",

@@ -1,0 +1,58 @@
+From ac74305913e4b06f44a85e0c9097b2f4dc131312 Mon Sep 17 00:00:00 2001
+From: afourney <adamfo@microsoft.com>
+Date: Wed, 5 Feb 2025 20:17:24 -0800
+Subject: [PATCH] Ensure decriptions appear each on one line. Fix web_surfer's
+ desc (#5390)
+
+Some agent descriptions were split over multiple lines in the M1
+orchestrator. This PR ensures that each description appears on one, and
+only one, line. This makes it easier for smaller models to understand.
+
+diff --git a/python/packages/autogen-agentchat/src/autogen_agentchat/teams/_group_chat/_magentic_one/_magentic_one_orchestrator.py b/python/packages/autogen-agentchat/src/autogen_agentchat/teams/_group_chat/_magentic_one/_magentic_one_orchestrator.py
+index b328ba30..f0f927ac 100644
+--- a/python/packages/autogen-agentchat/src/autogen_agentchat/teams/_group_chat/_magentic_one/_magentic_one_orchestrator.py
++++ b/python/packages/autogen-agentchat/src/autogen_agentchat/teams/_group_chat/_magentic_one/_magentic_one_orchestrator.py
+@@ -1,5 +1,6 @@
+ import json
+ import logging
++import re
+ from typing import Any, Dict, List, Mapping
+ 
+ from autogen_core import AgentId, CancellationToken, DefaultTopicId, MessageContext, event, rpc
+@@ -80,14 +81,12 @@ class MagenticOneOrchestrator(BaseGroupChatManager):
+         self._plan = ""
+         self._n_rounds = 0
+         self._n_stalls = 0
+-        self._team_description = "\n".join(
+-            [
+-                f"{topic_type}: {description}".strip()
+-                for topic_type, description in zip(
+-                    self._participant_topic_types, self._participant_descriptions, strict=True
+-                )
+-            ]
+-        )
++
++        # Produce a team description. Each agent sould appear on a single line.
++        self._team_description = ""
++        for topic_type, description in zip(self._participant_topic_types, self._participant_descriptions, strict=True):
++            self._team_description += re.sub(r"\s+", " ", f"{topic_type}: {description}").strip() + "\n"
++        self._team_description = self._team_description.strip()
+ 
+     def _get_task_ledger_facts_prompt(self, task: str) -> str:
+         return ORCHESTRATOR_TASK_LEDGER_FACTS_PROMPT.format(task=task)
+diff --git a/python/packages/autogen-ext/src/autogen_ext/agents/web_surfer/_multimodal_web_surfer.py b/python/packages/autogen-ext/src/autogen_ext/agents/web_surfer/_multimodal_web_surfer.py
+index b848ae8f..90ddbdb2 100644
+--- a/python/packages/autogen-ext/src/autogen_ext/agents/web_surfer/_multimodal_web_surfer.py
++++ b/python/packages/autogen-ext/src/autogen_ext/agents/web_surfer/_multimodal_web_surfer.py
+@@ -176,9 +176,9 @@ class MultimodalWebSurfer(BaseChatAgent, Component[MultimodalWebSurferConfig]):
+ 
+     DEFAULT_DESCRIPTION = """
+     A helpful assistant with access to a web browser.
+-    Ask them to perform web searches, open pages, and interact with content (e.g., clicking links, scrolling the viewport, etc., filling in form fields, etc.).
++    Ask them to perform web searches, open pages, and interact with content (e.g., clicking links, scrolling the viewport, filling in form fields, etc.).
+     It can also summarize the entire page, or answer questions based on the content of the page.
+-    It can also be asked to sleep and wait for pages to load, in cases where the pages seem to be taking a while to load.
++    It can also be asked to sleep and wait for pages to load, in cases where the page seems not yet fully loaded.
+     """
+     DEFAULT_START_PAGE = "https://www.bing.com/"
+ 

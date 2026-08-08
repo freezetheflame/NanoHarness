@@ -1,0 +1,8 @@
+From 151a38d6e93ef4f4655ca921f9dbe29f8a9669a9 Mon Sep 17 00:00:00 2001
+From: Nuno Campos <nuno@boringbits.io>
+Date: Wed, 17 Apr 2024 15:38:20 -0700
+Subject: [PATCH] Merge pull request #320 from
+ langchain-ai/nc/17apr/fix-stream-events
+
+Fix astream_events modifying output format unexpectedly
+

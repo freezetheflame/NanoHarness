@@ -1,0 +1,20 @@
+{
+  "complete": true,
+  "errors": [],
+  "manifest_id": "agent-real-defects-v1",
+  "repositories": [
+    {
+      "default_branch": "main",
+      "pinned_commit": "5931a5f0b313feff24e2516a586c55601b868ac1",
+      "queries": [
+        {
+          "item_count": 245,
+          "query": "repo:langchain-ai/langgraph is:issue is:closed closed:2024-01-01..2026-06-30 label:bug",
+          "query_id": "issue-label-bug"
+        }
+      ],
+      "repository": "langchain-ai/langgraph",
+      "repository_id": 676672661
+    }
+  ]
+}

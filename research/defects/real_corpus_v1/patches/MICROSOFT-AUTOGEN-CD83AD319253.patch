@@ -1,0 +1,22 @@
+From 0a314c17c78070402089f02c195ea755f9ef4c30 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=E6=B9=9B=E9=9C=B2=E5=85=88=E7=94=9F?=
+ <zhanluxianshen@163.com>
+Date: Sat, 5 Apr 2025 06:00:56 +0800
+Subject: [PATCH] fix autostudio dabase jsons. (#6183)
+
+Signed-off-by: zhanluxianshen <zhanluxianshen@163.com>
+Co-authored-by: Victor Dibia <victordibia@microsoft.com>
+
+diff --git a/python/packages/autogen-studio/autogenstudio/database/db_manager.py b/python/packages/autogen-studio/autogenstudio/database/db_manager.py
+index f42eb95c..bd56fc9b 100644
+--- a/python/packages/autogen-studio/autogenstudio/database/db_manager.py
++++ b/python/packages/autogen-studio/autogenstudio/database/db_manager.py
+@@ -326,7 +326,7 @@ class DatabaseManager:
+                         {
+                             "status": result.status,
+                             "message": result.message,
+-                            "id": result.data.get("id") if result.status else None,
++                            "id": result.data.get("id") if result.data else None,
+                         }
+                     )
+ 
