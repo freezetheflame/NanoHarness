@@ -1,0 +1,926 @@
+{
+  "candidate_count": 77,
+  "claim_warning": "These heuristic suggestions are hidden from H1/H2 and excluded from all agreement and defect-count calculations.",
+  "corpus_id": "agent-real-defects-v1",
+  "entries": [
+    {
+      "defect_id": "CREWAIINC-CREWAI-04B202486C03",
+      "evidence_ids": [
+        "de5d2eaa9b12-fix"
+      ],
+      "provisional_boundaries": [
+        "state"
+      ],
+      "provisional_decision": "exclude",
+      "provisional_exclusion_reason": "doc_or_format_only",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-18B7D0AAA5B0",
+      "evidence_ids": [
+        "b38f0825e7ac-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "exclude",
+      "provisional_exclusion_reason": "doc_or_format_only",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-1E81F04FA0D3",
+      "evidence_ids": [
+        "f700e014c9e6-fix"
+      ],
+      "provisional_boundaries": [
+        "model",
+        "context"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-1E9135EB1AC6",
+      "evidence_ids": [
+        "f13d307534d3-fix"
+      ],
+      "provisional_boundaries": [
+        "tool",
+        "state"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-2250F67CC995",
+      "evidence_ids": [
+        "46be5e8097a4-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-39544CABB83E",
+      "evidence_ids": [
+        "b35c3e802492-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-3A3F746A0B2C",
+      "evidence_ids": [
+        "f4f32b5f7fff-fix"
+      ],
+      "provisional_boundaries": [
+        "context",
+        "control_flow"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-509EBFDD10D0",
+      "evidence_ids": [
+        "cc129a0bce43-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-5261DAF3C41F",
+      "evidence_ids": [
+        "1da7473f2621-fix"
+      ],
+      "provisional_boundaries": [
+        "context",
+        "control_flow"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-55CE9DCF5420",
+      "evidence_ids": [
+        "6b262f5a6de3-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-64B8519A37DD",
+      "evidence_ids": [
+        "f89c2bfb7e54-fix"
+      ],
+      "provisional_boundaries": [
+        "context"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-767929542075",
+      "evidence_ids": [
+        "5abf9763735b-fix"
+      ],
+      "provisional_boundaries": [
+        "tool"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-7FA995D027A5",
+      "evidence_ids": [
+        "a1033e4bfee1-fix"
+      ],
+      "provisional_boundaries": [
+        "model",
+        "tool",
+        "context",
+        "control_flow"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-86560271EDF6",
+      "evidence_ids": [
+        "beef71264674-fix"
+      ],
+      "provisional_boundaries": [
+        "tool"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-A70EE6E80215",
+      "evidence_ids": [
+        "5a8649a97f9f-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "exclude",
+      "provisional_exclusion_reason": "doc_or_format_only",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-A7BAD35DD871",
+      "evidence_ids": [
+        "c50d62b82f03-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-A8C087332C76",
+      "evidence_ids": [
+        "beddc7218900-fix"
+      ],
+      "provisional_boundaries": [
+        "model"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-B357A08423FA",
+      "evidence_ids": [
+        "25fcf39cc103-fix"
+      ],
+      "provisional_boundaries": [
+        "tool"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-B54077DEA910",
+      "evidence_ids": [
+        "81bd81e5f5e7-fix"
+      ],
+      "provisional_boundaries": [
+        "model"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-D57AA34C799B",
+      "evidence_ids": [
+        "02718e291b6c-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-DDB20ED36374",
+      "evidence_ids": [
+        "4c74dc0f86a2-fix"
+      ],
+      "provisional_boundaries": [
+        "context"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-E2AB332A0BAA",
+      "evidence_ids": [
+        "1dbe8aab52b9-fix"
+      ],
+      "provisional_boundaries": [
+        "context"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-E356CA9140AB",
+      "evidence_ids": [
+        "7122a29a20a3-fix"
+      ],
+      "provisional_boundaries": [
+        "model"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-EB022D82C64B",
+      "evidence_ids": [
+        "baf91d8f0a15-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "exclude",
+      "provisional_exclusion_reason": "doc_or_format_only",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "CREWAIINC-CREWAI-EEDC3C0811C8",
+      "evidence_ids": [
+        "887adafd2c56-fix"
+      ],
+      "provisional_boundaries": [
+        "model",
+        "context",
+        "state"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "FREEZETHEFLAME-NANOHARNESS-35B5B7782B53",
+      "evidence_ids": [
+        "43fd031f3d89-fix"
+      ],
+      "provisional_boundaries": [
+        "model",
+        "context"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "FREEZETHEFLAME-NANOHARNESS-ECE647477872",
+      "evidence_ids": [
+        "ddf582b12ff1-fix"
+      ],
+      "provisional_boundaries": [
+        "model",
+        "tool",
+        "context",
+        "state",
+        "hook",
+        "evaluator",
+        "permission"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-0182B80F458A",
+      "evidence_ids": [
+        "3c75e414e5d4-fix"
+      ],
+      "provisional_boundaries": [
+        "tool",
+        "state",
+        "control_flow"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-06C154D70011",
+      "evidence_ids": [
+        "df1917319184-fix"
+      ],
+      "provisional_boundaries": [
+        "control_flow"
+      ],
+      "provisional_decision": "exclude",
+      "provisional_exclusion_reason": "doc_or_format_only",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-085B26BD19F0",
+      "evidence_ids": [
+        "520de30350e8-fix"
+      ],
+      "provisional_boundaries": [
+        "control_flow"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-0C116E758515",
+      "evidence_ids": [
+        "36b6cd1493c0-fix"
+      ],
+      "provisional_boundaries": [
+        "context",
+        "state",
+        "control_flow"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-1D85698F2DE2",
+      "evidence_ids": [
+        "470718381407-fix"
+      ],
+      "provisional_boundaries": [
+        "control_flow"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-2CCC5002E185",
+      "evidence_ids": [
+        "c87f9ab6b12b-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "exclude",
+      "provisional_exclusion_reason": "doc_or_format_only",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-2F6D38B47498",
+      "evidence_ids": [
+        "151a38d6e93e-fix"
+      ],
+      "provisional_boundaries": [
+        "control_flow"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-32E290AB59E2",
+      "evidence_ids": [
+        "be088801baa2-fix"
+      ],
+      "provisional_boundaries": [
+        "control_flow"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-37CF01E19507",
+      "evidence_ids": [
+        "a1b34efdb000-fix"
+      ],
+      "provisional_boundaries": [
+        "state",
+        "permission",
+        "control_flow"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-3A0A8FCFB120",
+      "evidence_ids": [
+        "19ca6b416bd3-fix"
+      ],
+      "provisional_boundaries": [
+        "model",
+        "tool",
+        "state",
+        "hook",
+        "control_flow"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-472044FDBEB7",
+      "evidence_ids": [
+        "e3a30a9b69ca-fix"
+      ],
+      "provisional_boundaries": [
+        "context"
+      ],
+      "provisional_decision": "exclude",
+      "provisional_exclusion_reason": "doc_or_format_only",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-58B8EA28E2D3",
+      "evidence_ids": [
+        "57b314c5d7d0-fix"
+      ],
+      "provisional_boundaries": [
+        "model",
+        "tool",
+        "control_flow"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-5EE53C71D22E",
+      "evidence_ids": [
+        "b6cc0228616c-fix"
+      ],
+      "provisional_boundaries": [
+        "context",
+        "state",
+        "control_flow"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-68228EF073F3",
+      "evidence_ids": [
+        "3dac1894cc05-fix"
+      ],
+      "provisional_boundaries": [
+        "context"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-68483D6E7574",
+      "evidence_ids": [
+        "18887e9f86a6-fix"
+      ],
+      "provisional_boundaries": [
+        "tool",
+        "control_flow"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-6B253E912DAC",
+      "evidence_ids": [
+        "0b6a9e345d33-fix"
+      ],
+      "provisional_boundaries": [
+        "state",
+        "control_flow"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-8F1BDAD55A9B",
+      "evidence_ids": [
+        "30598cd9139c-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-9458C5809A2D",
+      "evidence_ids": [
+        "8daeb561946b-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-9588EEF71CEB",
+      "evidence_ids": [
+        "d6c6516f16ef-fix"
+      ],
+      "provisional_boundaries": [
+        "model"
+      ],
+      "provisional_decision": "exclude",
+      "provisional_exclusion_reason": "doc_or_format_only",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-A9CD7093EC81",
+      "evidence_ids": [
+        "e3cb2dd23b1d-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "exclude",
+      "provisional_exclusion_reason": "doc_or_format_only",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-BDC1553450B9",
+      "evidence_ids": [
+        "220f9aaaabec-fix"
+      ],
+      "provisional_boundaries": [
+        "control_flow"
+      ],
+      "provisional_decision": "exclude",
+      "provisional_exclusion_reason": "doc_or_format_only",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-C2ABDDA05120",
+      "evidence_ids": [
+        "460c52290218-fix"
+      ],
+      "provisional_boundaries": [
+        "control_flow"
+      ],
+      "provisional_decision": "exclude",
+      "provisional_exclusion_reason": "doc_or_format_only",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-D5AA932E0F0D",
+      "evidence_ids": [
+        "a15f542a1f23-fix"
+      ],
+      "provisional_boundaries": [
+        "context",
+        "state",
+        "control_flow"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-D7C1D86F1B2E",
+      "evidence_ids": [
+        "217795eb7272-fix"
+      ],
+      "provisional_boundaries": [
+        "control_flow"
+      ],
+      "provisional_decision": "exclude",
+      "provisional_exclusion_reason": "doc_or_format_only",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-DF5A13F34BDC",
+      "evidence_ids": [
+        "f08756785382-fix"
+      ],
+      "provisional_boundaries": [
+        "control_flow"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-06029DF804F5",
+      "evidence_ids": [
+        "de757707bcaa-fix"
+      ],
+      "provisional_boundaries": [
+        "control_flow"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-10A44C35EBC4",
+      "evidence_ids": [
+        "c930251ebc95-fix"
+      ],
+      "provisional_boundaries": [
+        "context"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-1A55A455930E",
+      "evidence_ids": [
+        "5861bd92a681-fix"
+      ],
+      "provisional_boundaries": [
+        "model",
+        "tool"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-1EB93F23C63B",
+      "evidence_ids": [
+        "6c8b656588cc-fix"
+      ],
+      "provisional_boundaries": [
+        "model",
+        "tool",
+        "control_flow"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-1FE3CE06F15B",
+      "evidence_ids": [
+        "aa0d835f4dd9-fix"
+      ],
+      "provisional_boundaries": [
+        "model",
+        "tool",
+        "context"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-25828CF6C797",
+      "evidence_ids": [
+        "b0f42a1bd415-fix"
+      ],
+      "provisional_boundaries": [
+        "model"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-4AE8B72F6FF7",
+      "evidence_ids": [
+        "83f9f3e73336-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-5B5000568D6B",
+      "evidence_ids": [
+        "e83301ed187f-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-5F876512E45E",
+      "evidence_ids": [
+        "d999b452e8be-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "exclude",
+      "provisional_exclusion_reason": "doc_or_format_only",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-623C635D5A11",
+      "evidence_ids": [
+        "e32f4193870b-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-6EF6213DAE38",
+      "evidence_ids": [
+        "c620683ba640-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "exclude",
+      "provisional_exclusion_reason": "doc_or_format_only",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-78E69889C9F1",
+      "evidence_ids": [
+        "20f8ba9cfae4-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-86292287626C",
+      "evidence_ids": [
+        "eec854279a7a-fix"
+      ],
+      "provisional_boundaries": [
+        "control_flow"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-864AA4594BF8",
+      "evidence_ids": [
+        "b868e32b0579-fix"
+      ],
+      "provisional_boundaries": [
+        "model",
+        "tool"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-8C56CF8FA3CF",
+      "evidence_ids": [
+        "fef953e062bf-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-93657DE5BA24",
+      "evidence_ids": [
+        "db287183f2ec-fix"
+      ],
+      "provisional_boundaries": [
+        "model",
+        "tool",
+        "state"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-9D8F5F3B62A1",
+      "evidence_ids": [
+        "44640e29a37a-fix"
+      ],
+      "provisional_boundaries": [
+        "context"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-C025039423FB",
+      "evidence_ids": [
+        "501f8d22726e-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-C03E9EB5C672",
+      "evidence_ids": [
+        "ac74305913e4-fix"
+      ],
+      "provisional_boundaries": [
+        "model"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-CD83AD319253",
+      "evidence_ids": [
+        "0a314c17c780-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-DACBD27A78A4",
+      "evidence_ids": [
+        "bfcbb630172b-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "exclude",
+      "provisional_exclusion_reason": "doc_or_format_only",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-E39723653FA6",
+      "evidence_ids": [
+        "811fd6926d71-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-EA936C1865C5",
+      "evidence_ids": [
+        "dc55ec964bdc-fix"
+      ],
+      "provisional_boundaries": [],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-F5AED66A8629",
+      "evidence_ids": [
+        "0df6be1fc1a8-fix"
+      ],
+      "provisional_boundaries": [
+        "model"
+      ],
+      "provisional_decision": "uncertain",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    },
+    {
+      "defect_id": "MICROSOFT-AUTOGEN-FFBEE2BB6CEF",
+      "evidence_ids": [
+        "e10767421f62-fix"
+      ],
+      "provisional_boundaries": [
+        "context",
+        "control_flow"
+      ],
+      "provisional_decision": "include",
+      "provisional_exclusion_reason": "",
+      "rationale": "Heuristic machine pre-code based only on commit terms, changed paths, and candidate test paths; requires human evidence review."
+    }
+  ],
+  "role": "non-human-private-precode",
+  "schema_version": 1
+}

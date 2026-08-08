@@ -17,6 +17,7 @@ from research.defects.real_corpus_v1.enrich_candidates import enrich_candidates
 from research.defects.real_corpus_v1.archive_search_pages import (
     archive_search_pages,
 )
+from research.defects.real_corpus_v1.machine_precode import machine_precode
 from research.defects.real_corpus_v1.pipeline import (
     blind_packet,
     canonical_candidate_key,
@@ -542,9 +543,54 @@ def test_retained_real_defect_snapshot_checksums_match():
     )
     lines = (root / "SHA256SUMS").read_text(encoding="utf-8").splitlines()
 
-    assert len(lines) == 117
+    assert len(lines) == 120
     for line in lines:
         expected, relative = line.split("  ", 1)
         path = root / relative
         assert path.is_file(), relative
         assert hashlib.sha256(path.read_bytes()).hexdigest() == expected, relative
+
+
+def test_machine_precode_is_conservative_and_partition_blind():
+    candidates = [
+        {
+            "defect_id": "DOC-1",
+            "title": "fix broken documentation link",
+            "commit_message": "fix broken documentation link",
+            "changed_files": ["docs/install.md"],
+            "candidate_test_files": [],
+            "partition": "validation",
+            "selection_rank": "a" * 64,
+            "evidence": [],
+        },
+        {
+            "defect_id": "TOOL-1",
+            "title": "fix duplicate tool retry",
+            "commit_message": "fix duplicate tool retry",
+            "changed_files": ["runtime/tool_retry.py", "tests/test_tool_retry.py"],
+            "candidate_test_files": ["tests/test_tool_retry.py"],
+            "partition": "derivation",
+            "selection_rank": "b" * 64,
+            "evidence": [{"evidence_id": "tool-fix"}],
+        },
+        {
+            "defect_id": "AMB-1",
+            "title": "fix initialization",
+            "commit_message": "fix initialization",
+            "changed_files": ["src/init.py"],
+            "candidate_test_files": [],
+            "partition": "derivation",
+            "selection_rank": "c" * 64,
+            "evidence": [],
+        },
+    ]
+
+    output = machine_precode(candidates)
+
+    assert output[0]["provisional_decision"] == "exclude"
+    assert output[0]["provisional_exclusion_reason"] == "doc_or_format_only"
+    assert output[1]["provisional_decision"] == "include"
+    assert "tool" in output[1]["provisional_boundaries"]
+    assert output[2]["provisional_decision"] == "uncertain"
+    assert all("partition" not in item for item in output)
+    assert all("selection_rank" not in item for item in output)
