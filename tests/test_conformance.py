@@ -8,14 +8,17 @@ from nanoharness.testing.conformance import (
     RUNTIME_CONFORMANCE_SCHEMA_VERSION,
     CaseConformanceResult,
     PermissionDecisionProjection,
+    ProjectionExpectation,
     ProjectionMismatch,
     RuntimeCaseEvidence,
     RuntimeConformanceReport,
     SemanticProjection,
     ToolAttemptProjection,
+    compare_projections,
+    project_scenario_report,
 )
 from nanoharness.testing.scenario import Scenario, ScenarioReport
-from nanoharness.testing.trace import TraceRecorder
+from nanoharness.testing.trace import TraceEventType, TraceRecorder
 
 
 def _projection(case_id: str, runtime: str) -> SemanticProjection:
@@ -165,3 +168,142 @@ def test_tool_attempt_requires_error_type_for_error_outcome():
             arguments={"order_id": 7},
             outcome="error",
         )
+
+
+def _recovery_report(runtime: str, stop_reason: StopReason) -> tuple[Scenario, ScenarioReport]:
+    scenario = Scenario(scenario_id="M2", query="look up order 7")
+    recorder = TraceRecorder(trace_id=f"trace-{runtime}-M2")
+    recorder.record(TraceEventType.TASK_STARTED, {"query": scenario.query})
+    recorder.record(
+        TraceEventType.TOOL_ERROR,
+        {
+            "name": "lookup_order",
+            "arguments": {"order_id": 7},
+            "error_type": "TransientToolError",
+            "error_message": "retryable",
+        },
+    )
+    recorder.record(
+        TraceEventType.TOOL_EXCHANGE,
+        {
+            "name": "lookup_order",
+            "arguments": {"order_id": 7},
+            "result": {"status": "open"},
+            "observation_delivered": True,
+        },
+    )
+    result = RunResult(
+        status=RunStatus.COMPLETED,
+        stop_reason=stop_reason,
+        final_answer="open",
+        evaluation=EvaluationResult(achieved=True, confidence=1.0),
+    )
+    recorder.record(TraceEventType.TASK_COMPLETED, {"result": result})
+    return scenario, ScenarioReport(
+        scenario_id="M2",
+        passed=True,
+        result=result,
+        trace=recorder.snapshot(),
+    )
+
+
+def test_project_scenario_report_extracts_boundaries_and_invariants():
+    scenario, report = _recovery_report(
+        "nanoharness", StopReason.MODEL_TERMINATED
+    )
+
+    projection = project_scenario_report(
+        case_id="M2",
+        runtime="nanoharness",
+        scenario=scenario,
+        report=report,
+    )
+
+    assert [attempt.outcome for attempt in projection.tool_attempts] == [
+        "error",
+        "success",
+    ]
+    assert projection.tool_attempts[0].error_type == "TransientToolError"
+    assert projection.tool_attempts[1].result == {"status": "open"}
+    assert projection.recovery_observed is True
+    assert projection.lifecycle_start_count == 1
+    assert projection.lifecycle_end_count == 1
+    assert projection.lifecycle_paired is True
+    assert projection.event_ids_unique is True
+    assert projection.sequences_monotonic is True
+    assert projection.trace_ids_consistent is True
+    assert projection.scenario_round_trip is True
+    assert projection.report_round_trip is True
+
+
+def test_compare_projections_maps_only_declared_stop_reason_equivalence():
+    scenario, nano_report = _recovery_report(
+        "nanoharness", StopReason.MODEL_TERMINATED
+    )
+    _, graph_report = _recovery_report(
+        "langgraph", StopReason.SUBJECT_COMPLETED
+    )
+    nano = project_scenario_report("M2", "nanoharness", scenario, nano_report)
+    graph = project_scenario_report("M2", "langgraph", scenario, graph_report)
+    expected = ProjectionExpectation(
+        case_id="M2",
+        run_status="completed",
+        stop_reason="normal_termination",
+        goal_achieved=True,
+        report_passed=True,
+        execution_error_type=None,
+        tool_attempts=nano.tool_attempts,
+        permission_decisions=[],
+        recovery_observed=True,
+        lifecycle_start_count=1,
+        lifecycle_end_count=1,
+        lifecycle_paired=True,
+        event_ids_unique=True,
+        sequences_monotonic=True,
+        trace_ids_consistent=True,
+        scenario_round_trip=True,
+        report_round_trip=True,
+    )
+
+    result = compare_projections(
+        expected,
+        nano,
+        graph,
+        stop_reason_equivalences={
+            "model_terminated": "normal_termination",
+            "subject_completed": "normal_termination",
+        },
+    )
+
+    assert result.passed is True
+    assert result.mismatches == []
+    assert result.nanoharness.stop_reason == "model_terminated"
+    assert result.langgraph.stop_reason == "subject_completed"
+
+
+def test_compare_projections_reports_exact_nested_mismatch_path():
+    scenario, nano_report = _recovery_report(
+        "nanoharness", StopReason.MODEL_TERMINATED
+    )
+    _, graph_report = _recovery_report(
+        "langgraph", StopReason.SUBJECT_COMPLETED
+    )
+    graph_report.trace.events[1].payload["arguments"]["order_id"] = 8
+    nano = project_scenario_report("M2", "nanoharness", scenario, nano_report)
+    graph = project_scenario_report("M2", "langgraph", scenario, graph_report)
+    expected = ProjectionExpectation.model_validate(
+        nano.model_dump(exclude={"schema_version", "runtime"})
+    )
+
+    result = compare_projections(
+        expected,
+        nano,
+        graph,
+        stop_reason_equivalences={},
+    )
+
+    assert result.passed is False
+    assert any(
+        mismatch.path == "tool_attempts[0].arguments.order_id"
+        for mismatch in result.mismatches
+    )
