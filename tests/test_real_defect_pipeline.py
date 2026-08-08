@@ -199,6 +199,31 @@ def test_run_retrieval_archives_repository_pin_and_query(tmp_path):
     ).exists()
 
 
+def test_run_retrieval_can_resume_one_declared_repository(tmp_path):
+    manifest = {
+        "manifest_id": "test-manifest",
+        "window": {"start": "2024-01-01", "end": "2026-06-30"},
+        "repositories": ["owner/first", "owner/second"],
+        "queries": [],
+    }
+    transport = _Transport([
+        _Response({"id": 2, "default_branch": "main"}),
+        _Response([{"sha": "e" * 40}]),
+    ])
+
+    report = run_retrieval(
+        manifest,
+        tmp_path,
+        repositories=["owner/second"],
+        transport=transport,
+    )
+
+    assert [item["repository"] for item in report["repositories"]] == [
+        "owner/second"
+    ]
+    assert all("owner/first" not in url for url in transport.urls)
+
+
 def test_build_packets_creates_identical_blind_coder_templates(tmp_path):
     selected = select_and_partition([
         _candidate("owner/runtime", 1),

@@ -116,6 +116,7 @@ def run_retrieval(
     manifest: Mapping[str, Any],
     output_dir: Path,
     *,
+    repositories: Optional[Sequence[str]] = None,
     transport: Callable[[Request], Any] = urlopen,
 ) -> dict[str, Any]:
     """Execute all frozen queries and return a credential-free audit report."""
@@ -128,7 +129,14 @@ def run_retrieval(
         "errors": [],
     }
     window = manifest["window"]
-    for repository in manifest["repositories"]:
+    declared_repositories = list(manifest["repositories"])
+    selected_repositories = (
+        list(repositories) if repositories is not None else declared_repositories
+    )
+    unknown = set(selected_repositories) - set(declared_repositories)
+    if unknown:
+        raise ValueError(f"repositories are not declared in manifest: {sorted(unknown)}")
+    for repository in selected_repositories:
         repository_dir = output_dir / repository.replace("/", "__")
         try:
             metadata = _fetch_json(
@@ -198,14 +206,25 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--repository",
+        action="append",
+        dest="repositories",
+        help="Run one declared repository; repeat to run a subset",
+    )
+    parser.add_argument("--report", type=Path)
     return parser
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     args = build_parser().parse_args(argv)
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
-    report = run_retrieval(manifest, args.output)
-    report_path = args.output.parent / "retrieval_report.json"
+    report = run_retrieval(
+        manifest,
+        args.output,
+        repositories=args.repositories,
+    )
+    report_path = args.report or args.output.parent / "retrieval_report.json"
     report_path.write_text(
         json.dumps(report, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
