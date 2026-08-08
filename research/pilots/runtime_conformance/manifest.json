@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "experiment_id": "m1-m4-runtime-conformance-v1",
+  "case_ids": ["M1", "M2", "M3", "M4"],
+  "runtime_versions": {
+    "nanoharness": "0.1.0",
+    "langgraph": "1.2.10"
+  },
+  "stop_reason_equivalences": {
+    "model_terminated": "normal_termination",
+    "subject_completed": "normal_termination"
+  },
+  "comparison_fields": [
+    "run_status",
+    "stop_reason",
+    "goal_achieved",
+    "report_passed",
+    "execution_error_type",
+    "tool_attempts",
+    "permission_decisions",
+    "recovery_observed",
+    "lifecycle_start_count",
+    "lifecycle_end_count",
+    "lifecycle_paired",
+    "event_ids_unique",
+    "sequences_monotonic",
+    "trace_ids_consistent",
+    "scenario_round_trip",
+    "report_round_trip"
+  ],
+  "frozen_at": "2026-08-08T16:00:00+08:00",
+  "command": "python research/pilots/runtime_conformance/run.py --output-dir research/pilots/runtime_conformance",
+  "manifest_digest": "c504ffe68abdbc5f398d0aa25c68d88f770d52da64c2648fd93cb2671cd8c304",
+  "metadata": {
+    "status": "engineering-validation",
+    "purpose": "Validate M1--M4 semantic projections across NanoHarness and LangGraph.",
+    "claim_boundary": "Adapter and contract evidence only; not confirmatory mutation-score or agent-performance evidence."
+  }
+}
