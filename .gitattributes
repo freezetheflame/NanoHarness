@@ -1,2 +1,5 @@
 *.json text eol=lf
 *.sh text eol=lf
+**/SHA256SUMS text eol=lf
+research/defects/real_corpus_v1/patches/*.patch -text
+research/defects/real_corpus_v1/raw/*.zip binary
