@@ -28,9 +28,19 @@
       "query": "repo:{repository} is:issue is:closed closed:{start}..{end} (bug OR regression OR crash OR incorrect) in:title,body"
     },
     {
-      "id": "merged-pr-defect-terms",
+      "id": "merged-pr-core-defect-terms",
       "endpoint": "search/issues",
-      "query": "repo:{repository} is:pr is:merged merged:{start}..{end} (bug OR fix OR regression OR crash OR duplicate OR retry OR state OR tool OR context OR permission OR termination OR replay OR checkpoint) in:title,body"
+      "query": "repo:{repository} is:pr is:merged merged:{start}..{end} (bug OR fix OR regression OR crash) in:title,body"
+    },
+    {
+      "id": "merged-pr-runtime-defect-terms",
+      "endpoint": "search/issues",
+      "query": "repo:{repository} is:pr is:merged merged:{start}..{end} (duplicate OR retry OR state OR tool) in:title,body"
+    },
+    {
+      "id": "merged-pr-boundary-defect-terms",
+      "endpoint": "search/issues",
+      "query": "repo:{repository} is:pr is:merged merged:{start}..{end} (context OR permission OR termination OR replay OR checkpoint) in:title,body"
     },
     {
       "id": "fixing-commit-terms",

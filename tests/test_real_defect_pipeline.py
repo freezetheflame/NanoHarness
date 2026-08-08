@@ -244,3 +244,19 @@ def test_build_packets_creates_identical_blind_coder_templates(tmp_path):
     assert "selection_rank" not in packet_text
     assert "operator_ids" not in packet_text
     assert "machine_precode" not in packet_text
+
+
+def test_frozen_queries_respect_github_boolean_operator_limit():
+    manifest_path = (
+        __import__("pathlib").Path(__file__).parents[1]
+        / "research"
+        / "defects"
+        / "real_corpus_v1"
+        / "manifest.json"
+    )
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+    assert all(
+        query["query"].count(" OR ") <= 4
+        for query in manifest["queries"]
+    )
