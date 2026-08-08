@@ -117,6 +117,7 @@ def run_retrieval(
     output_dir: Path,
     *,
     repositories: Optional[Sequence[str]] = None,
+    query_ids: Optional[Sequence[str]] = None,
     transport: Callable[[Request], Any] = urlopen,
 ) -> dict[str, Any]:
     """Execute all frozen queries and return a credential-free audit report."""
@@ -136,6 +137,15 @@ def run_retrieval(
     unknown = set(selected_repositories) - set(declared_repositories)
     if unknown:
         raise ValueError(f"repositories are not declared in manifest: {sorted(unknown)}")
+    declared_queries = {item["id"]: item for item in manifest["queries"]}
+    selected_query_ids = (
+        list(query_ids) if query_ids is not None else list(declared_queries)
+    )
+    unknown_queries = set(selected_query_ids) - set(declared_queries)
+    if unknown_queries:
+        raise ValueError(
+            f"query IDs are not declared in manifest: {sorted(unknown_queries)}"
+        )
     for repository in selected_repositories:
         repository_dir = output_dir / repository.replace("/", "__")
         try:
@@ -167,7 +177,8 @@ def run_retrieval(
                 "queries": [],
             }
             report["repositories"].append(repository_report)
-            for query_spec in manifest["queries"]:
+            for query_id in selected_query_ids:
+                query_spec = declared_queries[query_id]
                 query = query_spec["query"].format(
                     repository=repository,
                     start=window["start"],
@@ -212,6 +223,12 @@ def build_parser() -> argparse.ArgumentParser:
         dest="repositories",
         help="Run one declared repository; repeat to run a subset",
     )
+    parser.add_argument(
+        "--query",
+        action="append",
+        dest="query_ids",
+        help="Run one declared query; repeat to run a subset",
+    )
     parser.add_argument("--report", type=Path)
     return parser
 
@@ -223,6 +240,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         manifest,
         args.output,
         repositories=args.repositories,
+        query_ids=args.query_ids,
     )
     report_path = args.report or args.output.parent / "retrieval_report.json"
     report_path.write_text(

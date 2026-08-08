@@ -224,6 +224,36 @@ def test_run_retrieval_can_resume_one_declared_repository(tmp_path):
     assert all("owner/first" not in url for url in transport.urls)
 
 
+def test_run_retrieval_can_resume_one_declared_query(tmp_path):
+    manifest = {
+        "manifest_id": "test-manifest",
+        "window": {"start": "2024-01-01", "end": "2026-06-30"},
+        "repositories": ["owner/runtime"],
+        "queries": [
+            {"id": "first", "endpoint": "search/issues", "query": "first"},
+            {"id": "second", "endpoint": "search/issues", "query": "second"},
+        ],
+    }
+    transport = _Transport([
+        _Response({"id": 2, "default_branch": "main"}),
+        _Response([{"sha": "d" * 40}]),
+        _Response({"total_count": 0, "items": []}),
+    ])
+
+    report = run_retrieval(
+        manifest,
+        tmp_path,
+        repositories=["owner/runtime"],
+        query_ids=["second"],
+        transport=transport,
+    )
+
+    assert [item["query_id"] for item in report["repositories"][0]["queries"]] == [
+        "second"
+    ]
+    assert "q=second" in transport.urls[-1]
+
+
 def test_build_packets_creates_identical_blind_coder_templates(tmp_path):
     selected = select_and_partition([
         _candidate("owner/runtime", 1),
