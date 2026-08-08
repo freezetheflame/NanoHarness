@@ -18,6 +18,7 @@ from research.defects.real_corpus_v1.archive_search_pages import (
     archive_search_pages,
 )
 from research.defects.real_corpus_v1.machine_precode import machine_precode
+from research.defects.real_corpus_v1.build_human_package import build_package
 from research.defects.real_corpus_v1.pipeline import (
     blind_packet,
     canonical_candidate_key,
@@ -543,7 +544,7 @@ def test_retained_real_defect_snapshot_checksums_match():
     )
     lines = (root / "SHA256SUMS").read_text(encoding="utf-8").splitlines()
 
-    assert len(lines) == 120
+    assert len(lines) == 121
     for line in lines:
         expected, relative = line.split("  ", 1)
         path = root / relative
@@ -594,3 +595,39 @@ def test_machine_precode_is_conservative_and_partition_blind():
     assert output[2]["provisional_decision"] == "uncertain"
     assert all("partition" not in item for item in output)
     assert all("selection_rank" not in item for item in output)
+
+
+def test_human_package_is_deterministic_and_rejects_forbidden_material(tmp_path):
+    packet = tmp_path / "evidence_packet.json"
+    template = tmp_path / "pass_a.json"
+    manual = tmp_path / "manual.md"
+    packet.write_bytes(b'{"candidates":[]}\n')
+    template.write_bytes(b'{"coder_id":"H2"}\n')
+    manual.write_bytes(b"# Manual\n")
+    entries = {
+        "evidence/evidence_packet.json": packet,
+        "coding/pass_a.json": template,
+        "docs/DEFECT_CODING_MANUAL.md": manual,
+    }
+    metadata = {
+        "coder_id": "H2",
+        "packet_sha256": hashlib.sha256(packet.read_bytes()).hexdigest(),
+    }
+
+    first = tmp_path / "first.zip"
+    second = tmp_path / "second.zip"
+    build_package(entries, first, metadata=metadata)
+    build_package(entries, second, metadata=metadata)
+
+    assert first.read_bytes() == second.read_bytes()
+    import zipfile
+    with zipfile.ZipFile(first) as archive:
+        names = archive.namelist()
+        assert "PACKAGE_METADATA.json" in names
+        assert "PACKAGE_SHA256SUMS" in names
+        assert not any("private" in name.lower() for name in names)
+        assert not any("machine" in name.lower() for name in names)
+        assert not any("H1" in name for name in names)
+
+    with pytest.raises(ValueError, match="forbidden blind-coding material"):
+        build_package({"private/machine_precode.json": packet}, tmp_path / "bad.zip", metadata=metadata)
