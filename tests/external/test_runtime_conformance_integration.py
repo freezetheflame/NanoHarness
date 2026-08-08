@@ -11,6 +11,18 @@ from research.pilots.runtime_conformance.run import (  # noqa: E402
     RuntimeConformanceManifest,
 )
 from nanoharness.testing import RuntimeConformanceReport  # noqa: E402
+from nanoharness.testing import TraceEventType  # noqa: E402
+
+
+def _boundary_audit(report):
+    matches = [
+        event.payload
+        for event in report.trace.events
+        if event.event_type is TraceEventType.CUSTOM
+        and event.payload.get("adapter_event") == "boundary_audit"
+    ]
+    assert len(matches) == 1
+    return matches[0]
 
 
 @pytest.mark.parametrize("case_id", ["M1", "M2", "M3", "M4"])
@@ -34,6 +46,7 @@ def test_m1_records_typed_tool_argument_and_delivered_observation():
     assert pair.langgraph.projection.tool_attempts[0].arguments == {"order_id": 7}
     assert pair.nanoharness.projection.tool_attempts[0].result == {"status": "open"}
     assert pair.nanoharness.projection.tool_attempts[0].observation_delivered is True
+    assert _boundary_audit(pair.langgraph.report)["lookup_attempts"] == 1
 
 
 def test_m2_records_recovery_after_transient_tool_error():
@@ -45,6 +58,7 @@ def test_m2_records_recovery_after_transient_tool_error():
         "error",
         "success",
     ]
+    assert _boundary_audit(pair.langgraph.report)["lookup_attempts"] == 2
 
 
 def test_m3_separates_normal_termination_from_goal_achievement():
@@ -65,6 +79,7 @@ def test_m4_denies_write_before_underlying_tool_attempt():
         assert evidence.projection.permission_decisions[0].allowed is False
         assert evidence.projection.tool_attempts == []
         assert evidence.report.passed is True
+    assert _boundary_audit(pair.langgraph.report)["update_attempts"] == 0
 
 
 def test_archived_m1_m4_evidence_matches_manifest_and_checksums():

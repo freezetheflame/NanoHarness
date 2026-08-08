@@ -104,6 +104,25 @@ class DenyWrites:
         return DENIAL if tool_name == "update_order" else None
 
 
+class ExecutableTools:
+    """Fresh LangGraph fixture tools with independently auditable attempts."""
+
+    def __init__(self, *, fail_first_lookup: bool = False):
+        self.lookup_attempts = 0
+        self.update_attempts = 0
+        self._fail_first_lookup = fail_first_lookup
+
+    def lookup_order(self, order_id: int):
+        self.lookup_attempts += 1
+        if self._fail_first_lookup and self.lookup_attempts == 1:
+            raise TransientToolError("retryable")
+        return LOOKUP_RESULT
+
+    def update_order(self, order_id: int, status: str):
+        self.update_attempts += 1
+        return {"order_id": order_id, "status": status}
+
+
 class ConformanceState(TypedDict, total=False):
     query: str
     answer: str
@@ -370,32 +389,60 @@ def _langgraph_adapter() -> LangGraphSubjectAdapter:
 
 def _build_langgraph(scenario: Scenario, recorder):
     case_id = scenario.fixtures["case_id"]
+    tools = ExecutableTools(fail_first_lookup=case_id == "M2")
 
     def execute(state):
         if case_id == "M1":
-            _record_lookup_success(recorder)
+            result = tools.lookup_order(7)
+            _record_lookup_success(recorder, result)
         elif case_id == "M2":
-            recorder.record(
-                TraceEventType.TOOL_ERROR,
-                {
-                    "name": "lookup_order",
-                    "arguments": {"order_id": 7},
-                    "error_type": "TransientToolError",
-                    "error_message": "retryable",
-                    "observation_delivered": False,
-                },
-            )
-            _record_lookup_success(recorder)
+            try:
+                tools.lookup_order(7)
+            except TransientToolError as exc:
+                recorder.record(
+                    TraceEventType.TOOL_ERROR,
+                    {
+                        "name": "lookup_order",
+                        "arguments": {"order_id": 7},
+                        "error_type": type(exc).__name__,
+                        "error_message": str(exc),
+                        "observation_delivered": False,
+                    },
+                )
+            result = tools.lookup_order(7)
+            _record_lookup_success(recorder, result)
         elif case_id == "M4":
+            arguments = {"order_id": 7, "status": "closed"}
+            denial = DenyWrites().enforce("update_order", arguments)
             recorder.record(
                 TraceEventType.PERMISSION_DECISION,
                 {
                     "tool_name": "update_order",
-                    "arguments": {"order_id": 7, "status": "closed"},
-                    "allowed": False,
-                    "denial": DENIAL,
+                    "arguments": arguments,
+                    "allowed": denial is None,
+                    "denial": denial,
                 },
             )
+            if denial is None:
+                result = tools.update_order(**arguments)
+                recorder.record(
+                    TraceEventType.TOOL_EXCHANGE,
+                    {
+                        "name": "update_order",
+                        "arguments": arguments,
+                        "result": result,
+                        "observation_delivered": True,
+                    },
+                )
+        recorder.record(
+            TraceEventType.CUSTOM,
+            {
+                "adapter": "langgraph",
+                "adapter_event": "boundary_audit",
+                "lookup_attempts": tools.lookup_attempts,
+                "update_attempts": tools.update_attempts,
+            },
+        )
         return {
             "answer": "order is open" if case_id in {"M1", "M2"} else "stopped",
             "achieved": bool(scenario.fixtures["achieved"]),
@@ -408,13 +455,13 @@ def _build_langgraph(scenario: Scenario, recorder):
     return graph.compile()
 
 
-def _record_lookup_success(recorder) -> None:
+def _record_lookup_success(recorder, result) -> None:
     recorder.record(
         TraceEventType.TOOL_EXCHANGE,
         {
             "name": "lookup_order",
             "arguments": {"order_id": 7},
-            "result": LOOKUP_RESULT,
+            "result": result,
             "observation_delivered": True,
         },
     )
