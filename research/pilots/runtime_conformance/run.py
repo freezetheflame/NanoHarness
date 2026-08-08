@@ -6,10 +6,14 @@ import argparse
 import hashlib
 import json
 import subprocess
+import sys
 from datetime import datetime
 from importlib import metadata
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
+
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from pydantic import BaseModel, Field, model_validator
 

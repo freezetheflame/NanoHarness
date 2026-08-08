@@ -1,6 +1,8 @@
 import hashlib
 import json
 from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
@@ -73,3 +75,17 @@ def test_manifest_rejects_missing_comparison_field():
 
     with pytest.raises(ValidationError, match="comparison fields do not match"):
         RuntimeConformanceManifest.model_validate(payload)
+
+
+def test_direct_script_cli_runs_from_repository_root(tmp_path):
+    script = DEFAULT_MANIFEST.parent / "run.py"
+
+    completed = subprocess.run(
+        [sys.executable, str(script), "--output-dir", str(tmp_path)],
+        cwd=DEFAULT_MANIFEST.parents[3],
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert "wrote 8 cells and 4 comparisons; passed=True" in completed.stdout
