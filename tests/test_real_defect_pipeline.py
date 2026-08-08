@@ -10,6 +10,12 @@ from research.defects.real_corpus_v1.pipeline import (
     select_and_partition,
     sha256_file,
 )
+from research.defects.real_corpus_v1.retrieve import (
+    GitHubRetrievalError,
+    fetch_pages,
+    parse_next_link,
+    run_retrieval,
+)
 
 
 def _candidate(repository, number, *, kind="pull"):
@@ -86,3 +92,107 @@ def test_sha256_file_hashes_exact_bytes(tmp_path):
     path.write_bytes(payload)
 
     assert sha256_file(path) == hashlib.sha256(payload).hexdigest()
+
+
+class _Response:
+    def __init__(self, payload, *, link=None, status=200):
+        self.payload = json.dumps(payload).encode("utf-8")
+        self.headers = {"Link": link} if link else {}
+        self.status = status
+
+    def read(self):
+        return self.payload
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_):
+        return False
+
+
+class _Transport:
+    def __init__(self, responses):
+        self.responses = list(responses)
+        self.urls = []
+
+    def __call__(self, request):
+        self.urls.append(request.full_url)
+        return self.responses.pop(0)
+
+
+def test_parse_next_link_selects_only_next_relation():
+    value = (
+        '<https://api.test/p1>; rel="prev", '
+        '<https://api.test/p3>; rel="next"'
+    )
+
+    assert parse_next_link(value) == "https://api.test/p3"
+    assert parse_next_link(None) is None
+
+
+def test_fetch_pages_follows_links_and_retains_raw_payloads(tmp_path):
+    transport = _Transport([
+        _Response(
+            {"items": [{"id": 1}]},
+            link='<https://api.test/p2>; rel="next"',
+        ),
+        _Response({"items": [{"id": 2}]}),
+    ])
+
+    items = fetch_pages(
+        "https://api.test/p1",
+        tmp_path,
+        transport=transport,
+    )
+
+    assert [item["id"] for item in items] == [1, 2]
+    assert transport.urls == ["https://api.test/p1", "https://api.test/p2"]
+    assert json.loads((tmp_path / "page-0001.json").read_text())["items"] == [
+        {"id": 1}
+    ]
+    assert json.loads((tmp_path / "page-0002.json").read_text())["items"] == [
+        {"id": 2}
+    ]
+
+
+def test_fetch_pages_rejects_non_object_search_payload(tmp_path):
+    with pytest.raises(GitHubRetrievalError, match="object with an items list"):
+        fetch_pages(
+            "https://api.test/p1",
+            tmp_path,
+            transport=_Transport([_Response([{"id": 1}])]),
+        )
+
+
+def test_run_retrieval_archives_repository_pin_and_query(tmp_path):
+    manifest = {
+        "manifest_id": "test-manifest",
+        "window": {"start": "2024-01-01", "end": "2026-06-30"},
+        "repositories": ["owner/runtime"],
+        "queries": [
+            {
+                "id": "closed-bugs",
+                "endpoint": "search/issues",
+                "query": (
+                    "repo:{repository} is:issue is:closed "
+                    "closed:{start}..{end} label:bug"
+                ),
+            }
+        ],
+    }
+    transport = _Transport([
+        _Response({"id": 42, "default_branch": "main"}),
+        _Response([{"sha": "f" * 40}]),
+        _Response({"total_count": 1, "items": [{"id": 7}]}),
+    ])
+
+    report = run_retrieval(manifest, tmp_path, transport=transport)
+
+    assert report["complete"] is True
+    assert report["repositories"][0]["repository_id"] == 42
+    assert report["repositories"][0]["pinned_commit"] == "f" * 40
+    assert report["repositories"][0]["queries"][0]["item_count"] == 1
+    assert (tmp_path / "owner__runtime" / "repository.json").exists()
+    assert (
+        tmp_path / "owner__runtime" / "queries" / "closed-bugs" / "page-0001.json"
+    ).exists()

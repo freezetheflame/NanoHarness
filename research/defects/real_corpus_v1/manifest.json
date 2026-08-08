@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "manifest_id": "agent-real-defects-v1",
+  "window": {
+    "start": "2024-01-01",
+    "end": "2026-06-30"
+  },
+  "repositories": [
+    "freezetheflame/NanoHarness",
+    "langchain-ai/langgraph",
+    "microsoft/autogen",
+    "crewAIInc/crewAI"
+  ],
+  "queries": [
+    {
+      "id": "issue-label-bug",
+      "endpoint": "search/issues",
+      "query": "repo:{repository} is:issue is:closed closed:{start}..{end} label:bug"
+    },
+    {
+      "id": "issue-label-regression",
+      "endpoint": "search/issues",
+      "query": "repo:{repository} is:issue is:closed closed:{start}..{end} label:regression"
+    },
+    {
+      "id": "issue-defect-terms",
+      "endpoint": "search/issues",
+      "query": "repo:{repository} is:issue is:closed closed:{start}..{end} (bug OR regression OR crash OR incorrect) in:title,body"
+    },
+    {
+      "id": "merged-pr-defect-terms",
+      "endpoint": "search/issues",
+      "query": "repo:{repository} is:pr is:merged merged:{start}..{end} (bug OR fix OR regression OR crash OR duplicate OR retry OR state OR tool OR context OR permission OR termination OR replay OR checkpoint) in:title,body"
+    },
+    {
+      "id": "fixing-commit-terms",
+      "endpoint": "search/commits",
+      "query": "repo:{repository} committer-date:{start}..{end} (fix OR bug OR regression OR revert)"
+    }
+  ],
+  "cap_per_repository": 25,
+  "selection_namespace": "agent-defect-corpus-v1",
+  "partition_namespace": "agent-defect-partition-v1",
+  "derivation_fraction": 0.6,
+  "protocol": "AgentMutationTestingPaper@0525e49:docs/superpowers/specs/2026-08-08-real-defect-corpus-design.md"
+}
