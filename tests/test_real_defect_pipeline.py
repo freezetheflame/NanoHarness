@@ -13,6 +13,7 @@ from research.defects.real_corpus_v1.build_candidate_index import (
 from research.defects.real_corpus_v1.collect_git_history import (
     collect_fixing_commits,
 )
+from research.defects.real_corpus_v1.enrich_candidates import enrich_candidates
 from research.defects.real_corpus_v1.pipeline import (
     blind_packet,
     canonical_candidate_key,
@@ -392,3 +393,89 @@ def test_build_candidate_index_uses_complete_git_histories(tmp_path):
     }
     assert all("partition" in item for item in selected["candidates"])
     assert outputs.packet.evidence_packet.exists()
+
+
+@pytest.mark.parametrize("script_name", ["build_packets.py", "build_candidate_index.py"])
+def test_nested_pipeline_scripts_support_direct_execution(script_name):
+    script = (
+        __import__("pathlib").Path(__file__).parents[1]
+        / "research"
+        / "defects"
+        / "real_corpus_v1"
+        / script_name
+    )
+
+    completed = subprocess.run(
+        [__import__("sys").executable, str(script), "--help"],
+        text=True,
+        capture_output=True,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+
+
+def test_enrich_candidates_archives_commit_evidence_and_patch(tmp_path):
+    repository_path = tmp_path / "subject"
+    subprocess.run(["git", "init", str(repository_path)], check=True, capture_output=True)
+    subprocess.run(
+        ["git", "-C", str(repository_path), "config", "user.email", "test@example.test"],
+        check=True,
+    )
+    subprocess.run(
+        ["git", "-C", str(repository_path), "config", "user.name", "Test"],
+        check=True,
+    )
+    (repository_path / "runtime.py").write_text("value = 1\n", encoding="utf-8")
+    (repository_path / "test_runtime.py").write_text(
+        "def test_value():\n    assert True\n",
+        encoding="utf-8",
+    )
+    subprocess.run(
+        ["git", "-C", str(repository_path), "add", "."],
+        check=True,
+    )
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repository_path),
+            "commit",
+            "-m",
+            "fix: preserve tool result (#17)",
+            "-m",
+            "The stale observation previously escaped validation.",
+        ],
+        check=True,
+        capture_output=True,
+    )
+    revision = subprocess.run(
+        ["git", "-C", str(repository_path), "rev-parse", "HEAD"],
+        check=True,
+        text=True,
+        capture_output=True,
+    ).stdout.strip()
+    selected = [{
+        "defect_id": "OWNER-RUNTIME-ABC",
+        "repository": "owner/runtime",
+        "revision": revision,
+        "title": "fix: preserve tool result (#17)",
+        "canonical_locator": f"https://github.com/owner/runtime/commit/{revision}",
+        "partition": "derivation",
+        "selection_rank": "a" * 64,
+        "evidence": [],
+    }]
+
+    enriched = enrich_candidates(
+        selected,
+        repository_paths={"owner/runtime": repository_path},
+        output_dir=tmp_path / "evidence",
+    )
+
+    record = enriched[0]
+    assert record["commit_message"].startswith("fix: preserve tool result")
+    assert record["changed_files"] == ["runtime.py", "test_runtime.py"]
+    assert record["candidate_test_files"] == ["test_runtime.py"]
+    assert record["pull_request_locator"] == "https://github.com/owner/runtime/pull/17"
+    patch = tmp_path / "evidence" / record["patch_path"]
+    assert patch.exists()
+    assert record["patch_sha256"] == hashlib.sha256(patch.read_bytes()).hexdigest()
