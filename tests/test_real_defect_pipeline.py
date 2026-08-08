@@ -7,6 +7,9 @@ from collections import Counter
 import pytest
 
 from research.defects.real_corpus_v1.build_packets import build_packets
+from research.defects.real_corpus_v1.build_candidate_index import (
+    build_candidate_index,
+)
 from research.defects.real_corpus_v1.collect_git_history import (
     collect_fixing_commits,
 )
@@ -353,3 +356,39 @@ def test_collect_fixing_commits_uses_pinned_history_and_window(tmp_path):
     assert candidates[0]["revision"] == pin
     assert candidates[0]["canonical_locator"].endswith(f"/commit/{pin}")
     assert candidates[0]["title"] == "fix: retry duplicate tool call"
+
+
+def test_build_candidate_index_uses_complete_git_histories(tmp_path):
+    raw = tmp_path / "raw"
+    repositories = ["owner/a", "owner/b"]
+    for repository, count in [("owner/a", 30), ("owner/b", 4)]:
+        path = raw / repository.replace("/", "__") / "git_history.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        candidates = [_candidate(repository, index) for index in range(count)]
+        path.write_text(
+            json.dumps({
+                "repository": repository,
+                "pinned_commit": str(count) * 40,
+                "candidate_count": count,
+                "candidates": candidates,
+            }),
+            encoding="utf-8",
+        )
+    manifest = {
+        "manifest_id": "test",
+        "repositories": repositories,
+        "cap_per_repository": 25,
+    }
+
+    outputs = build_candidate_index(raw, manifest, tmp_path / "output")
+
+    universe = json.loads(outputs.candidate_universe.read_text(encoding="utf-8"))
+    selected = json.loads(outputs.selected_private.read_text(encoding="utf-8"))
+    assert universe["candidate_count"] == 34
+    assert selected["candidate_count"] == 29
+    assert Counter(item["repository"] for item in selected["candidates"]) == {
+        "owner/a": 25,
+        "owner/b": 4,
+    }
+    assert all("partition" in item for item in selected["candidates"])
+    assert outputs.packet.evidence_packet.exists()
