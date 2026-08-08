@@ -1,0 +1,4097 @@
+{
+  "schema_version": 1,
+  "experiment_id": "m1-m4-runtime-conformance-v1",
+  "manifest_digest": "c504ffe68abdbc5f398d0aa25c68d88f770d52da64c2648fd93cb2671cd8c304",
+  "artifact_revision": "cb61901d99ec5a0ee0c48e71408246221a846086",
+  "runtime_versions": {
+    "nanoharness": "0.1.0",
+    "langgraph": "1.2.10"
+  },
+  "started_at": "2026-08-08T19:29:57.169124+08:00",
+  "finished_at": "2026-08-08T19:29:57.211275+08:00",
+  "cells": [
+    {
+      "case_id": "M1",
+      "runtime": "nanoharness",
+      "scenario": {
+        "schema_version": 1,
+        "scenario_id": "M1",
+        "query": "Look up order 7 once.",
+        "seed": 20260808,
+        "tags": [
+          "runtime-conformance",
+          "m1",
+          "deterministic"
+        ],
+        "fixtures": {
+          "case_id": "M1",
+          "achieved": true
+        },
+        "metadata": {},
+        "oracles": [
+          {
+            "oracle_id": "m1-goal",
+            "kind": "goal_achievement",
+            "parameters": {
+              "expected": true
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m1-status",
+            "kind": "run_status",
+            "parameters": {
+              "allowed": [
+                "completed"
+              ]
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m1-lifecycle",
+            "kind": "lifecycle",
+            "parameters": {},
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m1-tool-call",
+            "kind": "tool_calls",
+            "parameters": {
+              "required": [
+                "lookup_order"
+              ],
+              "min_counts": {
+                "lookup_order": 1
+              },
+              "max_counts": {
+                "lookup_order": 1
+              },
+              "expected_arguments": {
+                "lookup_order": {
+                  "order_id": 7
+                }
+              }
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m1-tool-result",
+            "kind": "tool_results",
+            "parameters": {
+              "expected_last": {
+                "lookup_order": {
+                  "status": "open"
+                }
+              }
+            },
+            "severity": "error"
+          }
+        ]
+      },
+      "report": {
+        "schema_version": 1,
+        "scenario_id": "M1",
+        "passed": true,
+        "result": {
+          "status": "completed",
+          "stop_reason": "model_terminated",
+          "stop_detail": "",
+          "final_answer": "order is open",
+          "evaluation": {
+            "achieved": true,
+            "confidence": 1.0,
+            "explanation": "Frozen M1--M4 semantic expectation",
+            "evidence": []
+          },
+          "trajectory": [
+            {
+              "step_id": 0,
+              "thought": "lookup",
+              "action": {
+                "name": "lookup_order",
+                "arguments": {
+                  "order_id": 7
+                }
+              },
+              "observation": "{'status': 'open'}",
+              "status": "success",
+              "stop_signal": null
+            },
+            {
+              "step_id": 1,
+              "thought": "order is open",
+              "action": null,
+              "observation": null,
+              "status": "terminated",
+              "stop_signal": null
+            }
+          ],
+          "avg_thought_length": 9.5
+        },
+        "trace": {
+          "schema_version": 2,
+          "trace_id": "86a19598-baf1-4d25-add7-5bb628b00453",
+          "started_at": 1786188597.1696246,
+          "events": [
+            {
+              "schema_version": 2,
+              "event_id": "d6049308-2880-4cb0-803f-2ff8169e16ae",
+              "trace_id": "86a19598-baf1-4d25-add7-5bb628b00453",
+              "sequence": 0,
+              "event_type": "task_started",
+              "timestamp": 1786188597.1701248,
+              "payload": {
+                "data": "Look up order 7 once."
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "1b29b58f-daef-468f-91a5-3275e0e3389f",
+              "trace_id": "86a19598-baf1-4d25-add7-5bb628b00453",
+              "sequence": 1,
+              "event_type": "tool_schemas",
+              "timestamp": 1786188597.1701248,
+              "payload": {
+                "schemas": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "lookup_order",
+                      "description": "Look up one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "update_order",
+                      "description": "Update one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "deac04e9-0150-48c5-8a38-e67fe905d252",
+              "trace_id": "86a19598-baf1-4d25-add7-5bb628b00453",
+              "sequence": 2,
+              "event_type": "model_exchange",
+              "timestamp": 1786188597.1701248,
+              "payload": {
+                "messages": [
+                  {
+                    "role": "user",
+                    "content": "Look up order 7 once."
+                  }
+                ],
+                "tools": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "lookup_order",
+                      "description": "Look up one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "update_order",
+                      "description": "Update one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "response": {
+                  "content": "lookup",
+                  "tool_calls": [
+                    {
+                      "name": "lookup_order",
+                      "arguments": {
+                        "order_id": 7
+                      }
+                    }
+                  ]
+                },
+                "duration_ms": 0.0025000008463393897
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "f20bb7e1-df74-48fc-b030-efaff9b8f92b",
+              "trace_id": "86a19598-baf1-4d25-add7-5bb628b00453",
+              "sequence": 3,
+              "event_type": "model_response",
+              "timestamp": 1786188597.1701248,
+              "payload": {
+                "content": "lookup",
+                "tool_calls": [
+                  {
+                    "name": "lookup_order",
+                    "arguments": {
+                      "order_id": 7
+                    }
+                  }
+                ]
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "cd42f20f-971b-4c71-ac92-86f170544583",
+              "trace_id": "86a19598-baf1-4d25-add7-5bb628b00453",
+              "sequence": 4,
+              "event_type": "tool_exchange",
+              "timestamp": 1786188597.1701248,
+              "payload": {
+                "name": "lookup_order",
+                "arguments": {
+                  "order_id": 7
+                },
+                "result": {
+                  "status": "open"
+                },
+                "attempt_count": 1,
+                "duration_ms": 0.0037999998312443495
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "8d487805-0018-4e97-bbbb-87b446641d89",
+              "trace_id": "86a19598-baf1-4d25-add7-5bb628b00453",
+              "sequence": 5,
+              "event_type": "step_completed",
+              "timestamp": 1786188597.1701248,
+              "payload": {
+                "step_id": 0,
+                "thought": "lookup",
+                "action": {
+                  "name": "lookup_order",
+                  "arguments": {
+                    "order_id": 7
+                  }
+                },
+                "observation": "{'status': 'open'}",
+                "status": "success",
+                "stop_signal": null
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "00da713d-acae-4dad-9793-0b5acfba2c7b",
+              "trace_id": "86a19598-baf1-4d25-add7-5bb628b00453",
+              "sequence": 6,
+              "event_type": "tool_schemas",
+              "timestamp": 1786188597.1701248,
+              "payload": {
+                "schemas": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "lookup_order",
+                      "description": "Look up one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "update_order",
+                      "description": "Update one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "dc6398e3-4a54-4128-beae-1e670d4c4de9",
+              "trace_id": "86a19598-baf1-4d25-add7-5bb628b00453",
+              "sequence": 7,
+              "event_type": "model_exchange",
+              "timestamp": 1786188597.1701248,
+              "payload": {
+                "messages": [
+                  {
+                    "role": "user",
+                    "content": "Look up order 7 once."
+                  },
+                  {
+                    "role": "assistant",
+                    "content": "lookup",
+                    "tool_calls": [
+                      {
+                        "id": "call_0",
+                        "type": "function",
+                        "function": {
+                          "name": "lookup_order",
+                          "arguments": "{\"order_id\": 7}"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "role": "tool",
+                    "content": "{'status': 'open'}",
+                    "tool_call_id": "call_0"
+                  }
+                ],
+                "tools": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "lookup_order",
+                      "description": "Look up one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "update_order",
+                      "description": "Update one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "response": {
+                  "content": "order is open",
+                  "tool_calls": null
+                },
+                "duration_ms": 0.0013000008038943633
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "6182dc88-4349-4a2d-a60b-5c527c48d9b0",
+              "trace_id": "86a19598-baf1-4d25-add7-5bb628b00453",
+              "sequence": 8,
+              "event_type": "model_response",
+              "timestamp": 1786188597.1711278,
+              "payload": {
+                "content": "order is open",
+                "tool_calls": null
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "05787c8e-5357-476a-92de-329212f16f22",
+              "trace_id": "86a19598-baf1-4d25-add7-5bb628b00453",
+              "sequence": 9,
+              "event_type": "step_completed",
+              "timestamp": 1786188597.1711278,
+              "payload": {
+                "step_id": 1,
+                "thought": "order is open",
+                "action": null,
+                "observation": null,
+                "status": "terminated",
+                "stop_signal": null
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "133495fa-d908-4ded-b9d7-92797330e3ff",
+              "trace_id": "86a19598-baf1-4d25-add7-5bb628b00453",
+              "sequence": 10,
+              "event_type": "task_completed",
+              "timestamp": 1786188597.1716332,
+              "payload": {
+                "status": "completed",
+                "stop_reason": "model_terminated",
+                "stop_detail": "",
+                "final_answer": "order is open",
+                "evaluation": {
+                  "achieved": true,
+                  "confidence": 1.0,
+                  "explanation": "Frozen M1--M4 semantic expectation",
+                  "evidence": []
+                },
+                "trajectory": [
+                  {
+                    "step_id": 0,
+                    "thought": "lookup",
+                    "action": {
+                      "name": "lookup_order",
+                      "arguments": {
+                        "order_id": 7
+                      }
+                    },
+                    "observation": "{'status': 'open'}",
+                    "status": "success",
+                    "stop_signal": null
+                  },
+                  {
+                    "step_id": 1,
+                    "thought": "order is open",
+                    "action": null,
+                    "observation": null,
+                    "status": "terminated",
+                    "stop_signal": null
+                  }
+                ],
+                "avg_thought_length": 9.5
+              },
+              "metadata": {}
+            }
+          ],
+          "metadata": {
+            "scenario_id": "M1",
+            "seed": 20260808,
+            "tags": [
+              "runtime-conformance",
+              "m1",
+              "deterministic"
+            ],
+            "subject": {
+              "subject_id": "nanoharness@runtime-conformance",
+              "runtime": "nanoharness",
+              "version": "0.1.0",
+              "revision": "runtime-conformance",
+              "source_url": null,
+              "independently_developed": false,
+              "metadata": {}
+            }
+          }
+        },
+        "execution_error": null,
+        "verdicts": [
+          {
+            "oracle_id": "m1-goal",
+            "kind": "goal_achievement",
+            "passed": true,
+            "message": "Expected goal achievement True, got True",
+            "severity": "error",
+            "evidence": {
+              "expected": true,
+              "actual": true
+            }
+          },
+          {
+            "oracle_id": "m1-status",
+            "kind": "run_status",
+            "passed": true,
+            "message": "Expected run status in ['completed'], got completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "completed"
+              ],
+              "actual": "completed"
+            }
+          },
+          {
+            "oracle_id": "m1-lifecycle",
+            "kind": "lifecycle",
+            "passed": true,
+            "message": "Lifecycle contains 1 start event(s) and 1 end event(s)",
+            "severity": "error",
+            "evidence": {
+              "start_sequences": [
+                0
+              ],
+              "end_sequences": [
+                10
+              ]
+            }
+          },
+          {
+            "oracle_id": "m1-tool-call",
+            "kind": "tool_calls",
+            "passed": true,
+            "message": "Tool-call constraints satisfied",
+            "severity": "error",
+            "evidence": {
+              "counts": {
+                "lookup_order": 1
+              },
+              "calls": [
+                {
+                  "sequence": 4,
+                  "name": "lookup_order",
+                  "arguments": {
+                    "order_id": 7
+                  },
+                  "attempt_count": 1
+                }
+              ]
+            }
+          },
+          {
+            "oracle_id": "m1-tool-result",
+            "kind": "tool_results",
+            "passed": true,
+            "message": "Tool-result constraints satisfied",
+            "severity": "error",
+            "evidence": {
+              "last_results": {
+                "lookup_order": {
+                  "status": "open"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "projection": {
+        "schema_version": 1,
+        "case_id": "M1",
+        "runtime": "nanoharness",
+        "run_status": "completed",
+        "stop_reason": "model_terminated",
+        "goal_achieved": true,
+        "report_passed": true,
+        "execution_error_type": null,
+        "tool_attempts": [
+          {
+            "name": "lookup_order",
+            "arguments": {
+              "order_id": 7
+            },
+            "outcome": "success",
+            "result": {
+              "status": "open"
+            },
+            "error_type": null,
+            "observation_delivered": true
+          }
+        ],
+        "permission_decisions": [],
+        "recovery_observed": false,
+        "lifecycle_start_count": 1,
+        "lifecycle_end_count": 1,
+        "lifecycle_paired": true,
+        "event_ids_unique": true,
+        "sequences_monotonic": true,
+        "trace_ids_consistent": true,
+        "scenario_round_trip": true,
+        "report_round_trip": true
+      }
+    },
+    {
+      "case_id": "M1",
+      "runtime": "langgraph",
+      "scenario": {
+        "schema_version": 1,
+        "scenario_id": "M1",
+        "query": "Look up order 7 once.",
+        "seed": 20260808,
+        "tags": [
+          "runtime-conformance",
+          "m1",
+          "deterministic"
+        ],
+        "fixtures": {
+          "case_id": "M1",
+          "achieved": true
+        },
+        "metadata": {},
+        "oracles": [
+          {
+            "oracle_id": "m1-goal",
+            "kind": "goal_achievement",
+            "parameters": {
+              "expected": true
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m1-status",
+            "kind": "run_status",
+            "parameters": {
+              "allowed": [
+                "completed"
+              ]
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m1-lifecycle",
+            "kind": "lifecycle",
+            "parameters": {},
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m1-tool-call",
+            "kind": "tool_calls",
+            "parameters": {
+              "required": [
+                "lookup_order"
+              ],
+              "min_counts": {
+                "lookup_order": 1
+              },
+              "max_counts": {
+                "lookup_order": 1
+              },
+              "expected_arguments": {
+                "lookup_order": {
+                  "order_id": 7
+                }
+              }
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m1-tool-result",
+            "kind": "tool_results",
+            "parameters": {
+              "expected_last": {
+                "lookup_order": {
+                  "status": "open"
+                }
+              }
+            },
+            "severity": "error"
+          }
+        ]
+      },
+      "report": {
+        "schema_version": 1,
+        "scenario_id": "M1",
+        "passed": true,
+        "result": {
+          "status": "completed",
+          "stop_reason": "subject_completed",
+          "stop_detail": "",
+          "final_answer": "order is open",
+          "evaluation": {
+            "achieved": true,
+            "confidence": 1.0,
+            "explanation": "Frozen M1--M4 semantic expectation",
+            "evidence": []
+          },
+          "trajectory": [],
+          "avg_thought_length": 0.0
+        },
+        "trace": {
+          "schema_version": 2,
+          "trace_id": "5b6d0177-3414-479f-84d6-7e2ce7cc5e87",
+          "started_at": 1786188597.1751428,
+          "events": [
+            {
+              "schema_version": 2,
+              "event_id": "bdf449d2-1cda-4440-95fd-9ccb30227e43",
+              "trace_id": "5b6d0177-3414-479f-84d6-7e2ce7cc5e87",
+              "sequence": 0,
+              "event_type": "task_started",
+              "timestamp": 1786188597.1751428,
+              "payload": {
+                "query": "Look up order 7 once.",
+                "adapter_managed": true
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "c6545113-a8d9-4acc-9626-21f942688688",
+              "trace_id": "5b6d0177-3414-479f-84d6-7e2ce7cc5e87",
+              "sequence": 1,
+              "event_type": "custom",
+              "timestamp": 1786188597.1821682,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 0,
+                "state": {
+                  "query": "Look up order 7 once."
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "5f22750a-16f2-4344-918d-092a6307dba8",
+              "trace_id": "5b6d0177-3414-479f-84d6-7e2ce7cc5e87",
+              "sequence": 2,
+              "event_type": "tool_exchange",
+              "timestamp": 1786188597.182673,
+              "payload": {
+                "name": "lookup_order",
+                "arguments": {
+                  "order_id": 7
+                },
+                "result": {
+                  "status": "open"
+                },
+                "observation_delivered": true
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "def68e60-3bc7-4796-86ce-c2638f01a195",
+              "trace_id": "5b6d0177-3414-479f-84d6-7e2ce7cc5e87",
+              "sequence": 3,
+              "event_type": "custom",
+              "timestamp": 1786188597.182673,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 1,
+                "state": {
+                  "query": "Look up order 7 once.",
+                  "answer": "order is open",
+                  "achieved": true
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "4f01fc6d-b727-4950-9237-26f9579c8de6",
+              "trace_id": "5b6d0177-3414-479f-84d6-7e2ce7cc5e87",
+              "sequence": 4,
+              "event_type": "task_completed",
+              "timestamp": 1786188597.1831775,
+              "payload": {
+                "result": {
+                  "status": "completed",
+                  "stop_reason": "subject_completed",
+                  "stop_detail": "",
+                  "final_answer": "order is open",
+                  "evaluation": {
+                    "achieved": true,
+                    "confidence": 1.0,
+                    "explanation": "Frozen M1--M4 semantic expectation",
+                    "evidence": []
+                  },
+                  "trajectory": [],
+                  "avg_thought_length": 0.0
+                },
+                "adapter_managed": true
+              },
+              "metadata": {}
+            }
+          ],
+          "metadata": {
+            "scenario_id": "M1",
+            "seed": 20260808,
+            "tags": [
+              "runtime-conformance",
+              "m1",
+              "deterministic"
+            ],
+            "subject": {
+              "subject_id": "langgraph@pypi-1.2.10",
+              "runtime": "langgraph",
+              "version": "1.2.10",
+              "revision": "pypi:1.2.10",
+              "source_url": "https://github.com/langchain-ai/langgraph",
+              "independently_developed": true,
+              "metadata": {
+                "distribution": "langgraph"
+              }
+            }
+          }
+        },
+        "execution_error": null,
+        "verdicts": [
+          {
+            "oracle_id": "m1-goal",
+            "kind": "goal_achievement",
+            "passed": true,
+            "message": "Expected goal achievement True, got True",
+            "severity": "error",
+            "evidence": {
+              "expected": true,
+              "actual": true
+            }
+          },
+          {
+            "oracle_id": "m1-status",
+            "kind": "run_status",
+            "passed": true,
+            "message": "Expected run status in ['completed'], got completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "completed"
+              ],
+              "actual": "completed"
+            }
+          },
+          {
+            "oracle_id": "m1-lifecycle",
+            "kind": "lifecycle",
+            "passed": true,
+            "message": "Lifecycle contains 1 start event(s) and 1 end event(s)",
+            "severity": "error",
+            "evidence": {
+              "start_sequences": [
+                0
+              ],
+              "end_sequences": [
+                4
+              ]
+            }
+          },
+          {
+            "oracle_id": "m1-tool-call",
+            "kind": "tool_calls",
+            "passed": true,
+            "message": "Tool-call constraints satisfied",
+            "severity": "error",
+            "evidence": {
+              "counts": {
+                "lookup_order": 1
+              },
+              "calls": [
+                {
+                  "sequence": 2,
+                  "name": "lookup_order",
+                  "arguments": {
+                    "order_id": 7
+                  },
+                  "attempt_count": 1
+                }
+              ]
+            }
+          },
+          {
+            "oracle_id": "m1-tool-result",
+            "kind": "tool_results",
+            "passed": true,
+            "message": "Tool-result constraints satisfied",
+            "severity": "error",
+            "evidence": {
+              "last_results": {
+                "lookup_order": {
+                  "status": "open"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "projection": {
+        "schema_version": 1,
+        "case_id": "M1",
+        "runtime": "langgraph",
+        "run_status": "completed",
+        "stop_reason": "subject_completed",
+        "goal_achieved": true,
+        "report_passed": true,
+        "execution_error_type": null,
+        "tool_attempts": [
+          {
+            "name": "lookup_order",
+            "arguments": {
+              "order_id": 7
+            },
+            "outcome": "success",
+            "result": {
+              "status": "open"
+            },
+            "error_type": null,
+            "observation_delivered": true
+          }
+        ],
+        "permission_decisions": [],
+        "recovery_observed": false,
+        "lifecycle_start_count": 1,
+        "lifecycle_end_count": 1,
+        "lifecycle_paired": true,
+        "event_ids_unique": true,
+        "sequences_monotonic": true,
+        "trace_ids_consistent": true,
+        "scenario_round_trip": true,
+        "report_round_trip": true
+      }
+    },
+    {
+      "case_id": "M2",
+      "runtime": "nanoharness",
+      "scenario": {
+        "schema_version": 1,
+        "scenario_id": "M2",
+        "query": "Look up order 7 and recover from one transient error.",
+        "seed": 20260808,
+        "tags": [
+          "runtime-conformance",
+          "m2",
+          "deterministic"
+        ],
+        "fixtures": {
+          "case_id": "M2",
+          "achieved": true
+        },
+        "metadata": {},
+        "oracles": [
+          {
+            "oracle_id": "m2-goal",
+            "kind": "goal_achievement",
+            "parameters": {
+              "expected": true
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m2-status",
+            "kind": "run_status",
+            "parameters": {
+              "allowed": [
+                "completed"
+              ]
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m2-lifecycle",
+            "kind": "lifecycle",
+            "parameters": {},
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m2-tool-call",
+            "kind": "tool_calls",
+            "parameters": {
+              "required": [
+                "lookup_order"
+              ],
+              "min_counts": {
+                "lookup_order": 2
+              },
+              "max_counts": {
+                "lookup_order": 2
+              },
+              "expected_arguments": {
+                "lookup_order": {
+                  "order_id": 7
+                }
+              }
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m2-tool-result",
+            "kind": "tool_results",
+            "parameters": {
+              "expected_last": {
+                "lookup_order": {
+                  "status": "open"
+                }
+              }
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m2-component-errors",
+            "kind": "component_errors",
+            "parameters": {
+              "allowed_components": [
+                "tool"
+              ]
+            },
+            "severity": "error"
+          }
+        ]
+      },
+      "report": {
+        "schema_version": 1,
+        "scenario_id": "M2",
+        "passed": true,
+        "result": {
+          "status": "completed",
+          "stop_reason": "model_terminated",
+          "stop_detail": "",
+          "final_answer": "order is open",
+          "evaluation": {
+            "achieved": true,
+            "confidence": 1.0,
+            "explanation": "Frozen M1--M4 semantic expectation",
+            "evidence": []
+          },
+          "trajectory": [
+            {
+              "step_id": 0,
+              "thought": "lookup",
+              "action": null,
+              "observation": "ToolError(lookup_order): retryable",
+              "status": "error",
+              "stop_signal": null
+            },
+            {
+              "step_id": 1,
+              "thought": "lookup",
+              "action": {
+                "name": "lookup_order",
+                "arguments": {
+                  "order_id": 7
+                }
+              },
+              "observation": "{'status': 'open'}",
+              "status": "success",
+              "stop_signal": null
+            },
+            {
+              "step_id": 2,
+              "thought": "order is open",
+              "action": null,
+              "observation": null,
+              "status": "terminated",
+              "stop_signal": null
+            }
+          ],
+          "avg_thought_length": 8.333333333333334
+        },
+        "trace": {
+          "schema_version": 2,
+          "trace_id": "73107fa2-362d-4d3d-8d8d-62a2e8851b2d",
+          "started_at": 1786188597.1851773,
+          "events": [
+            {
+              "schema_version": 2,
+              "event_id": "541626b4-083e-4157-aeab-57c7d58897fe",
+              "trace_id": "73107fa2-362d-4d3d-8d8d-62a2e8851b2d",
+              "sequence": 0,
+              "event_type": "task_started",
+              "timestamp": 1786188597.1851773,
+              "payload": {
+                "data": "Look up order 7 and recover from one transient error."
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "f0435fa1-d147-471f-9e77-bb00ce7c327f",
+              "trace_id": "73107fa2-362d-4d3d-8d8d-62a2e8851b2d",
+              "sequence": 1,
+              "event_type": "tool_schemas",
+              "timestamp": 1786188597.1851773,
+              "payload": {
+                "schemas": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "lookup_order",
+                      "description": "Look up one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "update_order",
+                      "description": "Update one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "79bbcabe-64a2-4a66-b7a3-5ff84eeca0ed",
+              "trace_id": "73107fa2-362d-4d3d-8d8d-62a2e8851b2d",
+              "sequence": 2,
+              "event_type": "model_exchange",
+              "timestamp": 1786188597.1856773,
+              "payload": {
+                "messages": [
+                  {
+                    "role": "user",
+                    "content": "Look up order 7 and recover from one transient error."
+                  }
+                ],
+                "tools": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "lookup_order",
+                      "description": "Look up one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "update_order",
+                      "description": "Update one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "response": {
+                  "content": "lookup",
+                  "tool_calls": [
+                    {
+                      "name": "lookup_order",
+                      "arguments": {
+                        "order_id": 7
+                      }
+                    }
+                  ]
+                },
+                "duration_ms": 0.0018999999156221747
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "225544b9-3802-4185-9acd-ab79713462c2",
+              "trace_id": "73107fa2-362d-4d3d-8d8d-62a2e8851b2d",
+              "sequence": 3,
+              "event_type": "model_response",
+              "timestamp": 1786188597.1856773,
+              "payload": {
+                "content": "lookup",
+                "tool_calls": [
+                  {
+                    "name": "lookup_order",
+                    "arguments": {
+                      "order_id": 7
+                    }
+                  }
+                ]
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "f17c5d8b-a5db-4d42-a1dc-46681c8b0fe9",
+              "trace_id": "73107fa2-362d-4d3d-8d8d-62a2e8851b2d",
+              "sequence": 4,
+              "event_type": "tool_error",
+              "timestamp": 1786188597.1856773,
+              "payload": {
+                "name": "lookup_order",
+                "arguments": {
+                  "order_id": 7
+                },
+                "error_type": "TransientToolError",
+                "error_message": "retryable",
+                "duration_ms": 0.00920000093174167
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "bafcaba6-f310-4288-9f4b-a8ddf2a38bc7",
+              "trace_id": "73107fa2-362d-4d3d-8d8d-62a2e8851b2d",
+              "sequence": 5,
+              "event_type": "step_completed",
+              "timestamp": 1786188597.1856773,
+              "payload": {
+                "step_id": 0,
+                "thought": "lookup",
+                "action": null,
+                "observation": "ToolError(lookup_order): retryable",
+                "status": "error",
+                "stop_signal": null
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "f89f5f4a-9745-4515-9437-94d3a93625a9",
+              "trace_id": "73107fa2-362d-4d3d-8d8d-62a2e8851b2d",
+              "sequence": 6,
+              "event_type": "tool_schemas",
+              "timestamp": 1786188597.1861775,
+              "payload": {
+                "schemas": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "lookup_order",
+                      "description": "Look up one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "update_order",
+                      "description": "Update one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "04742535-0008-48cd-b705-03114328479e",
+              "trace_id": "73107fa2-362d-4d3d-8d8d-62a2e8851b2d",
+              "sequence": 7,
+              "event_type": "model_exchange",
+              "timestamp": 1786188597.1861775,
+              "payload": {
+                "messages": [
+                  {
+                    "role": "user",
+                    "content": "Look up order 7 and recover from one transient error."
+                  },
+                  {
+                    "role": "assistant",
+                    "content": "lookup",
+                    "tool_calls": [
+                      {
+                        "id": "call_0",
+                        "type": "function",
+                        "function": {
+                          "name": "lookup_order",
+                          "arguments": "{\"order_id\": 7}"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "role": "tool",
+                    "content": "ToolError(lookup_order): retryable",
+                    "tool_call_id": "call_0"
+                  }
+                ],
+                "tools": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "lookup_order",
+                      "description": "Look up one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "update_order",
+                      "description": "Update one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "response": {
+                  "content": "lookup",
+                  "tool_calls": [
+                    {
+                      "name": "lookup_order",
+                      "arguments": {
+                        "order_id": 7
+                      }
+                    }
+                  ]
+                },
+                "duration_ms": 0.0010000003385357559
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "80933f62-fe64-4627-ad2a-0edc935f8ef9",
+              "trace_id": "73107fa2-362d-4d3d-8d8d-62a2e8851b2d",
+              "sequence": 8,
+              "event_type": "model_response",
+              "timestamp": 1786188597.1861775,
+              "payload": {
+                "content": "lookup",
+                "tool_calls": [
+                  {
+                    "name": "lookup_order",
+                    "arguments": {
+                      "order_id": 7
+                    }
+                  }
+                ]
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "49723933-7212-4357-bbab-cf9ad75abea0",
+              "trace_id": "73107fa2-362d-4d3d-8d8d-62a2e8851b2d",
+              "sequence": 9,
+              "event_type": "tool_exchange",
+              "timestamp": 1786188597.1861775,
+              "payload": {
+                "name": "lookup_order",
+                "arguments": {
+                  "order_id": 7
+                },
+                "result": {
+                  "status": "open"
+                },
+                "attempt_count": 1,
+                "duration_ms": 0.00270000055024866
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "d84813e4-330e-486b-a949-fa09bc7d2904",
+              "trace_id": "73107fa2-362d-4d3d-8d8d-62a2e8851b2d",
+              "sequence": 10,
+              "event_type": "step_completed",
+              "timestamp": 1786188597.186677,
+              "payload": {
+                "step_id": 1,
+                "thought": "lookup",
+                "action": {
+                  "name": "lookup_order",
+                  "arguments": {
+                    "order_id": 7
+                  }
+                },
+                "observation": "{'status': 'open'}",
+                "status": "success",
+                "stop_signal": null
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "cb177c0a-f678-4f44-b8df-d9519bf3b3b3",
+              "trace_id": "73107fa2-362d-4d3d-8d8d-62a2e8851b2d",
+              "sequence": 11,
+              "event_type": "tool_schemas",
+              "timestamp": 1786188597.186677,
+              "payload": {
+                "schemas": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "lookup_order",
+                      "description": "Look up one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "update_order",
+                      "description": "Update one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "c0e76514-36a4-4869-8ae7-68700ae5d441",
+              "trace_id": "73107fa2-362d-4d3d-8d8d-62a2e8851b2d",
+              "sequence": 12,
+              "event_type": "model_exchange",
+              "timestamp": 1786188597.186677,
+              "payload": {
+                "messages": [
+                  {
+                    "role": "user",
+                    "content": "Look up order 7 and recover from one transient error."
+                  },
+                  {
+                    "role": "assistant",
+                    "content": "lookup",
+                    "tool_calls": [
+                      {
+                        "id": "call_0",
+                        "type": "function",
+                        "function": {
+                          "name": "lookup_order",
+                          "arguments": "{\"order_id\": 7}"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "role": "tool",
+                    "content": "ToolError(lookup_order): retryable",
+                    "tool_call_id": "call_0"
+                  },
+                  {
+                    "role": "assistant",
+                    "content": "lookup",
+                    "tool_calls": [
+                      {
+                        "id": "call_1",
+                        "type": "function",
+                        "function": {
+                          "name": "lookup_order",
+                          "arguments": "{\"order_id\": 7}"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "role": "tool",
+                    "content": "{'status': 'open'}",
+                    "tool_call_id": "call_1"
+                  }
+                ],
+                "tools": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "lookup_order",
+                      "description": "Look up one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "update_order",
+                      "description": "Update one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "response": {
+                  "content": "order is open",
+                  "tool_calls": null
+                },
+                "duration_ms": 0.0012000000424450263
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "dbcffbda-f1de-4110-8213-f1e08c4128ca",
+              "trace_id": "73107fa2-362d-4d3d-8d8d-62a2e8851b2d",
+              "sequence": 13,
+              "event_type": "model_response",
+              "timestamp": 1786188597.187177,
+              "payload": {
+                "content": "order is open",
+                "tool_calls": null
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "544a9524-3ca6-441a-b67e-0b89df9fb922",
+              "trace_id": "73107fa2-362d-4d3d-8d8d-62a2e8851b2d",
+              "sequence": 14,
+              "event_type": "step_completed",
+              "timestamp": 1786188597.187177,
+              "payload": {
+                "step_id": 2,
+                "thought": "order is open",
+                "action": null,
+                "observation": null,
+                "status": "terminated",
+                "stop_signal": null
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "bdd4564e-3099-40a9-92d8-ec2cf91df773",
+              "trace_id": "73107fa2-362d-4d3d-8d8d-62a2e8851b2d",
+              "sequence": 15,
+              "event_type": "task_completed",
+              "timestamp": 1786188597.187177,
+              "payload": {
+                "status": "completed",
+                "stop_reason": "model_terminated",
+                "stop_detail": "",
+                "final_answer": "order is open",
+                "evaluation": {
+                  "achieved": true,
+                  "confidence": 1.0,
+                  "explanation": "Frozen M1--M4 semantic expectation",
+                  "evidence": []
+                },
+                "trajectory": [
+                  {
+                    "step_id": 0,
+                    "thought": "lookup",
+                    "action": null,
+                    "observation": "ToolError(lookup_order): retryable",
+                    "status": "error",
+                    "stop_signal": null
+                  },
+                  {
+                    "step_id": 1,
+                    "thought": "lookup",
+                    "action": {
+                      "name": "lookup_order",
+                      "arguments": {
+                        "order_id": 7
+                      }
+                    },
+                    "observation": "{'status': 'open'}",
+                    "status": "success",
+                    "stop_signal": null
+                  },
+                  {
+                    "step_id": 2,
+                    "thought": "order is open",
+                    "action": null,
+                    "observation": null,
+                    "status": "terminated",
+                    "stop_signal": null
+                  }
+                ],
+                "avg_thought_length": 8.333333333333334
+              },
+              "metadata": {}
+            }
+          ],
+          "metadata": {
+            "scenario_id": "M2",
+            "seed": 20260808,
+            "tags": [
+              "runtime-conformance",
+              "m2",
+              "deterministic"
+            ],
+            "subject": {
+              "subject_id": "nanoharness@runtime-conformance",
+              "runtime": "nanoharness",
+              "version": "0.1.0",
+              "revision": "runtime-conformance",
+              "source_url": null,
+              "independently_developed": false,
+              "metadata": {}
+            }
+          }
+        },
+        "execution_error": null,
+        "verdicts": [
+          {
+            "oracle_id": "m2-goal",
+            "kind": "goal_achievement",
+            "passed": true,
+            "message": "Expected goal achievement True, got True",
+            "severity": "error",
+            "evidence": {
+              "expected": true,
+              "actual": true
+            }
+          },
+          {
+            "oracle_id": "m2-status",
+            "kind": "run_status",
+            "passed": true,
+            "message": "Expected run status in ['completed'], got completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "completed"
+              ],
+              "actual": "completed"
+            }
+          },
+          {
+            "oracle_id": "m2-lifecycle",
+            "kind": "lifecycle",
+            "passed": true,
+            "message": "Lifecycle contains 1 start event(s) and 1 end event(s)",
+            "severity": "error",
+            "evidence": {
+              "start_sequences": [
+                0
+              ],
+              "end_sequences": [
+                15
+              ]
+            }
+          },
+          {
+            "oracle_id": "m2-tool-call",
+            "kind": "tool_calls",
+            "passed": true,
+            "message": "Tool-call constraints satisfied",
+            "severity": "error",
+            "evidence": {
+              "counts": {
+                "lookup_order": 2
+              },
+              "calls": [
+                {
+                  "sequence": 4,
+                  "name": "lookup_order",
+                  "arguments": {
+                    "order_id": 7
+                  },
+                  "attempt_count": 1
+                },
+                {
+                  "sequence": 9,
+                  "name": "lookup_order",
+                  "arguments": {
+                    "order_id": 7
+                  },
+                  "attempt_count": 1
+                }
+              ]
+            }
+          },
+          {
+            "oracle_id": "m2-tool-result",
+            "kind": "tool_results",
+            "passed": true,
+            "message": "Tool-result constraints satisfied",
+            "severity": "error",
+            "evidence": {
+              "last_results": {
+                "lookup_order": {
+                  "status": "open"
+                }
+              }
+            }
+          },
+          {
+            "oracle_id": "m2-component-errors",
+            "kind": "component_errors",
+            "passed": true,
+            "message": "No disallowed component errors",
+            "severity": "error",
+            "evidence": {
+              "errors": [],
+              "allowed_components": [
+                "tool"
+              ]
+            }
+          }
+        ]
+      },
+      "projection": {
+        "schema_version": 1,
+        "case_id": "M2",
+        "runtime": "nanoharness",
+        "run_status": "completed",
+        "stop_reason": "model_terminated",
+        "goal_achieved": true,
+        "report_passed": true,
+        "execution_error_type": null,
+        "tool_attempts": [
+          {
+            "name": "lookup_order",
+            "arguments": {
+              "order_id": 7
+            },
+            "outcome": "error",
+            "result": null,
+            "error_type": "TransientToolError",
+            "observation_delivered": false
+          },
+          {
+            "name": "lookup_order",
+            "arguments": {
+              "order_id": 7
+            },
+            "outcome": "success",
+            "result": {
+              "status": "open"
+            },
+            "error_type": null,
+            "observation_delivered": true
+          }
+        ],
+        "permission_decisions": [],
+        "recovery_observed": true,
+        "lifecycle_start_count": 1,
+        "lifecycle_end_count": 1,
+        "lifecycle_paired": true,
+        "event_ids_unique": true,
+        "sequences_monotonic": true,
+        "trace_ids_consistent": true,
+        "scenario_round_trip": true,
+        "report_round_trip": true
+      }
+    },
+    {
+      "case_id": "M2",
+      "runtime": "langgraph",
+      "scenario": {
+        "schema_version": 1,
+        "scenario_id": "M2",
+        "query": "Look up order 7 and recover from one transient error.",
+        "seed": 20260808,
+        "tags": [
+          "runtime-conformance",
+          "m2",
+          "deterministic"
+        ],
+        "fixtures": {
+          "case_id": "M2",
+          "achieved": true
+        },
+        "metadata": {},
+        "oracles": [
+          {
+            "oracle_id": "m2-goal",
+            "kind": "goal_achievement",
+            "parameters": {
+              "expected": true
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m2-status",
+            "kind": "run_status",
+            "parameters": {
+              "allowed": [
+                "completed"
+              ]
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m2-lifecycle",
+            "kind": "lifecycle",
+            "parameters": {},
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m2-tool-call",
+            "kind": "tool_calls",
+            "parameters": {
+              "required": [
+                "lookup_order"
+              ],
+              "min_counts": {
+                "lookup_order": 2
+              },
+              "max_counts": {
+                "lookup_order": 2
+              },
+              "expected_arguments": {
+                "lookup_order": {
+                  "order_id": 7
+                }
+              }
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m2-tool-result",
+            "kind": "tool_results",
+            "parameters": {
+              "expected_last": {
+                "lookup_order": {
+                  "status": "open"
+                }
+              }
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m2-component-errors",
+            "kind": "component_errors",
+            "parameters": {
+              "allowed_components": [
+                "tool"
+              ]
+            },
+            "severity": "error"
+          }
+        ]
+      },
+      "report": {
+        "schema_version": 1,
+        "scenario_id": "M2",
+        "passed": true,
+        "result": {
+          "status": "completed",
+          "stop_reason": "subject_completed",
+          "stop_detail": "",
+          "final_answer": "order is open",
+          "evaluation": {
+            "achieved": true,
+            "confidence": 1.0,
+            "explanation": "Frozen M1--M4 semantic expectation",
+            "evidence": []
+          },
+          "trajectory": [],
+          "avg_thought_length": 0.0
+        },
+        "trace": {
+          "schema_version": 2,
+          "trace_id": "7b90dc63-eccc-4509-9418-d9588e8a136f",
+          "started_at": 1786188597.1896763,
+          "events": [
+            {
+              "schema_version": 2,
+              "event_id": "41eeed56-3c95-4a41-807f-a402fffaa6dc",
+              "trace_id": "7b90dc63-eccc-4509-9418-d9588e8a136f",
+              "sequence": 0,
+              "event_type": "task_started",
+              "timestamp": 1786188597.1896763,
+              "payload": {
+                "query": "Look up order 7 and recover from one transient error.",
+                "adapter_managed": true
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "2b9039f6-b4f0-4f0e-8f6b-7f61bc35c9b6",
+              "trace_id": "7b90dc63-eccc-4509-9418-d9588e8a136f",
+              "sequence": 1,
+              "event_type": "custom",
+              "timestamp": 1786188597.1922116,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 0,
+                "state": {
+                  "query": "Look up order 7 and recover from one transient error."
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "d0e2d24f-78e6-4094-b08e-720017cd3b46",
+              "trace_id": "7b90dc63-eccc-4509-9418-d9588e8a136f",
+              "sequence": 2,
+              "event_type": "tool_error",
+              "timestamp": 1786188597.1922116,
+              "payload": {
+                "name": "lookup_order",
+                "arguments": {
+                  "order_id": 7
+                },
+                "error_type": "TransientToolError",
+                "error_message": "retryable",
+                "observation_delivered": false
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "7d85c8a5-eeff-4ed8-a929-2bbbdea79c81",
+              "trace_id": "7b90dc63-eccc-4509-9418-d9588e8a136f",
+              "sequence": 3,
+              "event_type": "tool_exchange",
+              "timestamp": 1786188597.1922116,
+              "payload": {
+                "name": "lookup_order",
+                "arguments": {
+                  "order_id": 7
+                },
+                "result": {
+                  "status": "open"
+                },
+                "observation_delivered": true
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "c058f338-e9d4-43e4-bbef-81f9b444d160",
+              "trace_id": "7b90dc63-eccc-4509-9418-d9588e8a136f",
+              "sequence": 4,
+              "event_type": "custom",
+              "timestamp": 1786188597.1927178,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 1,
+                "state": {
+                  "query": "Look up order 7 and recover from one transient error.",
+                  "answer": "order is open",
+                  "achieved": true
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "7c2c76a6-d2d3-418c-b52f-2634a07d2bcf",
+              "trace_id": "7b90dc63-eccc-4509-9418-d9588e8a136f",
+              "sequence": 5,
+              "event_type": "task_completed",
+              "timestamp": 1786188597.1927178,
+              "payload": {
+                "result": {
+                  "status": "completed",
+                  "stop_reason": "subject_completed",
+                  "stop_detail": "",
+                  "final_answer": "order is open",
+                  "evaluation": {
+                    "achieved": true,
+                    "confidence": 1.0,
+                    "explanation": "Frozen M1--M4 semantic expectation",
+                    "evidence": []
+                  },
+                  "trajectory": [],
+                  "avg_thought_length": 0.0
+                },
+                "adapter_managed": true
+              },
+              "metadata": {}
+            }
+          ],
+          "metadata": {
+            "scenario_id": "M2",
+            "seed": 20260808,
+            "tags": [
+              "runtime-conformance",
+              "m2",
+              "deterministic"
+            ],
+            "subject": {
+              "subject_id": "langgraph@pypi-1.2.10",
+              "runtime": "langgraph",
+              "version": "1.2.10",
+              "revision": "pypi:1.2.10",
+              "source_url": "https://github.com/langchain-ai/langgraph",
+              "independently_developed": true,
+              "metadata": {
+                "distribution": "langgraph"
+              }
+            }
+          }
+        },
+        "execution_error": null,
+        "verdicts": [
+          {
+            "oracle_id": "m2-goal",
+            "kind": "goal_achievement",
+            "passed": true,
+            "message": "Expected goal achievement True, got True",
+            "severity": "error",
+            "evidence": {
+              "expected": true,
+              "actual": true
+            }
+          },
+          {
+            "oracle_id": "m2-status",
+            "kind": "run_status",
+            "passed": true,
+            "message": "Expected run status in ['completed'], got completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "completed"
+              ],
+              "actual": "completed"
+            }
+          },
+          {
+            "oracle_id": "m2-lifecycle",
+            "kind": "lifecycle",
+            "passed": true,
+            "message": "Lifecycle contains 1 start event(s) and 1 end event(s)",
+            "severity": "error",
+            "evidence": {
+              "start_sequences": [
+                0
+              ],
+              "end_sequences": [
+                5
+              ]
+            }
+          },
+          {
+            "oracle_id": "m2-tool-call",
+            "kind": "tool_calls",
+            "passed": true,
+            "message": "Tool-call constraints satisfied",
+            "severity": "error",
+            "evidence": {
+              "counts": {
+                "lookup_order": 2
+              },
+              "calls": [
+                {
+                  "sequence": 2,
+                  "name": "lookup_order",
+                  "arguments": {
+                    "order_id": 7
+                  },
+                  "attempt_count": 1
+                },
+                {
+                  "sequence": 3,
+                  "name": "lookup_order",
+                  "arguments": {
+                    "order_id": 7
+                  },
+                  "attempt_count": 1
+                }
+              ]
+            }
+          },
+          {
+            "oracle_id": "m2-tool-result",
+            "kind": "tool_results",
+            "passed": true,
+            "message": "Tool-result constraints satisfied",
+            "severity": "error",
+            "evidence": {
+              "last_results": {
+                "lookup_order": {
+                  "status": "open"
+                }
+              }
+            }
+          },
+          {
+            "oracle_id": "m2-component-errors",
+            "kind": "component_errors",
+            "passed": true,
+            "message": "No disallowed component errors",
+            "severity": "error",
+            "evidence": {
+              "errors": [],
+              "allowed_components": [
+                "tool"
+              ]
+            }
+          }
+        ]
+      },
+      "projection": {
+        "schema_version": 1,
+        "case_id": "M2",
+        "runtime": "langgraph",
+        "run_status": "completed",
+        "stop_reason": "subject_completed",
+        "goal_achieved": true,
+        "report_passed": true,
+        "execution_error_type": null,
+        "tool_attempts": [
+          {
+            "name": "lookup_order",
+            "arguments": {
+              "order_id": 7
+            },
+            "outcome": "error",
+            "result": null,
+            "error_type": "TransientToolError",
+            "observation_delivered": false
+          },
+          {
+            "name": "lookup_order",
+            "arguments": {
+              "order_id": 7
+            },
+            "outcome": "success",
+            "result": {
+              "status": "open"
+            },
+            "error_type": null,
+            "observation_delivered": true
+          }
+        ],
+        "permission_decisions": [],
+        "recovery_observed": true,
+        "lifecycle_start_count": 1,
+        "lifecycle_end_count": 1,
+        "lifecycle_paired": true,
+        "event_ids_unique": true,
+        "sequences_monotonic": true,
+        "trace_ids_consistent": true,
+        "scenario_round_trip": true,
+        "report_round_trip": true
+      }
+    },
+    {
+      "case_id": "M3",
+      "runtime": "nanoharness",
+      "scenario": {
+        "schema_version": 1,
+        "scenario_id": "M3",
+        "query": "Stop without completing the requested lookup.",
+        "seed": 20260808,
+        "tags": [
+          "runtime-conformance",
+          "m3",
+          "deterministic"
+        ],
+        "fixtures": {
+          "case_id": "M3",
+          "achieved": false
+        },
+        "metadata": {},
+        "oracles": [
+          {
+            "oracle_id": "m3-goal",
+            "kind": "goal_achievement",
+            "parameters": {
+              "expected": true
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m3-status",
+            "kind": "run_status",
+            "parameters": {
+              "allowed": [
+                "completed"
+              ]
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m3-lifecycle",
+            "kind": "lifecycle",
+            "parameters": {},
+            "severity": "error"
+          }
+        ]
+      },
+      "report": {
+        "schema_version": 1,
+        "scenario_id": "M3",
+        "passed": false,
+        "result": {
+          "status": "completed",
+          "stop_reason": "model_terminated",
+          "stop_detail": "",
+          "final_answer": "stopping without lookup",
+          "evaluation": {
+            "achieved": false,
+            "confidence": 1.0,
+            "explanation": "Frozen M1--M4 semantic expectation",
+            "evidence": []
+          },
+          "trajectory": [
+            {
+              "step_id": 0,
+              "thought": "stopping without lookup",
+              "action": null,
+              "observation": null,
+              "status": "terminated",
+              "stop_signal": null
+            }
+          ],
+          "avg_thought_length": 23.0
+        },
+        "trace": {
+          "schema_version": 2,
+          "trace_id": "ed441be9-f417-4d03-b846-85c375155c24",
+          "started_at": 1786188597.1947217,
+          "events": [
+            {
+              "schema_version": 2,
+              "event_id": "24a2af54-9901-4c10-948c-1c290d063ab8",
+              "trace_id": "ed441be9-f417-4d03-b846-85c375155c24",
+              "sequence": 0,
+              "event_type": "task_started",
+              "timestamp": 1786188597.1947217,
+              "payload": {
+                "data": "Stop without completing the requested lookup."
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "44c7cbc9-274e-4c59-8239-2f9ba5d90474",
+              "trace_id": "ed441be9-f417-4d03-b846-85c375155c24",
+              "sequence": 1,
+              "event_type": "tool_schemas",
+              "timestamp": 1786188597.1952224,
+              "payload": {
+                "schemas": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "lookup_order",
+                      "description": "Look up one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "update_order",
+                      "description": "Update one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "625e7af3-de42-41f3-ac9f-543d1d2e09f0",
+              "trace_id": "ed441be9-f417-4d03-b846-85c375155c24",
+              "sequence": 2,
+              "event_type": "model_exchange",
+              "timestamp": 1786188597.1952224,
+              "payload": {
+                "messages": [
+                  {
+                    "role": "user",
+                    "content": "Stop without completing the requested lookup."
+                  }
+                ],
+                "tools": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "lookup_order",
+                      "description": "Look up one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "update_order",
+                      "description": "Update one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "response": {
+                  "content": "stopping without lookup",
+                  "tool_calls": null
+                },
+                "duration_ms": 0.002200000380980782
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "b70de775-5f16-42c6-9557-4d801efba4f1",
+              "trace_id": "ed441be9-f417-4d03-b846-85c375155c24",
+              "sequence": 3,
+              "event_type": "model_response",
+              "timestamp": 1786188597.1952224,
+              "payload": {
+                "content": "stopping without lookup",
+                "tool_calls": null
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "994b475d-2fac-4b98-8db2-635d49d90a40",
+              "trace_id": "ed441be9-f417-4d03-b846-85c375155c24",
+              "sequence": 4,
+              "event_type": "step_completed",
+              "timestamp": 1786188597.1952224,
+              "payload": {
+                "step_id": 0,
+                "thought": "stopping without lookup",
+                "action": null,
+                "observation": null,
+                "status": "terminated",
+                "stop_signal": null
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "0b9c3614-addc-4a56-bcb3-5562b34282dd",
+              "trace_id": "ed441be9-f417-4d03-b846-85c375155c24",
+              "sequence": 5,
+              "event_type": "task_completed",
+              "timestamp": 1786188597.1957226,
+              "payload": {
+                "status": "completed",
+                "stop_reason": "model_terminated",
+                "stop_detail": "",
+                "final_answer": "stopping without lookup",
+                "evaluation": {
+                  "achieved": false,
+                  "confidence": 1.0,
+                  "explanation": "Frozen M1--M4 semantic expectation",
+                  "evidence": []
+                },
+                "trajectory": [
+                  {
+                    "step_id": 0,
+                    "thought": "stopping without lookup",
+                    "action": null,
+                    "observation": null,
+                    "status": "terminated",
+                    "stop_signal": null
+                  }
+                ],
+                "avg_thought_length": 23.0
+              },
+              "metadata": {}
+            }
+          ],
+          "metadata": {
+            "scenario_id": "M3",
+            "seed": 20260808,
+            "tags": [
+              "runtime-conformance",
+              "m3",
+              "deterministic"
+            ],
+            "subject": {
+              "subject_id": "nanoharness@runtime-conformance",
+              "runtime": "nanoharness",
+              "version": "0.1.0",
+              "revision": "runtime-conformance",
+              "source_url": null,
+              "independently_developed": false,
+              "metadata": {}
+            }
+          }
+        },
+        "execution_error": null,
+        "verdicts": [
+          {
+            "oracle_id": "m3-goal",
+            "kind": "goal_achievement",
+            "passed": false,
+            "message": "Expected goal achievement True, got False",
+            "severity": "error",
+            "evidence": {
+              "expected": true,
+              "actual": false
+            }
+          },
+          {
+            "oracle_id": "m3-status",
+            "kind": "run_status",
+            "passed": true,
+            "message": "Expected run status in ['completed'], got completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "completed"
+              ],
+              "actual": "completed"
+            }
+          },
+          {
+            "oracle_id": "m3-lifecycle",
+            "kind": "lifecycle",
+            "passed": true,
+            "message": "Lifecycle contains 1 start event(s) and 1 end event(s)",
+            "severity": "error",
+            "evidence": {
+              "start_sequences": [
+                0
+              ],
+              "end_sequences": [
+                5
+              ]
+            }
+          }
+        ]
+      },
+      "projection": {
+        "schema_version": 1,
+        "case_id": "M3",
+        "runtime": "nanoharness",
+        "run_status": "completed",
+        "stop_reason": "model_terminated",
+        "goal_achieved": false,
+        "report_passed": false,
+        "execution_error_type": null,
+        "tool_attempts": [],
+        "permission_decisions": [],
+        "recovery_observed": false,
+        "lifecycle_start_count": 1,
+        "lifecycle_end_count": 1,
+        "lifecycle_paired": true,
+        "event_ids_unique": true,
+        "sequences_monotonic": true,
+        "trace_ids_consistent": true,
+        "scenario_round_trip": true,
+        "report_round_trip": true
+      }
+    },
+    {
+      "case_id": "M3",
+      "runtime": "langgraph",
+      "scenario": {
+        "schema_version": 1,
+        "scenario_id": "M3",
+        "query": "Stop without completing the requested lookup.",
+        "seed": 20260808,
+        "tags": [
+          "runtime-conformance",
+          "m3",
+          "deterministic"
+        ],
+        "fixtures": {
+          "case_id": "M3",
+          "achieved": false
+        },
+        "metadata": {},
+        "oracles": [
+          {
+            "oracle_id": "m3-goal",
+            "kind": "goal_achievement",
+            "parameters": {
+              "expected": true
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m3-status",
+            "kind": "run_status",
+            "parameters": {
+              "allowed": [
+                "completed"
+              ]
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m3-lifecycle",
+            "kind": "lifecycle",
+            "parameters": {},
+            "severity": "error"
+          }
+        ]
+      },
+      "report": {
+        "schema_version": 1,
+        "scenario_id": "M3",
+        "passed": false,
+        "result": {
+          "status": "completed",
+          "stop_reason": "subject_completed",
+          "stop_detail": "",
+          "final_answer": "stopped",
+          "evaluation": {
+            "achieved": false,
+            "confidence": 1.0,
+            "explanation": "Frozen M1--M4 semantic expectation",
+            "evidence": []
+          },
+          "trajectory": [],
+          "avg_thought_length": 0.0
+        },
+        "trace": {
+          "schema_version": 2,
+          "trace_id": "6ed12d6c-d1ed-4632-9e5e-99170123d895",
+          "started_at": 1786188597.198722,
+          "events": [
+            {
+              "schema_version": 2,
+              "event_id": "2719fbbb-200a-47c9-aa4b-60a87547545d",
+              "trace_id": "6ed12d6c-d1ed-4632-9e5e-99170123d895",
+              "sequence": 0,
+              "event_type": "task_started",
+              "timestamp": 1786188597.198722,
+              "payload": {
+                "query": "Stop without completing the requested lookup.",
+                "adapter_managed": true
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "b5387529-c425-4375-925d-54047ba0dfb9",
+              "trace_id": "6ed12d6c-d1ed-4632-9e5e-99170123d895",
+              "sequence": 1,
+              "event_type": "custom",
+              "timestamp": 1786188597.2012289,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 0,
+                "state": {
+                  "query": "Stop without completing the requested lookup."
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "95577c94-f474-4b89-a6af-ecc6771080db",
+              "trace_id": "6ed12d6c-d1ed-4632-9e5e-99170123d895",
+              "sequence": 2,
+              "event_type": "custom",
+              "timestamp": 1786188597.202767,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 1,
+                "state": {
+                  "query": "Stop without completing the requested lookup.",
+                  "answer": "stopped",
+                  "achieved": false
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "ba4ec22b-7349-4d39-aa7d-d60574e8f2e6",
+              "trace_id": "6ed12d6c-d1ed-4632-9e5e-99170123d895",
+              "sequence": 3,
+              "event_type": "task_completed",
+              "timestamp": 1786188597.202767,
+              "payload": {
+                "result": {
+                  "status": "completed",
+                  "stop_reason": "subject_completed",
+                  "stop_detail": "",
+                  "final_answer": "stopped",
+                  "evaluation": {
+                    "achieved": false,
+                    "confidence": 1.0,
+                    "explanation": "Frozen M1--M4 semantic expectation",
+                    "evidence": []
+                  },
+                  "trajectory": [],
+                  "avg_thought_length": 0.0
+                },
+                "adapter_managed": true
+              },
+              "metadata": {}
+            }
+          ],
+          "metadata": {
+            "scenario_id": "M3",
+            "seed": 20260808,
+            "tags": [
+              "runtime-conformance",
+              "m3",
+              "deterministic"
+            ],
+            "subject": {
+              "subject_id": "langgraph@pypi-1.2.10",
+              "runtime": "langgraph",
+              "version": "1.2.10",
+              "revision": "pypi:1.2.10",
+              "source_url": "https://github.com/langchain-ai/langgraph",
+              "independently_developed": true,
+              "metadata": {
+                "distribution": "langgraph"
+              }
+            }
+          }
+        },
+        "execution_error": null,
+        "verdicts": [
+          {
+            "oracle_id": "m3-goal",
+            "kind": "goal_achievement",
+            "passed": false,
+            "message": "Expected goal achievement True, got False",
+            "severity": "error",
+            "evidence": {
+              "expected": true,
+              "actual": false
+            }
+          },
+          {
+            "oracle_id": "m3-status",
+            "kind": "run_status",
+            "passed": true,
+            "message": "Expected run status in ['completed'], got completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "completed"
+              ],
+              "actual": "completed"
+            }
+          },
+          {
+            "oracle_id": "m3-lifecycle",
+            "kind": "lifecycle",
+            "passed": true,
+            "message": "Lifecycle contains 1 start event(s) and 1 end event(s)",
+            "severity": "error",
+            "evidence": {
+              "start_sequences": [
+                0
+              ],
+              "end_sequences": [
+                3
+              ]
+            }
+          }
+        ]
+      },
+      "projection": {
+        "schema_version": 1,
+        "case_id": "M3",
+        "runtime": "langgraph",
+        "run_status": "completed",
+        "stop_reason": "subject_completed",
+        "goal_achieved": false,
+        "report_passed": false,
+        "execution_error_type": null,
+        "tool_attempts": [],
+        "permission_decisions": [],
+        "recovery_observed": false,
+        "lifecycle_start_count": 1,
+        "lifecycle_end_count": 1,
+        "lifecycle_paired": true,
+        "event_ids_unique": true,
+        "sequences_monotonic": true,
+        "trace_ids_consistent": true,
+        "scenario_round_trip": true,
+        "report_round_trip": true
+      }
+    },
+    {
+      "case_id": "M4",
+      "runtime": "nanoharness",
+      "scenario": {
+        "schema_version": 1,
+        "scenario_id": "M4",
+        "query": "Update order 7 to closed even though writes are denied.",
+        "seed": 20260808,
+        "tags": [
+          "runtime-conformance",
+          "m4",
+          "deterministic"
+        ],
+        "fixtures": {
+          "case_id": "M4",
+          "achieved": false
+        },
+        "metadata": {},
+        "oracles": [
+          {
+            "oracle_id": "m4-goal",
+            "kind": "goal_achievement",
+            "parameters": {
+              "expected": false
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m4-status",
+            "kind": "run_status",
+            "parameters": {
+              "allowed": [
+                "completed"
+              ]
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m4-lifecycle",
+            "kind": "lifecycle",
+            "parameters": {},
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m4-permission",
+            "kind": "permission_enforcement",
+            "parameters": {
+              "require_decision_for_execution": true,
+              "denied_must_not_execute": true
+            },
+            "severity": "error"
+          }
+        ]
+      },
+      "report": {
+        "schema_version": 1,
+        "scenario_id": "M4",
+        "passed": true,
+        "result": {
+          "status": "completed",
+          "stop_reason": "model_terminated",
+          "stop_detail": "",
+          "final_answer": "write was denied",
+          "evaluation": {
+            "achieved": false,
+            "confidence": 1.0,
+            "explanation": "Frozen M1--M4 semantic expectation",
+            "evidence": []
+          },
+          "trajectory": [
+            {
+              "step_id": 0,
+              "thought": "update",
+              "action": null,
+              "observation": "write denied by policy",
+              "status": "error",
+              "stop_signal": null
+            },
+            {
+              "step_id": 1,
+              "thought": "write was denied",
+              "action": null,
+              "observation": null,
+              "status": "terminated",
+              "stop_signal": null
+            }
+          ],
+          "avg_thought_length": 11.0
+        },
+        "trace": {
+          "schema_version": 2,
+          "trace_id": "370183f2-22c2-44b2-b241-87862a6fdac1",
+          "started_at": 1786188597.2037718,
+          "events": [
+            {
+              "schema_version": 2,
+              "event_id": "2cd53f3c-c951-4150-9c38-e9778f82d375",
+              "trace_id": "370183f2-22c2-44b2-b241-87862a6fdac1",
+              "sequence": 0,
+              "event_type": "task_started",
+              "timestamp": 1786188597.204272,
+              "payload": {
+                "data": "Update order 7 to closed even though writes are denied."
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "3b921629-7a90-4862-9d4f-ee066bc9a085",
+              "trace_id": "370183f2-22c2-44b2-b241-87862a6fdac1",
+              "sequence": 1,
+              "event_type": "tool_schemas",
+              "timestamp": 1786188597.204272,
+              "payload": {
+                "schemas": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "lookup_order",
+                      "description": "Look up one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "update_order",
+                      "description": "Update one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "16d27b61-58d6-48ac-9ee1-beaa890fed09",
+              "trace_id": "370183f2-22c2-44b2-b241-87862a6fdac1",
+              "sequence": 2,
+              "event_type": "model_exchange",
+              "timestamp": 1786188597.2047715,
+              "payload": {
+                "messages": [
+                  {
+                    "role": "user",
+                    "content": "Update order 7 to closed even though writes are denied."
+                  }
+                ],
+                "tools": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "lookup_order",
+                      "description": "Look up one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "update_order",
+                      "description": "Update one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "response": {
+                  "content": "update",
+                  "tool_calls": [
+                    {
+                      "name": "update_order",
+                      "arguments": {
+                        "order_id": 7,
+                        "status": "closed"
+                      }
+                    }
+                  ]
+                },
+                "duration_ms": 0.0020000006770715117
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "e82a5eca-50ce-450a-927e-4d02a68e587c",
+              "trace_id": "370183f2-22c2-44b2-b241-87862a6fdac1",
+              "sequence": 3,
+              "event_type": "model_response",
+              "timestamp": 1786188597.2047715,
+              "payload": {
+                "content": "update",
+                "tool_calls": [
+                  {
+                    "name": "update_order",
+                    "arguments": {
+                      "order_id": 7,
+                      "status": "closed"
+                    }
+                  }
+                ]
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "63f92fca-5156-4e8e-8a77-c8f94953bd89",
+              "trace_id": "370183f2-22c2-44b2-b241-87862a6fdac1",
+              "sequence": 4,
+              "event_type": "permission_decision",
+              "timestamp": 1786188597.2047715,
+              "payload": {
+                "tool_name": "update_order",
+                "arguments": {
+                  "order_id": 7,
+                  "status": "closed"
+                },
+                "allowed": false,
+                "denial": "write denied by policy",
+                "duration_ms": 0.0027999994927085936
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "05d5a694-4bb1-4f1c-b847-36d26b064cff",
+              "trace_id": "370183f2-22c2-44b2-b241-87862a6fdac1",
+              "sequence": 5,
+              "event_type": "step_completed",
+              "timestamp": 1786188597.2047715,
+              "payload": {
+                "step_id": 0,
+                "thought": "update",
+                "action": null,
+                "observation": "write denied by policy",
+                "status": "error",
+                "stop_signal": null
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "99a705c6-539a-433b-8fb8-22398767e7bd",
+              "trace_id": "370183f2-22c2-44b2-b241-87862a6fdac1",
+              "sequence": 6,
+              "event_type": "tool_schemas",
+              "timestamp": 1786188597.2052703,
+              "payload": {
+                "schemas": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "lookup_order",
+                      "description": "Look up one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "update_order",
+                      "description": "Update one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "17909ce7-d25a-436d-808e-fb5376bf5eb6",
+              "trace_id": "370183f2-22c2-44b2-b241-87862a6fdac1",
+              "sequence": 7,
+              "event_type": "model_exchange",
+              "timestamp": 1786188597.2052703,
+              "payload": {
+                "messages": [
+                  {
+                    "role": "user",
+                    "content": "Update order 7 to closed even though writes are denied."
+                  },
+                  {
+                    "role": "assistant",
+                    "content": "update",
+                    "tool_calls": [
+                      {
+                        "id": "call_0",
+                        "type": "function",
+                        "function": {
+                          "name": "update_order",
+                          "arguments": "{\"order_id\": 7, \"status\": \"closed\"}"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "role": "tool",
+                    "content": "write denied by policy",
+                    "tool_call_id": "call_0"
+                  }
+                ],
+                "tools": [
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "lookup_order",
+                      "description": "Look up one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id"
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "function",
+                    "function": {
+                      "name": "update_order",
+                      "description": "Update one order.",
+                      "parameters": {
+                        "type": "object",
+                        "properties": {
+                          "order_id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "order_id",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "response": {
+                  "content": "write was denied",
+                  "tool_calls": null
+                },
+                "duration_ms": 0.0012000000424450263
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "76b65b9b-b59d-4bcc-bbe5-978c9cbdfa88",
+              "trace_id": "370183f2-22c2-44b2-b241-87862a6fdac1",
+              "sequence": 8,
+              "event_type": "model_response",
+              "timestamp": 1786188597.2052703,
+              "payload": {
+                "content": "write was denied",
+                "tool_calls": null
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "bad2420e-4551-447b-b183-e7ac94baf4cf",
+              "trace_id": "370183f2-22c2-44b2-b241-87862a6fdac1",
+              "sequence": 9,
+              "event_type": "step_completed",
+              "timestamp": 1786188597.2052703,
+              "payload": {
+                "step_id": 1,
+                "thought": "write was denied",
+                "action": null,
+                "observation": null,
+                "status": "terminated",
+                "stop_signal": null
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "2790a450-9e98-4ad0-b371-a0d21465bb71",
+              "trace_id": "370183f2-22c2-44b2-b241-87862a6fdac1",
+              "sequence": 10,
+              "event_type": "task_completed",
+              "timestamp": 1786188597.2057707,
+              "payload": {
+                "status": "completed",
+                "stop_reason": "model_terminated",
+                "stop_detail": "",
+                "final_answer": "write was denied",
+                "evaluation": {
+                  "achieved": false,
+                  "confidence": 1.0,
+                  "explanation": "Frozen M1--M4 semantic expectation",
+                  "evidence": []
+                },
+                "trajectory": [
+                  {
+                    "step_id": 0,
+                    "thought": "update",
+                    "action": null,
+                    "observation": "write denied by policy",
+                    "status": "error",
+                    "stop_signal": null
+                  },
+                  {
+                    "step_id": 1,
+                    "thought": "write was denied",
+                    "action": null,
+                    "observation": null,
+                    "status": "terminated",
+                    "stop_signal": null
+                  }
+                ],
+                "avg_thought_length": 11.0
+              },
+              "metadata": {}
+            }
+          ],
+          "metadata": {
+            "scenario_id": "M4",
+            "seed": 20260808,
+            "tags": [
+              "runtime-conformance",
+              "m4",
+              "deterministic"
+            ],
+            "subject": {
+              "subject_id": "nanoharness@runtime-conformance",
+              "runtime": "nanoharness",
+              "version": "0.1.0",
+              "revision": "runtime-conformance",
+              "source_url": null,
+              "independently_developed": false,
+              "metadata": {}
+            }
+          }
+        },
+        "execution_error": null,
+        "verdicts": [
+          {
+            "oracle_id": "m4-goal",
+            "kind": "goal_achievement",
+            "passed": true,
+            "message": "Expected goal achievement False, got False",
+            "severity": "error",
+            "evidence": {
+              "expected": false,
+              "actual": false
+            }
+          },
+          {
+            "oracle_id": "m4-status",
+            "kind": "run_status",
+            "passed": true,
+            "message": "Expected run status in ['completed'], got completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "completed"
+              ],
+              "actual": "completed"
+            }
+          },
+          {
+            "oracle_id": "m4-lifecycle",
+            "kind": "lifecycle",
+            "passed": true,
+            "message": "Lifecycle contains 1 start event(s) and 1 end event(s)",
+            "severity": "error",
+            "evidence": {
+              "start_sequences": [
+                0
+              ],
+              "end_sequences": [
+                10
+              ]
+            }
+          },
+          {
+            "oracle_id": "m4-permission",
+            "kind": "permission_enforcement",
+            "passed": true,
+            "message": "Permission enforcement constraints satisfied",
+            "severity": "error",
+            "evidence": {
+              "decisions": [
+                {
+                  "sequence": 4,
+                  "tool_name": "update_order",
+                  "allowed": false
+                }
+              ],
+              "executions": []
+            }
+          }
+        ]
+      },
+      "projection": {
+        "schema_version": 1,
+        "case_id": "M4",
+        "runtime": "nanoharness",
+        "run_status": "completed",
+        "stop_reason": "model_terminated",
+        "goal_achieved": false,
+        "report_passed": true,
+        "execution_error_type": null,
+        "tool_attempts": [],
+        "permission_decisions": [
+          {
+            "tool_name": "update_order",
+            "arguments": {
+              "order_id": 7,
+              "status": "closed"
+            },
+            "allowed": false,
+            "denial": "write denied by policy"
+          }
+        ],
+        "recovery_observed": false,
+        "lifecycle_start_count": 1,
+        "lifecycle_end_count": 1,
+        "lifecycle_paired": true,
+        "event_ids_unique": true,
+        "sequences_monotonic": true,
+        "trace_ids_consistent": true,
+        "scenario_round_trip": true,
+        "report_round_trip": true
+      }
+    },
+    {
+      "case_id": "M4",
+      "runtime": "langgraph",
+      "scenario": {
+        "schema_version": 1,
+        "scenario_id": "M4",
+        "query": "Update order 7 to closed even though writes are denied.",
+        "seed": 20260808,
+        "tags": [
+          "runtime-conformance",
+          "m4",
+          "deterministic"
+        ],
+        "fixtures": {
+          "case_id": "M4",
+          "achieved": false
+        },
+        "metadata": {},
+        "oracles": [
+          {
+            "oracle_id": "m4-goal",
+            "kind": "goal_achievement",
+            "parameters": {
+              "expected": false
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m4-status",
+            "kind": "run_status",
+            "parameters": {
+              "allowed": [
+                "completed"
+              ]
+            },
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m4-lifecycle",
+            "kind": "lifecycle",
+            "parameters": {},
+            "severity": "error"
+          },
+          {
+            "oracle_id": "m4-permission",
+            "kind": "permission_enforcement",
+            "parameters": {
+              "require_decision_for_execution": true,
+              "denied_must_not_execute": true
+            },
+            "severity": "error"
+          }
+        ]
+      },
+      "report": {
+        "schema_version": 1,
+        "scenario_id": "M4",
+        "passed": true,
+        "result": {
+          "status": "completed",
+          "stop_reason": "subject_completed",
+          "stop_detail": "",
+          "final_answer": "stopped",
+          "evaluation": {
+            "achieved": false,
+            "confidence": 1.0,
+            "explanation": "Frozen M1--M4 semantic expectation",
+            "evidence": []
+          },
+          "trajectory": [],
+          "avg_thought_length": 0.0
+        },
+        "trace": {
+          "schema_version": 2,
+          "trace_id": "0198df17-ee4b-4b2e-84db-cd2ee5c83016",
+          "started_at": 1786188597.2077713,
+          "events": [
+            {
+              "schema_version": 2,
+              "event_id": "20447f96-85c1-4224-b885-2103c8315d82",
+              "trace_id": "0198df17-ee4b-4b2e-84db-cd2ee5c83016",
+              "sequence": 0,
+              "event_type": "task_started",
+              "timestamp": 1786188597.2077713,
+              "payload": {
+                "query": "Update order 7 to closed even though writes are denied.",
+                "adapter_managed": true
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "4937e158-83f6-4980-ad9b-e9dd05aa8c59",
+              "trace_id": "0198df17-ee4b-4b2e-84db-cd2ee5c83016",
+              "sequence": 1,
+              "event_type": "custom",
+              "timestamp": 1786188597.210272,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 0,
+                "state": {
+                  "query": "Update order 7 to closed even though writes are denied."
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "7033f56f-58be-4c96-bb64-9ae0078bd457",
+              "trace_id": "0198df17-ee4b-4b2e-84db-cd2ee5c83016",
+              "sequence": 2,
+              "event_type": "permission_decision",
+              "timestamp": 1786188597.210272,
+              "payload": {
+                "tool_name": "update_order",
+                "arguments": {
+                  "order_id": 7,
+                  "status": "closed"
+                },
+                "allowed": false,
+                "denial": "write denied by policy"
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "f4549bcd-225b-4cf3-b9d9-6e78cd0ad042",
+              "trace_id": "0198df17-ee4b-4b2e-84db-cd2ee5c83016",
+              "sequence": 3,
+              "event_type": "custom",
+              "timestamp": 1786188597.210272,
+              "payload": {
+                "adapter": "langgraph",
+                "adapter_event": "state_snapshot",
+                "snapshot_index": 1,
+                "state": {
+                  "query": "Update order 7 to closed even though writes are denied.",
+                  "answer": "stopped",
+                  "achieved": false
+                }
+              },
+              "metadata": {}
+            },
+            {
+              "schema_version": 2,
+              "event_id": "48567973-104d-4e16-a955-85cbaa4bbd8b",
+              "trace_id": "0198df17-ee4b-4b2e-84db-cd2ee5c83016",
+              "sequence": 4,
+              "event_type": "task_completed",
+              "timestamp": 1786188597.210272,
+              "payload": {
+                "result": {
+                  "status": "completed",
+                  "stop_reason": "subject_completed",
+                  "stop_detail": "",
+                  "final_answer": "stopped",
+                  "evaluation": {
+                    "achieved": false,
+                    "confidence": 1.0,
+                    "explanation": "Frozen M1--M4 semantic expectation",
+                    "evidence": []
+                  },
+                  "trajectory": [],
+                  "avg_thought_length": 0.0
+                },
+                "adapter_managed": true
+              },
+              "metadata": {}
+            }
+          ],
+          "metadata": {
+            "scenario_id": "M4",
+            "seed": 20260808,
+            "tags": [
+              "runtime-conformance",
+              "m4",
+              "deterministic"
+            ],
+            "subject": {
+              "subject_id": "langgraph@pypi-1.2.10",
+              "runtime": "langgraph",
+              "version": "1.2.10",
+              "revision": "pypi:1.2.10",
+              "source_url": "https://github.com/langchain-ai/langgraph",
+              "independently_developed": true,
+              "metadata": {
+                "distribution": "langgraph"
+              }
+            }
+          }
+        },
+        "execution_error": null,
+        "verdicts": [
+          {
+            "oracle_id": "m4-goal",
+            "kind": "goal_achievement",
+            "passed": true,
+            "message": "Expected goal achievement False, got False",
+            "severity": "error",
+            "evidence": {
+              "expected": false,
+              "actual": false
+            }
+          },
+          {
+            "oracle_id": "m4-status",
+            "kind": "run_status",
+            "passed": true,
+            "message": "Expected run status in ['completed'], got completed",
+            "severity": "error",
+            "evidence": {
+              "allowed": [
+                "completed"
+              ],
+              "actual": "completed"
+            }
+          },
+          {
+            "oracle_id": "m4-lifecycle",
+            "kind": "lifecycle",
+            "passed": true,
+            "message": "Lifecycle contains 1 start event(s) and 1 end event(s)",
+            "severity": "error",
+            "evidence": {
+              "start_sequences": [
+                0
+              ],
+              "end_sequences": [
+                4
+              ]
+            }
+          },
+          {
+            "oracle_id": "m4-permission",
+            "kind": "permission_enforcement",
+            "passed": true,
+            "message": "Permission enforcement constraints satisfied",
+            "severity": "error",
+            "evidence": {
+              "decisions": [
+                {
+                  "sequence": 2,
+                  "tool_name": "update_order",
+                  "allowed": false
+                }
+              ],
+              "executions": []
+            }
+          }
+        ]
+      },
+      "projection": {
+        "schema_version": 1,
+        "case_id": "M4",
+        "runtime": "langgraph",
+        "run_status": "completed",
+        "stop_reason": "subject_completed",
+        "goal_achieved": false,
+        "report_passed": true,
+        "execution_error_type": null,
+        "tool_attempts": [],
+        "permission_decisions": [
+          {
+            "tool_name": "update_order",
+            "arguments": {
+              "order_id": 7,
+              "status": "closed"
+            },
+            "allowed": false,
+            "denial": "write denied by policy"
+          }
+        ],
+        "recovery_observed": false,
+        "lifecycle_start_count": 1,
+        "lifecycle_end_count": 1,
+        "lifecycle_paired": true,
+        "event_ids_unique": true,
+        "sequences_monotonic": true,
+        "trace_ids_consistent": true,
+        "scenario_round_trip": true,
+        "report_round_trip": true
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "case_id": "M1",
+      "passed": true,
+      "nanoharness": {
+        "schema_version": 1,
+        "case_id": "M1",
+        "runtime": "nanoharness",
+        "run_status": "completed",
+        "stop_reason": "model_terminated",
+        "goal_achieved": true,
+        "report_passed": true,
+        "execution_error_type": null,
+        "tool_attempts": [
+          {
+            "name": "lookup_order",
+            "arguments": {
+              "order_id": 7
+            },
+            "outcome": "success",
+            "result": {
+              "status": "open"
+            },
+            "error_type": null,
+            "observation_delivered": true
+          }
+        ],
+        "permission_decisions": [],
+        "recovery_observed": false,
+        "lifecycle_start_count": 1,
+        "lifecycle_end_count": 1,
+        "lifecycle_paired": true,
+        "event_ids_unique": true,
+        "sequences_monotonic": true,
+        "trace_ids_consistent": true,
+        "scenario_round_trip": true,
+        "report_round_trip": true
+      },
+      "langgraph": {
+        "schema_version": 1,
+        "case_id": "M1",
+        "runtime": "langgraph",
+        "run_status": "completed",
+        "stop_reason": "subject_completed",
+        "goal_achieved": true,
+        "report_passed": true,
+        "execution_error_type": null,
+        "tool_attempts": [
+          {
+            "name": "lookup_order",
+            "arguments": {
+              "order_id": 7
+            },
+            "outcome": "success",
+            "result": {
+              "status": "open"
+            },
+            "error_type": null,
+            "observation_delivered": true
+          }
+        ],
+        "permission_decisions": [],
+        "recovery_observed": false,
+        "lifecycle_start_count": 1,
+        "lifecycle_end_count": 1,
+        "lifecycle_paired": true,
+        "event_ids_unique": true,
+        "sequences_monotonic": true,
+        "trace_ids_consistent": true,
+        "scenario_round_trip": true,
+        "report_round_trip": true
+      },
+      "mismatches": []
+    },
+    {
+      "case_id": "M2",
+      "passed": true,
+      "nanoharness": {
+        "schema_version": 1,
+        "case_id": "M2",
+        "runtime": "nanoharness",
+        "run_status": "completed",
+        "stop_reason": "model_terminated",
+        "goal_achieved": true,
+        "report_passed": true,
+        "execution_error_type": null,
+        "tool_attempts": [
+          {
+            "name": "lookup_order",
+            "arguments": {
+              "order_id": 7
+            },
+            "outcome": "error",
+            "result": null,
+            "error_type": "TransientToolError",
+            "observation_delivered": false
+          },
+          {
+            "name": "lookup_order",
+            "arguments": {
+              "order_id": 7
+            },
+            "outcome": "success",
+            "result": {
+              "status": "open"
+            },
+            "error_type": null,
+            "observation_delivered": true
+          }
+        ],
+        "permission_decisions": [],
+        "recovery_observed": true,
+        "lifecycle_start_count": 1,
+        "lifecycle_end_count": 1,
+        "lifecycle_paired": true,
+        "event_ids_unique": true,
+        "sequences_monotonic": true,
+        "trace_ids_consistent": true,
+        "scenario_round_trip": true,
+        "report_round_trip": true
+      },
+      "langgraph": {
+        "schema_version": 1,
+        "case_id": "M2",
+        "runtime": "langgraph",
+        "run_status": "completed",
+        "stop_reason": "subject_completed",
+        "goal_achieved": true,
+        "report_passed": true,
+        "execution_error_type": null,
+        "tool_attempts": [
+          {
+            "name": "lookup_order",
+            "arguments": {
+              "order_id": 7
+            },
+            "outcome": "error",
+            "result": null,
+            "error_type": "TransientToolError",
+            "observation_delivered": false
+          },
+          {
+            "name": "lookup_order",
+            "arguments": {
+              "order_id": 7
+            },
+            "outcome": "success",
+            "result": {
+              "status": "open"
+            },
+            "error_type": null,
+            "observation_delivered": true
+          }
+        ],
+        "permission_decisions": [],
+        "recovery_observed": true,
+        "lifecycle_start_count": 1,
+        "lifecycle_end_count": 1,
+        "lifecycle_paired": true,
+        "event_ids_unique": true,
+        "sequences_monotonic": true,
+        "trace_ids_consistent": true,
+        "scenario_round_trip": true,
+        "report_round_trip": true
+      },
+      "mismatches": []
+    },
+    {
+      "case_id": "M3",
+      "passed": true,
+      "nanoharness": {
+        "schema_version": 1,
+        "case_id": "M3",
+        "runtime": "nanoharness",
+        "run_status": "completed",
+        "stop_reason": "model_terminated",
+        "goal_achieved": false,
+        "report_passed": false,
+        "execution_error_type": null,
+        "tool_attempts": [],
+        "permission_decisions": [],
+        "recovery_observed": false,
+        "lifecycle_start_count": 1,
+        "lifecycle_end_count": 1,
+        "lifecycle_paired": true,
+        "event_ids_unique": true,
+        "sequences_monotonic": true,
+        "trace_ids_consistent": true,
+        "scenario_round_trip": true,
+        "report_round_trip": true
+      },
+      "langgraph": {
+        "schema_version": 1,
+        "case_id": "M3",
+        "runtime": "langgraph",
+        "run_status": "completed",
+        "stop_reason": "subject_completed",
+        "goal_achieved": false,
+        "report_passed": false,
+        "execution_error_type": null,
+        "tool_attempts": [],
+        "permission_decisions": [],
+        "recovery_observed": false,
+        "lifecycle_start_count": 1,
+        "lifecycle_end_count": 1,
+        "lifecycle_paired": true,
+        "event_ids_unique": true,
+        "sequences_monotonic": true,
+        "trace_ids_consistent": true,
+        "scenario_round_trip": true,
+        "report_round_trip": true
+      },
+      "mismatches": []
+    },
+    {
+      "case_id": "M4",
+      "passed": true,
+      "nanoharness": {
+        "schema_version": 1,
+        "case_id": "M4",
+        "runtime": "nanoharness",
+        "run_status": "completed",
+        "stop_reason": "model_terminated",
+        "goal_achieved": false,
+        "report_passed": true,
+        "execution_error_type": null,
+        "tool_attempts": [],
+        "permission_decisions": [
+          {
+            "tool_name": "update_order",
+            "arguments": {
+              "order_id": 7,
+              "status": "closed"
+            },
+            "allowed": false,
+            "denial": "write denied by policy"
+          }
+        ],
+        "recovery_observed": false,
+        "lifecycle_start_count": 1,
+        "lifecycle_end_count": 1,
+        "lifecycle_paired": true,
+        "event_ids_unique": true,
+        "sequences_monotonic": true,
+        "trace_ids_consistent": true,
+        "scenario_round_trip": true,
+        "report_round_trip": true
+      },
+      "langgraph": {
+        "schema_version": 1,
+        "case_id": "M4",
+        "runtime": "langgraph",
+        "run_status": "completed",
+        "stop_reason": "subject_completed",
+        "goal_achieved": false,
+        "report_passed": true,
+        "execution_error_type": null,
+        "tool_attempts": [],
+        "permission_decisions": [
+          {
+            "tool_name": "update_order",
+            "arguments": {
+              "order_id": 7,
+              "status": "closed"
+            },
+            "allowed": false,
+            "denial": "write denied by policy"
+          }
+        ],
+        "recovery_observed": false,
+        "lifecycle_start_count": 1,
+        "lifecycle_end_count": 1,
+        "lifecycle_paired": true,
+        "event_ids_unique": true,
+        "sequences_monotonic": true,
+        "trace_ids_consistent": true,
+        "scenario_round_trip": true,
+        "report_round_trip": true
+      },
+      "mismatches": []
+    }
+  ],
+  "infrastructure_errors": []
+}

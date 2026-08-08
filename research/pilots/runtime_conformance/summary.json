@@ -1,0 +1,36 @@
+{
+  "artifact_revision": "cb61901d99ec5a0ee0c48e71408246221a846086",
+  "cases": [
+    {
+      "case_id": "M1",
+      "mismatches": 0,
+      "passed": true
+    },
+    {
+      "case_id": "M2",
+      "mismatches": 0,
+      "passed": true
+    },
+    {
+      "case_id": "M3",
+      "mismatches": 0,
+      "passed": true
+    },
+    {
+      "case_id": "M4",
+      "mismatches": 0,
+      "passed": true
+    }
+  ],
+  "cells": 8,
+  "comparisons": 4,
+  "experiment_id": "m1-m4-runtime-conformance-v1",
+  "infrastructure_errors": [],
+  "manifest_digest": "c504ffe68abdbc5f398d0aa25c68d88f770d52da64c2648fd93cb2671cd8c304",
+  "passed": true,
+  "runtime_versions": {
+    "langgraph": "1.2.10",
+    "nanoharness": "0.1.0"
+  },
+  "schema_version": 1
+}

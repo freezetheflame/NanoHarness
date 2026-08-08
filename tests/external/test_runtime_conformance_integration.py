@@ -1,8 +1,16 @@
+import hashlib
+import json
+from pathlib import Path
+
 import pytest
 
 pytest.importorskip("langgraph")
 
 from research.pilots.runtime_conformance.cases import run_case_pair  # noqa: E402
+from research.pilots.runtime_conformance.run import (  # noqa: E402
+    RuntimeConformanceManifest,
+)
+from nanoharness.testing import RuntimeConformanceReport  # noqa: E402
 
 
 @pytest.mark.parametrize("case_id", ["M1", "M2", "M3", "M4"])
@@ -57,3 +65,32 @@ def test_m4_denies_write_before_underlying_tool_attempt():
         assert evidence.projection.permission_decisions[0].allowed is False
         assert evidence.projection.tool_attempts == []
         assert evidence.report.passed is True
+
+
+def test_archived_m1_m4_evidence_matches_manifest_and_checksums():
+    root = (
+        Path(__file__).parents[2]
+        / "research"
+        / "pilots"
+        / "runtime_conformance"
+    )
+    manifest = RuntimeConformanceManifest.model_validate_json(
+        (root / "manifest.json").read_text(encoding="utf-8")
+    )
+    report = RuntimeConformanceReport.model_validate_json(
+        (root / "raw" / "conformance_report.json").read_text(encoding="utf-8")
+    )
+    summary = json.loads((root / "summary.json").read_text(encoding="utf-8"))
+
+    assert report.manifest_digest == manifest.manifest_digest
+    assert report.artifact_revision == "cb61901d99ec5a0ee0c48e71408246221a846086"
+    assert len(report.cells) == 8
+    assert len(report.comparisons) == 4
+    assert all(item.passed and not item.mismatches for item in report.comparisons)
+    assert summary["passed"] is True
+    assert summary["infrastructure_errors"] == []
+
+    lines = (root / "SHA256SUMS").read_text(encoding="utf-8").splitlines()
+    for line in lines:
+        expected, relative = line.split("  ", 1)
+        assert hashlib.sha256((root / relative).read_bytes()).hexdigest() == expected
