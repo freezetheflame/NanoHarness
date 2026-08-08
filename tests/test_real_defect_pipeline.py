@@ -4,6 +4,7 @@ from collections import Counter
 
 import pytest
 
+from research.defects.real_corpus_v1.build_packets import build_packets
 from research.defects.real_corpus_v1.pipeline import (
     blind_packet,
     canonical_candidate_key,
@@ -196,3 +197,25 @@ def test_run_retrieval_archives_repository_pin_and_query(tmp_path):
     assert (
         tmp_path / "owner__runtime" / "queries" / "closed-bugs" / "page-0001.json"
     ).exists()
+
+
+def test_build_packets_creates_identical_blind_coder_templates(tmp_path):
+    selected = select_and_partition([
+        _candidate("owner/runtime", 1),
+        _candidate("owner/runtime", 2),
+    ])
+
+    outputs = build_packets(selected, tmp_path)
+
+    packet_text = outputs.evidence_packet.read_text(encoding="utf-8")
+    h1 = json.loads(outputs.h1_pass_a.read_text(encoding="utf-8"))
+    h2 = json.loads(outputs.h2_pass_a.read_text(encoding="utf-8"))
+    assert h1["packet_sha256"] == sha256_file(outputs.evidence_packet)
+    assert h2["packet_sha256"] == h1["packet_sha256"]
+    h1["coder_id"] = "CODER"
+    h2["coder_id"] = "CODER"
+    assert h1 == h2
+    assert "partition" not in packet_text
+    assert "selection_rank" not in packet_text
+    assert "operator_ids" not in packet_text
+    assert "machine_precode" not in packet_text

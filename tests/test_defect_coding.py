@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timezone
 
 import pytest
@@ -11,6 +12,7 @@ from nanoharness.testing import (
     DefectCodingEntry,
     DefectCodingSubmission,
 )
+from nanoharness.testing.defect_coding_cli import main as coding_cli_main
 
 
 PACKET_DIGEST = "a" * 64
@@ -119,3 +121,71 @@ def test_valid_pass_a_round_trips():
     )
 
     assert restored == submission
+
+
+def test_coding_cli_accepts_complete_digest_bound_submission(tmp_path, capsys):
+    packet = tmp_path / "evidence_packet.json"
+    packet.write_text(
+        json.dumps({"candidates": [{"defect_id": "LG-1"}]}) + "\n",
+        encoding="utf-8",
+    )
+    digest = __import__("hashlib").sha256(packet.read_bytes()).hexdigest()
+    submission = DefectCodingSubmission(
+        corpus_id="agent-defects-v1",
+        pass_id=CodingPass.PASS_A,
+        coder_id="H1",
+        manual_version="1.0",
+        packet_sha256=digest,
+        entries=[_entry()],
+        completion=_completion(packet_sha256=digest),
+    )
+    submission_path = tmp_path / "pass_a.json"
+    submission_path.write_text(submission.model_dump_json(), encoding="utf-8")
+
+    exit_code = coding_cli_main([
+        str(packet),
+        str(submission_path),
+        "--require-complete",
+    ])
+    output = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 0
+    assert output == {"errors": [], "valid": True}
+
+
+def test_coding_cli_rejects_missing_candidate_and_wrong_digest(tmp_path, capsys):
+    packet = tmp_path / "evidence_packet.json"
+    packet.write_text(
+        json.dumps({
+            "candidates": [
+                {"defect_id": "LG-1"},
+                {"defect_id": "LG-2"},
+            ]
+        }) + "\n",
+        encoding="utf-8",
+    )
+    submission = DefectCodingSubmission(
+        corpus_id="agent-defects-v1",
+        pass_id=CodingPass.PASS_A,
+        coder_id="H1",
+        manual_version="1.0",
+        packet_sha256=PACKET_DIGEST,
+        entries=[_entry()],
+    )
+    submission_path = tmp_path / "pass_a.json"
+    submission_path.write_text(submission.model_dump_json(), encoding="utf-8")
+
+    exit_code = coding_cli_main([
+        str(packet),
+        str(submission_path),
+        "--require-complete",
+    ])
+    output = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 1
+    assert output["valid"] is False
+    assert output["errors"] == [
+        "packet digest mismatch",
+        "submission IDs do not exactly match packet IDs",
+        "completion declaration is required",
+    ]
