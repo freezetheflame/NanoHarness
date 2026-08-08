@@ -52,5 +52,10 @@
   "selection_namespace": "agent-defect-corpus-v1",
   "partition_namespace": "agent-defect-partition-v1",
   "derivation_fraction": 0.6,
+  "authoritative_candidate_lane": {
+    "kind": "pinned_default_branch_first_parent_git_history",
+    "subject_pattern": "\\b(fix|bug|regression|revert)\\b",
+    "search_api_role": "supplementary evidence discovery"
+  },
   "protocol": "AgentMutationTestingPaper@0525e49:docs/superpowers/specs/2026-08-08-real-defect-corpus-design.md"
 }

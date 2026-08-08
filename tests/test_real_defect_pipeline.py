@@ -1,10 +1,15 @@
 import hashlib
 import json
+import os
+import subprocess
 from collections import Counter
 
 import pytest
 
 from research.defects.real_corpus_v1.build_packets import build_packets
+from research.defects.real_corpus_v1.collect_git_history import (
+    collect_fixing_commits,
+)
 from research.defects.real_corpus_v1.pipeline import (
     blind_packet,
     canonical_candidate_key,
@@ -299,3 +304,52 @@ def test_frozen_queries_respect_github_boolean_operator_limit():
         query["query"].count(" OR ") <= 4
         for query in manifest["queries"]
     )
+
+
+def test_collect_fixing_commits_uses_pinned_history_and_window(tmp_path):
+    repository_path = tmp_path / "subject"
+    subprocess.run(["git", "init", str(repository_path)], check=True, capture_output=True)
+    subprocess.run(
+        ["git", "-C", str(repository_path), "config", "user.email", "test@example.test"],
+        check=True,
+    )
+    subprocess.run(
+        ["git", "-C", str(repository_path), "config", "user.name", "Test"],
+        check=True,
+    )
+    commit_environment = os.environ.copy()
+    commit_environment.update({
+        "GIT_AUTHOR_DATE": "2025-01-02T00:00:00Z",
+        "GIT_COMMITTER_DATE": "2025-01-02T00:00:00Z",
+    })
+    subprocess.run(
+        ["git", "-C", str(repository_path), "commit", "--allow-empty", "-m", "feat: add option"],
+        check=True,
+        env=commit_environment,
+        capture_output=True,
+    )
+    subprocess.run(
+        ["git", "-C", str(repository_path), "commit", "--allow-empty", "-m", "fix: retry duplicate tool call"],
+        check=True,
+        env=commit_environment,
+        capture_output=True,
+    )
+    pin = subprocess.run(
+        ["git", "-C", str(repository_path), "rev-parse", "HEAD"],
+        check=True,
+        text=True,
+        capture_output=True,
+    ).stdout.strip()
+
+    candidates = collect_fixing_commits(
+        repository_path,
+        repository="owner/runtime",
+        pinned_commit=pin,
+        start="2024-01-01",
+        end="2026-06-30",
+    )
+
+    assert len(candidates) == 1
+    assert candidates[0]["revision"] == pin
+    assert candidates[0]["canonical_locator"].endswith(f"/commit/{pin}")
+    assert candidates[0]["title"] == "fix: retry duplicate tool call"
