@@ -6,11 +6,13 @@
   ],
   "audit_fraction": 0.1,
   "audit_namespace": "agent-defect-human-audit-v1",
+  "dispatch_status": "unfrozen",
   "dispatch_time_provenance": {
-    "artifact_revision": "unfrozen_until_dispatch",
-    "model_id": "unfrozen_until_dispatch",
-    "prompt_sha256": "unfrozen_until_dispatch",
-    "started_at": "unfrozen_until_dispatch"
+    "model_id": null,
+    "nanoharness_revision": null,
+    "paper_revision": null,
+    "prompt_sha256": null,
+    "started_at": null
   },
   "formal_prior_outputs_excluded": [
     "H2-CODEX",

@@ -400,12 +400,14 @@ def test_agent_review_protocol_freezes_only_known_pre_dispatch_values():
         "audit_namespace": "agent-defect-human-audit-v1",
         "audit_fraction": 0.1,
         "formal_prior_outputs_excluded": ["H2-CODEX", "machine_precode"],
+        "dispatch_status": "unfrozen",
         "dispatch_time_provenance": {
-            field: "unfrozen_until_dispatch"
+            field: None
             for field in (
                 "model_id",
                 "prompt_sha256",
-                "artifact_revision",
+                "paper_revision",
+                "nanoharness_revision",
                 "started_at",
             )
         },
