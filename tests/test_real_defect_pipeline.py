@@ -801,9 +801,41 @@ def test_retained_real_defect_snapshot_checksums_match():
     assert len(lines) == 125
     for line in lines:
         expected, relative = line.split("  ", 1)
+        if relative.startswith("formal/agent-review-v1/"):
+            continue
         path = root / relative
         assert path.is_file(), relative
         assert hashlib.sha256(path.read_bytes()).hexdigest() == expected, relative
+
+
+def test_frozen_agent_input_checksums_are_complete_sorted_and_match_bytes():
+    root = (
+        __import__("pathlib").Path(__file__).parents[1]
+        / "research"
+        / "defects"
+        / "real_corpus_v1"
+        / "formal"
+        / "agent-review-v1"
+    )
+    inventory = root / "SHA256SUMS"
+    lines = inventory.read_text(encoding="utf-8").splitlines()
+    relative_paths = [line.split("  ", 1)[1] for line in lines]
+
+    expected_paths = sorted(
+        path.relative_to(root).as_posix()
+        for path in root.rglob("*")
+        if path.is_file()
+        and path != inventory
+        and not path.relative_to(root).as_posix().startswith("pass_a/")
+    )
+    assert relative_paths == expected_paths
+    assert "AGENT_PROMPT.md" in relative_paths
+    assert "protocol.json" in relative_paths
+    assert relative_paths == sorted(relative_paths)
+    for line in lines:
+        expected, relative = line.split("  ", 1)
+        assert len(expected) == 64
+        assert hashlib.sha256((root / relative).read_bytes()).hexdigest() == expected
 
 
 def test_machine_precode_is_conservative_and_partition_blind():
