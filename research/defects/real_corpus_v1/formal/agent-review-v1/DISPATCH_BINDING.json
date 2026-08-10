@@ -1,0 +1,479 @@
+{
+  "canonical_task_mapping": {
+    "formal_a1": {
+      "annotator_id": "A1",
+      "output": "research/defects/real_corpus_v1/formal/agent-review-v1/pass_a/A1.json",
+      "template": "research/defects/real_corpus_v1/formal/agent-review-v1/templates/A1/pass_a.json"
+    },
+    "formal_a2": {
+      "annotator_id": "A2",
+      "output": "research/defects/real_corpus_v1/formal/agent-review-v1/pass_a/A2.json",
+      "template": "research/defects/real_corpus_v1/formal/agent-review-v1/templates/A2/pass_a.json"
+    },
+    "formal_a3": {
+      "annotator_id": "A3",
+      "output": "research/defects/real_corpus_v1/formal/agent-review-v1/pass_a/A3.json",
+      "template": "research/defects/real_corpus_v1/formal/agent-review-v1/templates/A3/pass_a.json"
+    }
+  },
+  "fork_turns": "none",
+  "freeze_payload_revision": "b5095acc300d2376fca7afe8a253e3eb8f58e5d2",
+  "inputs": {
+    "formal_inventory": {
+      "path": "research/defects/real_corpus_v1/formal/agent-review-v1/SHA256SUMS",
+      "sha256": "732253682781e1f3f53422c1ac85536a5999cfb4f6b755621b300a629193e195"
+    },
+    "packet": {
+      "path": "research/defects/real_corpus_v1/evidence_packet.json",
+      "sha256": "92fc19ca1f96e183dfb21087aae966445ce46e3ae75e81dbdbacfa1f74f82593"
+    },
+    "paper": {
+      "instructions": {
+        "path": "experiments/defects/real-corpus-v1/AGENT_ANNOTATOR_INSTRUCTIONS.md",
+        "sha256": "6ede37faf1ff01f81ba1c5e6adc4b63b988c50e1854fe9d6cefdbaa8fcef62e7"
+      },
+      "manual": {
+        "path": "experiments/design/DEFECT_CODING_MANUAL.md",
+        "sha256": "8d08350e8630dc1eb1bd35b5d572499b8c9f3800e757657010858409b509132a"
+      },
+      "revision": "91674e63aab0cf9da599ae52f341cf99004ddd4a"
+    },
+    "patches": [
+      {
+        "defect_id": "CREWAIINC-CREWAI-04B202486C03",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-04B202486C03.patch",
+        "sha256": "0f2d1a2db3932d716cf868a45134e25819ba420dae96d90256132bc9dc470425"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-18B7D0AAA5B0",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-18B7D0AAA5B0.patch",
+        "sha256": "930bfe1a9ed6aa78bac0ab4f0ad7435636dc6b2383ff4dd45e113868d5cdee87"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-1E81F04FA0D3",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-1E81F04FA0D3.patch",
+        "sha256": "a0b5b608965606867e2e5c92f47fd629cba76a99d78e37be961e48b7cb4d186c"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-1E9135EB1AC6",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-1E9135EB1AC6.patch",
+        "sha256": "e36938726a15af80766dffc4e7fa9925854d0161122da6b58903a01177fb1761"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-2250F67CC995",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-2250F67CC995.patch",
+        "sha256": "111811b39a2d61b5a7eed735e4b0a3944bf3c5c793fd5372afe806625e2647a6"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-39544CABB83E",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-39544CABB83E.patch",
+        "sha256": "453cc6d740ee2a1bf2b8d68a9e95cfda5f579946c0aabd6df20f7ddb7bb109cb"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-3A3F746A0B2C",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-3A3F746A0B2C.patch",
+        "sha256": "ea1cfdab2f5697106f2ed6b4e030476ee2b605a13f384ea61a236c5ddf435b4d"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-509EBFDD10D0",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-509EBFDD10D0.patch",
+        "sha256": "e3bd008d8a557bcc3b720ae6b981e150f8fd49f0145814718e74584175885bfb"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-5261DAF3C41F",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-5261DAF3C41F.patch",
+        "sha256": "7046dedfb2b1366c3aa1284d0eeeb1d316811aa0072356ffbfaaa6514867b785"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-55CE9DCF5420",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-55CE9DCF5420.patch",
+        "sha256": "245bc4b29c7fae404261128a89e3c6164839bb6d39f433dde01d1eeafd9cccf6"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-64B8519A37DD",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-64B8519A37DD.patch",
+        "sha256": "493a01ed5d48deff481668d878e44e451792864845a659ac7280259b1b6b9948"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-767929542075",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-767929542075.patch",
+        "sha256": "38a90c0ec1e5c7f3906b060acdf61dd338c39299f0b14e18695a8533e2cb7318"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-7FA995D027A5",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-7FA995D027A5.patch",
+        "sha256": "72213f8647a4ba2c49979d195b19aad2d0ea57079c6be0e18dd5ed6c28b9d98e"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-86560271EDF6",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-86560271EDF6.patch",
+        "sha256": "c7899f9ebf47710b512e599fc3521cee83b9ea168173586925e0f0a64be8df50"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-A70EE6E80215",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-A70EE6E80215.patch",
+        "sha256": "1b385a5e9165b94b9458a2dad57d4f76f04b15e9a5a0ded784e50975b160b6be"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-A7BAD35DD871",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-A7BAD35DD871.patch",
+        "sha256": "c9d0f8c7210fd2412b0289093ec8d2145527b2dde9ce34460223907eb61e0361"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-A8C087332C76",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-A8C087332C76.patch",
+        "sha256": "8d4dfa9d86c4a2e16ded59b89cde0880b73e5df867034aa425f00496a1a813c0"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-B357A08423FA",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-B357A08423FA.patch",
+        "sha256": "0dc94f0134521a0ad43ba73d7526af12fd30c9c3cb3cd7e0c8f56539959cabd0"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-B54077DEA910",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-B54077DEA910.patch",
+        "sha256": "b3def5d87a02d56e9d6fa6479140bdfa9788dc678f607390ea9af60e496f2b21"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-D57AA34C799B",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-D57AA34C799B.patch",
+        "sha256": "5283cab91786ba426f143c9b2f7f1a0345b96f8a6ea1d3544e8358fdb331a7cb"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-DDB20ED36374",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-DDB20ED36374.patch",
+        "sha256": "4a96199d870b45514dc326408fef5478267353b90a1d3593814a049f2ab73871"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-E2AB332A0BAA",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-E2AB332A0BAA.patch",
+        "sha256": "1bd93c1e9554be9e3cf5162e4343d32afadd450c8c977b34969abb833787259c"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-E356CA9140AB",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-E356CA9140AB.patch",
+        "sha256": "7ff83ebf430f65f1896a72b891cf56be24c260125a6c022f7b3bd8530c6e2475"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-EB022D82C64B",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-EB022D82C64B.patch",
+        "sha256": "58d6fe511ccedb01dd5fbb9ae45ae5de0ee15670a2a8a91b40a298c9a45a5b72"
+      },
+      {
+        "defect_id": "CREWAIINC-CREWAI-EEDC3C0811C8",
+        "path": "research/defects/real_corpus_v1/patches/CREWAIINC-CREWAI-EEDC3C0811C8.patch",
+        "sha256": "2c4de6b00b46ccca5415a779aa6f7ce75cf861514b9b8536ec32a33fb0a8b3dc"
+      },
+      {
+        "defect_id": "FREEZETHEFLAME-NANOHARNESS-35B5B7782B53",
+        "path": "research/defects/real_corpus_v1/patches/FREEZETHEFLAME-NANOHARNESS-35B5B7782B53.patch",
+        "sha256": "512e7ab6046ab830fe1fe614254e0c2c4d3465225fcd6a99684b13b66d857211"
+      },
+      {
+        "defect_id": "FREEZETHEFLAME-NANOHARNESS-ECE647477872",
+        "path": "research/defects/real_corpus_v1/patches/FREEZETHEFLAME-NANOHARNESS-ECE647477872.patch",
+        "sha256": "3dfa3a43a0f45af33f085dfa5cc75bb8a7b788c213046a590aa4b357c1cfe7f5"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-0182B80F458A",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-0182B80F458A.patch",
+        "sha256": "51a2eebb6f46fae458622bab2d8657792b24d2b7922115d06d422c5783b68b8f"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-06C154D70011",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-06C154D70011.patch",
+        "sha256": "c85d5eeb659584df666bd688e6b92c9a68e9387b83161365e8d8cfb55fecb7fe"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-085B26BD19F0",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-085B26BD19F0.patch",
+        "sha256": "97c6b7fd971f52812002cbbe5de756374846e03453026132f77c7c9d14e69db8"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-0C116E758515",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-0C116E758515.patch",
+        "sha256": "bbf98ae920e65f6602cf6b1b8409fe93f94d41796e5622da43b585e3d339fbca"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-1D85698F2DE2",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-1D85698F2DE2.patch",
+        "sha256": "6ebc99a6572d397059d2c40febb5e344cb62437fde778ce5aaf4516256097e15"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-2CCC5002E185",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-2CCC5002E185.patch",
+        "sha256": "f25d6094ade6ac77ea92d4227ee9c40d418a589237414b5a9813e51604451717"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-2F6D38B47498",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-2F6D38B47498.patch",
+        "sha256": "eedd986adb9055f15b141a36df482fd41fc488d1e7c58558abd66cd99657b10a"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-32E290AB59E2",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-32E290AB59E2.patch",
+        "sha256": "1e29fa10721823e215c4d5a8614e6cf9ffc2beeba5b29fe9545cbba5c7392e11"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-37CF01E19507",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-37CF01E19507.patch",
+        "sha256": "3b246923461a8039b7d29ab4700b2567bf5bae1a77891fbb983d0a3ff3243c8d"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-3A0A8FCFB120",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-3A0A8FCFB120.patch",
+        "sha256": "eb2581c397b26176d70801bb011c93935dcc3ec6a20f870077af45100d82d7c9"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-472044FDBEB7",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-472044FDBEB7.patch",
+        "sha256": "5940c8838dd49732a88c600883fe96783e27de3ae374d4e878bd0ba2dd6e5716"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-58B8EA28E2D3",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-58B8EA28E2D3.patch",
+        "sha256": "9705f52a785b9d51661c37320d3985022c7921865fd4b3f4c57c9fb3e5635628"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-5EE53C71D22E",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-5EE53C71D22E.patch",
+        "sha256": "6bd49575a1335481e9451d3e6aa04ef620a200c94668bc8947ffe9e6c1b9bb88"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-68228EF073F3",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-68228EF073F3.patch",
+        "sha256": "72acb7026be1e81767425c5fd56a652b8ff48d959019b52e5e2bdb1a4b549cef"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-68483D6E7574",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-68483D6E7574.patch",
+        "sha256": "2224436638c1b5a03e93a4b73448f029c159a168698ddd1e99421cfe13fdc4bd"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-6B253E912DAC",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-6B253E912DAC.patch",
+        "sha256": "7a8d34322374b38cab969b9d8e5b66c666301d942337bc1aafaad718f597ab62"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-8F1BDAD55A9B",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-8F1BDAD55A9B.patch",
+        "sha256": "835f7d9ab66b33559fa696e11c02826437ce12124213d8e8482eb9282a3d5d26"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-9458C5809A2D",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-9458C5809A2D.patch",
+        "sha256": "e496788ef7813fecdd33f7a6d0ebdc9318d0b0933945a86ac323ec94916c55d8"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-9588EEF71CEB",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-9588EEF71CEB.patch",
+        "sha256": "a9f748cefe3e76f9ad1f8cfc1608582a637bbac2d85e5e3b82530bf86f78f890"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-A9CD7093EC81",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-A9CD7093EC81.patch",
+        "sha256": "6212b43fa31cf21eca88b85dbfb12a8a9db8de212b0ce3dde68896ba1a54abac"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-BDC1553450B9",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-BDC1553450B9.patch",
+        "sha256": "88aced3f60fc4f051bc3e78068980b9c043c7d48106af71fcba71f3da5509128"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-C2ABDDA05120",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-C2ABDDA05120.patch",
+        "sha256": "14ddfbf31fa3c0278ebe51e3d372ac80bb06d695ee33c0a9354e362af14e335a"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-D5AA932E0F0D",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-D5AA932E0F0D.patch",
+        "sha256": "ce6639dd38fa5d7bf5e28238b3afdb868a73a31fe9efff27815a161116de0f47"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-D7C1D86F1B2E",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-D7C1D86F1B2E.patch",
+        "sha256": "52f02e3831cfed709fb0718b3ea8e1d9e4296b7e5f581d4eb77cee28fca2675c"
+      },
+      {
+        "defect_id": "LANGCHAIN-AI-LANGGRAPH-DF5A13F34BDC",
+        "path": "research/defects/real_corpus_v1/patches/LANGCHAIN-AI-LANGGRAPH-DF5A13F34BDC.patch",
+        "sha256": "06d7caad871e2ad0b9e9bb557d4861b75d8991c185b4c092d3b97d497dfdcd77"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-06029DF804F5",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-06029DF804F5.patch",
+        "sha256": "f2da40ff2747799323d13885c5060097cabb588ca9e1ee37a841c51a0bfeb55b"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-10A44C35EBC4",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-10A44C35EBC4.patch",
+        "sha256": "58401bd28cc6fb123fd643e80d2f5ee013a55286b0446197b4f2a46de5773c79"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-1A55A455930E",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-1A55A455930E.patch",
+        "sha256": "4e983b68bd2e1c7222dbf07084da42bae6aa94eafdf92b743c8e41cd928e67de"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-1EB93F23C63B",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-1EB93F23C63B.patch",
+        "sha256": "756ce21b766c697c248ea23405173b0ac6b30cf52417998c6cb41fcf0be4da3f"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-1FE3CE06F15B",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-1FE3CE06F15B.patch",
+        "sha256": "216975faf4f4272b37cc29176369f55fd234f195a754521b54cdcb8c377255d8"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-25828CF6C797",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-25828CF6C797.patch",
+        "sha256": "f7fdefa3629fac8e69973866c77f18fd9df197563f5df05fc56b6b7f9f3aaf34"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-4AE8B72F6FF7",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-4AE8B72F6FF7.patch",
+        "sha256": "396485768538a3c1ed5260370174f58b3e8f25726660582e94e95cf658887c89"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-5B5000568D6B",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-5B5000568D6B.patch",
+        "sha256": "e22153192ddde1638869bff2d71d506cd32b4bfbc7242a1ea2811505f79c50ba"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-5F876512E45E",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-5F876512E45E.patch",
+        "sha256": "272c46496900473e9d3d0530f59e4f7ff0a58de09d27a4df474fdc0b4631ab0d"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-623C635D5A11",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-623C635D5A11.patch",
+        "sha256": "a18afbd2fd614e2e01af121a5ccd0e33f6c321569ff0664921bb16488ea99277"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-6EF6213DAE38",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-6EF6213DAE38.patch",
+        "sha256": "7421c8bdd7aa03ed1c7dffea448282e301bd83b9a628c6452e69d75d446914b5"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-78E69889C9F1",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-78E69889C9F1.patch",
+        "sha256": "410179823d037e6f503620dba8ec0ce16de18e7633eb519ed75391e380972ce1"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-86292287626C",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-86292287626C.patch",
+        "sha256": "10d1b1808e95fa660b649089b63bc657bd760002c76361f54c9273d236172b23"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-864AA4594BF8",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-864AA4594BF8.patch",
+        "sha256": "bd30b55e5ce1c6d1cd626a3737dbf18481780c24c6a9f254566b8763a5130b65"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-8C56CF8FA3CF",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-8C56CF8FA3CF.patch",
+        "sha256": "a65df60b0cb63ec98260aef7066064b51fde5b846075f9623a51839c7e579e7a"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-93657DE5BA24",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-93657DE5BA24.patch",
+        "sha256": "82328f70cadd585229a402b9e70466f755ab463ea2590492fce840e169f2a46a"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-9D8F5F3B62A1",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-9D8F5F3B62A1.patch",
+        "sha256": "4151c6db0094d1ed72d80a7c4eab541755b7456915ed6dbfd9500d2fa6621ad5"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-C025039423FB",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-C025039423FB.patch",
+        "sha256": "497d58ede2275b7a9d49042a7e4b0b78c52084bfbac5e8b97f0d7e877d9484af"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-C03E9EB5C672",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-C03E9EB5C672.patch",
+        "sha256": "ee6eb3a35b06ff3d190be1a220e366f018755ad521972ecbc6d4c3bd3f54f2d5"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-CD83AD319253",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-CD83AD319253.patch",
+        "sha256": "f4816e2a0455aae3b24979b33430f47e777773b26854867da2933e26ce0c7540"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-DACBD27A78A4",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-DACBD27A78A4.patch",
+        "sha256": "f4044d90e3cfa3c58fd922f2a26ee049137dc4077d55082501ea434a27c5de17"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-E39723653FA6",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-E39723653FA6.patch",
+        "sha256": "3b5ffd405f2b0e54b4914a3c61876dab8d713cb0972a3e9dde2f0dcfeed0d07a"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-EA936C1865C5",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-EA936C1865C5.patch",
+        "sha256": "bd560f4eae6913a7ac0ab913327282e12659e887d57251042634ace4389eebfc"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-F5AED66A8629",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-F5AED66A8629.patch",
+        "sha256": "43ab42604eb94bc9336cde3ab4d6cb48ee8700736a3ec29a73e5aafc2e400953"
+      },
+      {
+        "defect_id": "MICROSOFT-AUTOGEN-FFBEE2BB6CEF",
+        "path": "research/defects/real_corpus_v1/patches/MICROSOFT-AUTOGEN-FFBEE2BB6CEF.patch",
+        "sha256": "243e45f612bc18da9ef7935b97055900134b521fbc38ec51ce33e6b6f7da0b50"
+      }
+    ],
+    "prompt": {
+      "path": "research/defects/real_corpus_v1/formal/agent-review-v1/AGENT_PROMPT.md",
+      "sha256": "db24b8a1a539762fadf75a96638622529fe1be44cdca9b769e1671796d9e8a94"
+    },
+    "protocol": {
+      "path": "research/defects/real_corpus_v1/formal/agent-review-v1/protocol.json",
+      "sha256": "b1d154c132049556edf3733d7a2cdada5fa5eb27c8475871c24d397bc84b577c"
+    },
+    "templates": {
+      "A1": {
+        "path": "research/defects/real_corpus_v1/formal/agent-review-v1/templates/A1/pass_a.json",
+        "sha256": "eae08b1609148ce37da2b5728c6456d2aecf45012199f72a843a8c532aba3428"
+      },
+      "A2": {
+        "path": "research/defects/real_corpus_v1/formal/agent-review-v1/templates/A2/pass_a.json",
+        "sha256": "a5ba812e3c334a65eed688e3cdf4ab3b0027be5bc64c899f4ce4c1b965e7ae6b"
+      },
+      "A3": {
+        "path": "research/defects/real_corpus_v1/formal/agent-review-v1/templates/A3/pass_a.json",
+        "sha256": "f9d7974537d431d429f217bf09f4c6e83e519a17e72fd243f551954ff46a4acd"
+      }
+    },
+    "tooling": [
+      {
+        "path": ".gitattributes",
+        "sha256": "f68b2e7344b4e73a447e57601ba9c4cbcdaae88c7ce7042669d8c41b7783068c"
+      },
+      {
+        "path": "research/defects/real_corpus_v1/agent_dispatch.py",
+        "sha256": "44b26eae4119c15702def4e0963be06bc3c5311bd7ea15a3828ad2f9b088414d"
+      },
+      {
+        "path": "research/defects/real_corpus_v1/agent_dispatch_cli.py",
+        "sha256": "f966e850176eab3698829ab8f4f839055f0a0f414fbbe6bc9442f6e8a1cc2ea7"
+      },
+      {
+        "path": "research/defects/real_corpus_v1/agent_review.py",
+        "sha256": "69457ef5cf123b32dcdb8281786544ea4719153e5cb329934c28bfa9e60d96b0"
+      },
+      {
+        "path": "research/defects/real_corpus_v1/agent_review_cli.py",
+        "sha256": "3dda1dddb72d797ca46defad987f30e03d29ffbd949f69f2fdf94c007240dce9"
+      }
+    ]
+  },
+  "model_configuration": {
+    "reasoning_effort": "high"
+  },
+  "model_id": "gpt-5.6-sol",
+  "protocol_id": "agent-review-v1",
+  "schema_version": 1
+}
