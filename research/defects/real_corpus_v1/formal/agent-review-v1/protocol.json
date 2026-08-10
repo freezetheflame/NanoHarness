@@ -6,18 +6,71 @@
   ],
   "audit_fraction": 0.1,
   "audit_namespace": "agent-defect-human-audit-v1",
-  "dispatch_status": "unfrozen",
+  "dispatch_prompt": {
+    "canonical_task_mapping": {
+      "formal_a1": {
+        "annotator_id": "A1",
+        "output": "pass_a/A1.json",
+        "template": "templates/A1/pass_a.json"
+      },
+      "formal_a2": {
+        "annotator_id": "A2",
+        "output": "pass_a/A2.json",
+        "template": "templates/A2/pass_a.json"
+      },
+      "formal_a3": {
+        "annotator_id": "A3",
+        "output": "pass_a/A3.json",
+        "template": "templates/A3/pass_a.json"
+      }
+    },
+    "forbidden_inputs": [
+      "private inputs",
+      "hidden selection or partition information",
+      "other Agent templates or outputs",
+      "formal analysis",
+      "Operator Catalog or mapping projection",
+      "legacy H1, H2, or H2-CODEX material",
+      "extracted handoff material",
+      "machine precode"
+    ],
+    "identical_prompt_bytes_required": true,
+    "path": "research/defects/real_corpus_v1/formal/agent-review-v1/AGENT_PROMPT.md",
+    "protocol_bytes_immutable_for_all_annotators": true
+  },
+  "dispatch_status": "frozen_ready",
   "dispatch_time_provenance": {
-    "model_id": null,
-    "nanoharness_revision": null,
-    "paper_revision": null,
-    "prompt_sha256": null,
-    "started_at": null
+    "model_configuration": {
+      "reasoning_effort": "high"
+    },
+    "model_id": "gpt-5.6-sol",
+    "nanoharness_revision": "8ea573b71ba8c7b7016a4436cec5d304292d44ee",
+    "nanoharness_revision_kind": "pre-freeze_code_and_artifact_revision",
+    "paper_revision": "91674e63aab0cf9da599ae52f341cf99004ddd4a",
+    "prompt_sha256": "ccc0b852c65793e6848f9d8f57c557ad5184b8caf018ab91eb94c640757de629",
+    "started_at": "2026-08-10T17:58:25.7202961+08:00"
   },
   "formal_prior_outputs_excluded": [
     "H2-CODEX",
     "machine_precode"
   ],
+  "input_revisions": {
+    "manual": {
+      "instructions_path": "experiments/defects/real-corpus-v1/AGENT_ANNOTATOR_INSTRUCTIONS.md",
+      "paper_revision": "91674e63aab0cf9da599ae52f341cf99004ddd4a",
+      "path": "experiments/design/DEFECT_CODING_MANUAL.md",
+      "version": "2.0"
+    },
+    "packet": {
+      "path": "research/defects/real_corpus_v1/evidence_packet.json",
+      "sha256": "92fc19ca1f96e183dfb21087aae966445ce46e3ae75e81dbdbacfa1f74f82593"
+    },
+    "protocol": {
+      "dispatch_status": "frozen_ready",
+      "protocol_id": "agent-review-v1",
+      "schema_version": 1
+    }
+  },
   "manual_version": "2.0",
   "packet_sha256": "92fc19ca1f96e183dfb21087aae966445ce46e3ae75e81dbdbacfa1f74f82593",
   "protocol_id": "agent-review-v1",

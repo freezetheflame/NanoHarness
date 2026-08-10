@@ -354,6 +354,7 @@ def test_build_packets_creates_three_structurally_identical_agent_templates(
         for annotator_id in ("A1", "A2", "A3")
     ]
     normalized = []
+    normalized_bytes = []
     for template in templates:
         annotator_id = template["coder_id"]
         assert template["agent_provenance"]["annotator_id"] == annotator_id
@@ -377,8 +378,12 @@ def test_build_packets_creates_three_structurally_identical_agent_templates(
         template["coder_id"] = "ANNOTATOR"
         template["agent_provenance"]["annotator_id"] = "ANNOTATOR"
         normalized.append(template)
+        normalized_bytes.append(
+            (json.dumps(template, indent=2, sort_keys=True) + "\n").encode("utf-8")
+        )
 
     assert normalized[0] == normalized[1] == normalized[2]
+    assert normalized_bytes[0] == normalized_bytes[1] == normalized_bytes[2]
     assert outputs.agent_pass_a == {
         annotator_id: (
             tmp_path
@@ -406,42 +411,101 @@ def test_build_packets_creates_three_structurally_identical_agent_templates(
     )
 
 
-def test_agent_review_protocol_freezes_only_known_pre_dispatch_values():
+def test_agent_review_protocol_freezes_identical_dispatch_prompt_and_provenance():
+    import hashlib
+    from datetime import datetime
+
     root = (
         __import__("pathlib").Path(__file__).parents[1]
         / "research"
         / "defects"
         / "real_corpus_v1"
     )
+    formal_root = root / "formal" / "agent-review-v1"
     protocol = json.loads(
-        (root / "formal" / "agent-review-v1" / "protocol.json").read_text(
-            encoding="utf-8"
-        )
+        (formal_root / "protocol.json").read_text(encoding="utf-8")
     )
+    prompt_bytes = (formal_root / "AGENT_PROMPT.md").read_bytes()
+    prompt_text = prompt_bytes.decode("utf-8")
+    prompt_sha256 = hashlib.sha256(prompt_bytes).hexdigest()
 
-    assert protocol == {
-        "schema_version": 1,
-        "protocol_id": "agent-review-v1",
-        "annotator_ids": ["A1", "A2", "A3"],
-        "manual_version": "2.0",
-        "packet_sha256": (
-            "92fc19ca1f96e183dfb21087aae966445ce46e3ae75e81dbdbacfa1f74f82593"
+    assert protocol["schema_version"] == 1
+    assert protocol["protocol_id"] == "agent-review-v1"
+    assert protocol["annotator_ids"] == ["A1", "A2", "A3"]
+    assert protocol["manual_version"] == "2.0"
+    assert protocol["packet_sha256"] == (
+        "92fc19ca1f96e183dfb21087aae966445ce46e3ae75e81dbdbacfa1f74f82593"
+    )
+    assert protocol["audit_namespace"] == "agent-defect-human-audit-v1"
+    assert protocol["audit_fraction"] == 0.1
+    assert protocol["dispatch_status"] == "frozen_ready"
+
+    provenance = protocol["dispatch_time_provenance"]
+    assert provenance == {
+        "model_id": "gpt-5.6-sol",
+        "model_configuration": {"reasoning_effort": "high"},
+        "nanoharness_revision": (
+            "8ea573b71ba8c7b7016a4436cec5d304292d44ee"
         ),
-        "audit_namespace": "agent-defect-human-audit-v1",
-        "audit_fraction": 0.1,
-        "formal_prior_outputs_excluded": ["H2-CODEX", "machine_precode"],
-        "dispatch_status": "unfrozen",
-        "dispatch_time_provenance": {
-            field: None
-            for field in (
-                "model_id",
-                "prompt_sha256",
-                "paper_revision",
-                "nanoharness_revision",
-                "started_at",
-            )
+        "nanoharness_revision_kind": "pre-freeze_code_and_artifact_revision",
+        "paper_revision": "91674e63aab0cf9da599ae52f341cf99004ddd4a",
+        "prompt_sha256": prompt_sha256,
+        "started_at": provenance["started_at"],
+    }
+    assert datetime.fromisoformat(provenance["started_at"]).utcoffset() is not None
+
+    dispatch = protocol["dispatch_prompt"]
+    assert dispatch["path"] == (
+        "research/defects/real_corpus_v1/formal/agent-review-v1/AGENT_PROMPT.md"
+    )
+    assert dispatch["identical_prompt_bytes_required"] is True
+    assert dispatch["protocol_bytes_immutable_for_all_annotators"] is True
+    assert dispatch["canonical_task_mapping"] == {
+        "formal_a1": {
+            "annotator_id": "A1",
+            "template": "templates/A1/pass_a.json",
+            "output": "pass_a/A1.json",
+        },
+        "formal_a2": {
+            "annotator_id": "A2",
+            "template": "templates/A2/pass_a.json",
+            "output": "pass_a/A2.json",
+        },
+        "formal_a3": {
+            "annotator_id": "A3",
+            "template": "templates/A3/pass_a.json",
+            "output": "pass_a/A3.json",
         },
     }
+    assert protocol["input_revisions"]["packet"]["sha256"] == protocol["packet_sha256"]
+    assert protocol["input_revisions"]["manual"]["version"] == "2.0"
+    assert (
+        protocol["input_revisions"]["manual"]["paper_revision"]
+        == provenance["paper_revision"]
+    )
+    assert protocol["input_revisions"]["protocol"] == {
+        "protocol_id": "agent-review-v1",
+        "schema_version": 1,
+        "dispatch_status": "frozen_ready",
+    }
+
+    for task_name, annotator_id, output in (
+        ("formal_a1", "A1", "pass_a/A1.json"),
+        ("formal_a2", "A2", "pass_a/A2.json"),
+        ("formal_a3", "A3", "pass_a/A3.json"),
+    ):
+        assert task_name in prompt_text
+        assert annotator_id in prompt_text
+        assert output in prompt_text
+    assert "unknown canonical task name" in prompt_text.lower()
+    assert "Do not embed or recompute a prompt hash from this file" in prompt_text
+    assert prompt_sha256 not in prompt_text
+    assert "77" in prompt_text
+    assert "operator_ids" in prompt_text
+    assert "independent_started_at" in prompt_text
+    assert "completed_at" in prompt_text
+    assert "private" in prompt_text.lower()
+    assert "machine precode" in prompt_text.lower()
 
 
 def test_frozen_queries_respect_github_boolean_operator_limit():
