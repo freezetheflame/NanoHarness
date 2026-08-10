@@ -90,12 +90,12 @@ class CoderCompletionDeclaration(BaseModel):
 class AgentAnnotationProvenance(BaseModel):
     """Reproducible identity and input record for an agent annotation."""
 
-    protocol_id: str = Field(min_length=1)
+    protocol_id: str = Field(min_length=1, pattern=r"\S")
     annotator_id: Literal["A1", "A2", "A3"]
-    model_id: str = Field(min_length=1)
+    model_id: str = Field(min_length=1, pattern=r"\S")
     prompt_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     input_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    artifact_revision: str = Field(min_length=7)
+    artifact_revision: str = Field(pattern=r"^[0-9a-f]{7,40}$")
     started_at: datetime
 
     @model_validator(mode="after")

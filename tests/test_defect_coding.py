@@ -161,11 +161,16 @@ def test_agent_provenance_round_trips_with_submission():
     ("changes", "field_name"),
     [
         ({"protocol_id": ""}, "protocol_id"),
+        ({"protocol_id": " \t"}, "protocol_id"),
         ({"annotator_id": "H1"}, "annotator_id"),
         ({"model_id": ""}, "model_id"),
+        ({"model_id": " \t"}, "model_id"),
         ({"prompt_sha256": "A" * 64}, "prompt_sha256"),
         ({"input_sha256": "a" * 63}, "input_sha256"),
         ({"artifact_revision": "abcdef"}, "artifact_revision"),
+        ({"artifact_revision": "       "}, "artifact_revision"),
+        ({"artifact_revision": "revision!"}, "artifact_revision"),
+        ({"artifact_revision": "a" * 41}, "artifact_revision"),
         ({"started_at": datetime.now()}, "started_at"),
     ],
 )
