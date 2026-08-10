@@ -955,6 +955,44 @@ def test_agent_review_rejects_unvalidated_source_submission_extras(
         )
 
 
+@pytest.mark.parametrize(
+    ("location", "extra_key"),
+    [
+        ("submission", "hidden_partition_assignment"),
+        ("entry", "operator_metadata"),
+    ],
+)
+def test_agent_review_rejects_unvalidated_submission_structure_extras(
+    tmp_path,
+    location,
+    extra_key,
+):
+    from research.defects.real_corpus_v1.agent_review import analyze_agent_reviews
+
+    packet, paths, _, _ = _agent_review_fixture(tmp_path)
+    raw_submissions = _raw_agent_submissions(paths)
+    tampered = json.loads(raw_submissions["A2"])
+    target = tampered if location == "submission" else tampered["entries"][0]
+    target[extra_key] = "must-not-be-ignored"
+    raw_submissions["A2"] = json.dumps(tampered).encode("utf-8")
+
+    with pytest.raises(ValueError, match="unexpected field"):
+        analyze_agent_reviews(packet.read_bytes(), raw_submissions)
+
+
+def test_agent_review_accepts_legal_empty_pass_a_operator_ids(tmp_path):
+    from research.defects.real_corpus_v1.agent_review import analyze_agent_reviews
+
+    packet, paths, _, _ = _agent_review_fixture(tmp_path)
+
+    analysis = analyze_agent_reviews(
+        packet.read_bytes(),
+        _raw_agent_submissions(paths),
+    )
+
+    assert analysis["invalid_count"] == 0
+
+
 def test_agent_review_source_sha_is_bound_to_analyzed_raw_bytes(tmp_path):
     from research.defects.real_corpus_v1.agent_review import build_review_artifacts
 

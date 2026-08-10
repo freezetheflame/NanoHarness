@@ -33,6 +33,30 @@ PROVENANCE_FIELDS = {
     "started_at",
 }
 COMPLETION_FIELDS = {"completed_at", "independent", "packet_sha256"}
+SUBMISSION_FIELDS = {
+    "schema_version",
+    "corpus_id",
+    "pass_id",
+    "coder_id",
+    "manual_version",
+    "packet_sha256",
+    "entries",
+    "completion",
+    "agent_provenance",
+}
+ENTRY_FIELDS = {
+    "defect_id",
+    "decision",
+    "exclusion_reason",
+    "boundaries",
+    "operator_ids",
+    "trigger",
+    "symptom",
+    "root_cause",
+    "impact",
+    "evidence_ids",
+    "rationale",
+}
 
 
 def _unique_by_id(items: Sequence[Mapping[str, Any]], label: str) -> dict[str, Any]:
@@ -81,6 +105,21 @@ def _reject_unexpected_source_fields(
     agent_id: str,
     submission: Mapping[str, Any],
 ) -> None:
+    extras = set(submission) - SUBMISSION_FIELDS
+    if extras:
+        raise ValueError(
+            f"{agent_id} submission has unexpected field: {sorted(extras)[0]}"
+        )
+    entries = submission.get("entries")
+    if isinstance(entries, list):
+        for index, entry in enumerate(entries):
+            if isinstance(entry, Mapping):
+                extras = set(entry) - ENTRY_FIELDS
+                if extras:
+                    raise ValueError(
+                        f"{agent_id} entry {index} has unexpected field: "
+                        f"{sorted(extras)[0]}"
+                    )
     for container, allowed in (
         ("agent_provenance", PROVENANCE_FIELDS),
         ("completion", COMPLETION_FIELDS),
