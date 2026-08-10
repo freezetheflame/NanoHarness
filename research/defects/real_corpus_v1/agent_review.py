@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import math
 from collections import Counter
 from itertools import combinations
@@ -15,13 +16,13 @@ AGENT_IDS = ("A1", "A2", "A3")
 DECISIONS = ("include", "exclude", "uncertain")
 AUDIT_NAMESPACE = "agent-defect-human-audit-v1"
 AUDIT_FRACTION = 0.1
-FORBIDDEN_PACKET_KEYS = {
-    "machine_precode",
-    "operator_catalog",
+FORBIDDEN_PACKET_KEY_FRAGMENTS = (
     "partition",
+    "operator",
     "private",
+    "machine",
     "selection_rank",
-}
+)
 
 
 def _unique_by_id(items: Sequence[Mapping[str, Any]], label: str) -> dict[str, Any]:
@@ -35,7 +36,10 @@ def _reject_forbidden_material(value: Any) -> None:
     if isinstance(value, Mapping):
         for key, nested in value.items():
             normalized = str(key).lower()
-            if normalized in FORBIDDEN_PACKET_KEYS or "private" in normalized:
+            if any(
+                fragment in normalized
+                for fragment in FORBIDDEN_PACKET_KEY_FRAGMENTS
+            ):
                 raise ValueError(f"forbidden blind packet material: {key}")
             _reject_forbidden_material(nested)
     elif isinstance(value, list):
@@ -71,16 +75,50 @@ def _validate_inputs(
             raise ValueError("all submissions require agent provenance")
         if submission.agent_provenance.protocol_id != "agent-review-v1":
             raise ValueError("all submissions must use protocol agent-review-v1")
+        if submission.completion is None:
+            raise ValueError("all submissions require completion")
         entry_ids = {entry.defect_id for entry in submission.entries}
         if entry_ids != packet_ids:
             raise ValueError("submission IDs must exactly match packet IDs")
+        for entry in submission.entries:
+            candidate_evidence_ids = {
+                evidence["evidence_id"]
+                for evidence in candidate_by_id[entry.defect_id].get("evidence", [])
+            }
+            if not entry.evidence_ids or not set(entry.evidence_ids) <= candidate_evidence_ids:
+                raise ValueError(f"{entry.defect_id} has invalid evidence IDs")
+            if not entry.rationale.strip():
+                raise ValueError(f"{entry.defect_id} requires rationale")
+            if entry.decision.value == "include":
+                if not entry.boundaries:
+                    raise ValueError(f"{entry.defect_id} include requires boundaries")
+                for field_name in ("trigger", "symptom", "root_cause", "impact"):
+                    if not getattr(entry, field_name).strip():
+                        raise ValueError(
+                            f"{entry.defect_id} include requires {field_name}"
+                        )
+            elif entry.decision.value == "exclude":
+                if not entry.exclusion_reason.strip():
+                    raise ValueError(
+                        f"{entry.defect_id} exclude requires exclusion reason"
+                    )
+                if entry.boundaries:
+                    raise ValueError(
+                        f"{entry.defect_id} exclude must not have boundaries"
+                    )
         validated[agent_id] = submission
 
     shared_fields = (
+        ("schema version", lambda item: item.schema_version),
+        ("corpus", lambda item: item.corpus_id),
         ("manual version", lambda item: item.manual_version),
         ("protocol", lambda item: item.agent_provenance.protocol_id),
         ("model", lambda item: item.agent_provenance.model_id),
         ("prompt", lambda item: item.agent_provenance.prompt_sha256),
+        (
+            "artifact revision",
+            lambda item: item.agent_provenance.artifact_revision,
+        ),
     )
     for label, accessor in shared_fields:
         if len({accessor(item) for item in validated.values()}) != 1:
@@ -190,24 +228,28 @@ def analyze_agent_reviews(
         for label, (left, right) in zip(pair_labels, pairs)
     }
 
-    common_include = [
-        defect_id
-        for defect_id, row in zip(defect_ids, decision_rows)
-        if all(decision == "include" for decision in row)
-    ]
-    pairwise_boundary = {
-        label: (
+    pairwise_included = {
+        label: [
+            defect_id
+            for defect_id in defect_ids
+            if entries[left][defect_id].decision.value == "include"
+            and entries[right][defect_id].decision.value == "include"
+        ]
+        for label, (left, right) in zip(pair_labels, pairs)
+    }
+    pairwise_boundary = {}
+    for label, (left, right) in zip(pair_labels, pairs):
+        eligible_ids = pairwise_included[label]
+        pairwise_boundary[label] = (
             sum(
                 _jaccard(
                     entries[left][defect_id].boundaries,
                     entries[right][defect_id].boundaries,
                 )
-                for defect_id in common_include
-            ) / len(common_include)
-            if common_include else None
+                for defect_id in eligible_ids
+            ) / len(eligible_ids)
+            if eligible_ids else None
         )
-        for label, (left, right) in zip(pair_labels, pairs)
-    }
     boundary_values = [value for value in pairwise_boundary.values() if value is not None]
     counts = {
         "unanimous": sum(len(set(row)) == 1 for row in decision_rows),
@@ -216,6 +258,11 @@ def analyze_agent_reviews(
         "any_uncertain": sum("uncertain" in row for row in decision_rows),
     }
     reasons = _selection_reasons(defect_ids, entries)
+    deterministic_audit_count = sum(
+        item_reasons == ["deterministic_consistency_audit"]
+        for item_reasons in reasons.values()
+    )
+    non_consistent_selection_count = len(reasons) - deterministic_audit_count
     first = validated[AGENT_IDS[0]]
     return {
         "schema_version": 1,
@@ -227,13 +274,31 @@ def analyze_agent_reviews(
         "model_id": first.agent_provenance.model_id,
         "prompt_sha256": first.agent_provenance.prompt_sha256,
         "sample_size": len(defect_ids),
+        "missing_count": 0,
+        "invalid_count": 0,
+        "decision_marginals": {
+            agent_id: {
+                category: sum(
+                    entries[agent_id][defect_id].decision.value == category
+                    for defect_id in defect_ids
+                )
+                for category in DECISIONS
+            }
+            for agent_id in AGENT_IDS
+        },
         "decision_agreement": {
             "fleiss_kappa": _fleiss_kappa(decision_rows),
+            "fleiss_denominator": len(defect_ids),
             "pairwise_cohen_kappa": pairwise_kappa,
+            "pairwise_cohen_denominators": {
+                label: len(defect_ids) for label in pair_labels
+            },
             "counts": counts,
         },
         "boundary_agreement": {
-            "common_include_denominator": len(common_include),
+            "pairwise_denominators": {
+                label: len(pairwise_included[label]) for label in pair_labels
+            },
             "pairwise_mean_jaccard": pairwise_boundary,
             "mean_pairwise_jaccard": (
                 sum(boundary_values) / len(boundary_values) if boundary_values else None
@@ -243,6 +308,10 @@ def analyze_agent_reviews(
             "namespace": AUDIT_NAMESPACE,
             "fraction": AUDIT_FRACTION,
             "selected_count": len(reasons),
+            "eligible_unanimous_count": (
+                len(defect_ids) - non_consistent_selection_count
+            ),
+            "deterministic_audit_count": deterministic_audit_count,
             "reasons_by_defect_id": reasons,
         },
     }
@@ -252,32 +321,97 @@ def build_review_artifacts(
     packet_bytes: bytes,
     packet: Mapping[str, Any],
     submissions: Mapping[str, Mapping[str, Any]],
+    *,
+    raw_submission_digests: Mapping[str, str] | None = None,
+    patch_payloads: Mapping[str, bytes] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """Return the agreement report and selected, partition-blind human packet."""
 
     agreement = analyze_agent_reviews(packet_bytes, packet, submissions)
     candidate_by_id, validated = _validate_inputs(packet_bytes, packet, submissions)
+    if raw_submission_digests is None:
+        raw_submission_digests = {
+            agent_id: hashlib.sha256(
+                json.dumps(
+                    submissions[agent_id],
+                    sort_keys=True,
+                    ensure_ascii=False,
+                    separators=(",", ":"),
+                ).encode("utf-8")
+            ).hexdigest()
+            for agent_id in AGENT_IDS
+        }
+    if set(raw_submission_digests) != set(AGENT_IDS) or any(
+        len(digest) != 64
+        or any(character not in "0123456789abcdef" for character in digest)
+        for digest in raw_submission_digests.values()
+    ):
+        raise ValueError("raw submission digests must cover exactly A1, A2, A3")
     entries = _entry_maps(validated)
     reasons = agreement["human_audit_selection"]["reasons_by_defect_id"]
+    if patch_payloads is None or not set(reasons) <= set(patch_payloads):
+        raise ValueError("patch payloads are required for every selected candidate")
     candidates = []
     for defect_id in sorted(reasons):
+        candidate = dict(candidate_by_id[defect_id])
+        patch_path = candidate.get("patch_path")
+        expected_patch_digest = candidate.get("patch_sha256")
+        if not isinstance(patch_path, str) or not patch_path:
+            raise ValueError(f"{defect_id} selected candidate requires patch_path")
+        if (
+            not isinstance(expected_patch_digest, str)
+            or len(expected_patch_digest) != 64
+            or any(
+                character not in "0123456789abcdef"
+                for character in expected_patch_digest
+            )
+        ):
+            raise ValueError(f"{defect_id} selected candidate requires patch_sha256")
+        patch_payload = patch_payloads[defect_id]
+        actual_patch_digest = hashlib.sha256(patch_payload).hexdigest()
+        if actual_patch_digest != expected_patch_digest:
+            raise ValueError(f"{defect_id} patch SHA-256 mismatch")
+        try:
+            candidate["patch_text"] = patch_payload.decode("utf-8")
+        except UnicodeDecodeError as error:
+            raise ValueError(f"{defect_id} patch must be UTF-8") from error
+        annotations = {}
+        for agent_id in AGENT_IDS:
+            annotation = entries[agent_id][defect_id].model_dump(mode="json")
+            if not annotation["operator_ids"]:
+                annotation.pop("operator_ids")
+            annotations[agent_id] = annotation
         candidates.append({
             "defect_id": defect_id,
-            "candidate": candidate_by_id[defect_id],
-            "annotations": {
-                agent_id: entries[agent_id][defect_id].model_dump(mode="json")
-                for agent_id in AGENT_IDS
-            },
+            "candidate": candidate,
+            "annotations": annotations,
             "selection_reasons": reasons[defect_id],
             "human_review": {
-                "decision": None,
-                "boundaries": [],
-                "rationale": "",
+                "reviewer_id": None,
+                "reviewed_at": None,
+                "evidence_considered": [],
+                "disposition": None,
+                "final_decision": None,
+                "final_exclusion_reason": "",
+                "final_boundaries": [],
+                "final_trigger": "",
+                "final_symptom": "",
+                "final_root_cause": "",
+                "final_impact": "",
+                "final_rationale": "",
             },
         })
     human_packet = {
         "schema_version": 1,
         "packet_sha256": agreement["packet_sha256"],
+        "source_submissions": {
+            agent_id: {
+                "sha256": raw_submission_digests[agent_id],
+                "provenance": submissions[agent_id]["agent_provenance"],
+                "completion": submissions[agent_id]["completion"],
+            }
+            for agent_id in AGENT_IDS
+        },
         "candidates": candidates,
     }
     return agreement, human_packet

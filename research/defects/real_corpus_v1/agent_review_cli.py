@@ -12,7 +12,10 @@ from typing import Any, Optional, Sequence
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from research.defects.real_corpus_v1.agent_review import build_review_artifacts
+from research.defects.real_corpus_v1.agent_review import (
+    analyze_agent_reviews,
+    build_review_artifacts,
+)
 
 
 def _json_bytes(payload: Any) -> bytes:
@@ -41,8 +44,41 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             "A2": json.loads(args.a2.read_text(encoding="utf-8")),
             "A3": json.loads(args.a3.read_text(encoding="utf-8")),
         }
+        analysis = analyze_agent_reviews(packet_bytes, packet, submissions)
+        candidates = {
+            candidate["defect_id"]: candidate
+            for candidate in packet.get("candidates", [])
+        }
+        packet_parent = args.packet.resolve().parent
+        patch_payloads = {}
+        for defect_id in analysis["human_audit_selection"][
+            "reasons_by_defect_id"
+        ]:
+            candidate = candidates[defect_id]
+            patch_path = candidate.get("patch_path")
+            if not isinstance(patch_path, str) or not patch_path:
+                raise ValueError(
+                    f"{defect_id} selected candidate requires patch_path"
+                )
+            resolved_patch = (packet_parent / patch_path).resolve()
+            try:
+                resolved_patch.relative_to(packet_parent)
+            except ValueError as error:
+                raise ValueError(
+                    f"{defect_id} patch_path escapes packet directory"
+                ) from error
+            patch_payloads[defect_id] = resolved_patch.read_bytes()
+        raw_submission_digests = {
+            "A1": hashlib.sha256(args.a1.read_bytes()).hexdigest(),
+            "A2": hashlib.sha256(args.a2.read_bytes()).hexdigest(),
+            "A3": hashlib.sha256(args.a3.read_bytes()).hexdigest(),
+        }
         agreement, human_packet = build_review_artifacts(
-            packet_bytes, packet, submissions
+            packet_bytes,
+            packet,
+            submissions,
+            raw_submission_digests=raw_submission_digests,
+            patch_payloads=patch_payloads,
         )
         artifacts = {
             "human_audit_packet.json": _json_bytes(human_packet),
