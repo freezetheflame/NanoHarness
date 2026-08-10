@@ -1153,6 +1153,8 @@ def test_agent_review_selects_union_with_reasons_and_is_order_independent(tmp_pa
         "is_private_data",
         "machine_hint",
         "candidate_selection_rank_note",
+        "hidden_selection_bucket",
+        "selection_metadata",
     ],
 )
 def test_agent_review_rejects_forbidden_human_packet_material(
@@ -1173,6 +1175,29 @@ def test_agent_review_rejects_forbidden_human_packet_material(
 
     with pytest.raises(ValueError, match="forbidden blind packet material"):
         build_review_artifacts(packet.read_bytes(), packet_payload, submissions)
+
+
+def test_agent_review_requires_true_raw_submission_digests(tmp_path):
+    from research.defects.real_corpus_v1.agent_review import build_review_artifacts
+
+    packet, paths, _, decisions = _agent_review_fixture(tmp_path)
+    packet_payload = json.loads(packet.read_text(encoding="utf-8"))
+    submissions = {
+        agent_id: json.loads(path.read_text(encoding="utf-8"))
+        for agent_id, path in paths.items()
+    }
+    patch_payloads = {
+        defect_id: (tmp_path / f"patches/{defect_id}.patch").read_bytes()
+        for defect_id in decisions
+    }
+
+    with pytest.raises(ValueError, match="raw submission digests are required"):
+        build_review_artifacts(
+            packet.read_bytes(),
+            packet_payload,
+            submissions,
+            patch_payloads=patch_payloads,
+        )
 
 
 def test_agent_review_cli_writes_deterministic_artifacts_and_checksums(tmp_path):

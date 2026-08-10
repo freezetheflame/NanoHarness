@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import hashlib
-import json
 import math
 from collections import Counter
 from itertools import combinations
@@ -21,7 +20,7 @@ FORBIDDEN_PACKET_KEY_FRAGMENTS = (
     "operator",
     "private",
     "machine",
-    "selection_rank",
+    "selection",
 )
 
 
@@ -330,17 +329,7 @@ def build_review_artifacts(
     agreement = analyze_agent_reviews(packet_bytes, packet, submissions)
     candidate_by_id, validated = _validate_inputs(packet_bytes, packet, submissions)
     if raw_submission_digests is None:
-        raw_submission_digests = {
-            agent_id: hashlib.sha256(
-                json.dumps(
-                    submissions[agent_id],
-                    sort_keys=True,
-                    ensure_ascii=False,
-                    separators=(",", ":"),
-                ).encode("utf-8")
-            ).hexdigest()
-            for agent_id in AGENT_IDS
-        }
+        raise ValueError("raw submission digests are required")
     if set(raw_submission_digests) != set(AGENT_IDS) or any(
         len(digest) != 64
         or any(character not in "0123456789abcdef" for character in digest)
