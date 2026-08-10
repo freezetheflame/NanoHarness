@@ -896,7 +896,7 @@ def _agent_review_fixture(tmp_path):
             "packet_sha256": packet_digest,
             "entries": entries,
             "completion": {
-                "completed_at": "2026-08-10T00:00:00+00:00",
+                "completed_at": "2026-08-10T00:00:00Z",
                 "independent": True,
                 "packet_sha256": packet_digest,
             },
@@ -907,7 +907,7 @@ def _agent_review_fixture(tmp_path):
                 "prompt_sha256": "b" * 64,
                 "input_sha256": packet_digest,
                 "artifact_revision": "abcdef1",
-                "started_at": "2026-08-10T00:00:00+00:00",
+                "started_at": "2026-08-10T00:00:00Z",
             },
         }
         path = tmp_path / f"{agent_id}.json"
@@ -916,17 +916,87 @@ def _agent_review_fixture(tmp_path):
     return packet, annotation_paths, candidates, decisions
 
 
+def _raw_agent_submissions(paths):
+    return {agent_id: path.read_bytes() for agent_id, path in paths.items()}
+
+
+def _agent_patch_payloads(tmp_path, decisions):
+    return {
+        defect_id: (tmp_path / f"patches/{defect_id}.patch").read_bytes()
+        for defect_id in decisions
+    }
+
+
+@pytest.mark.parametrize(
+    ("container", "extra_key"),
+    [
+        ("agent_provenance", "partition"),
+        ("completion", "operator_metadata"),
+    ],
+)
+def test_agent_review_rejects_unvalidated_source_submission_extras(
+    tmp_path,
+    container,
+    extra_key,
+):
+    from research.defects.real_corpus_v1.agent_review import build_review_artifacts
+
+    packet, paths, _, decisions = _agent_review_fixture(tmp_path)
+    raw_submissions = _raw_agent_submissions(paths)
+    tampered = json.loads(raw_submissions["A3"])
+    tampered[container][extra_key] = "must-not-leak"
+    raw_submissions["A3"] = json.dumps(tampered).encode("utf-8")
+
+    with pytest.raises(ValueError, match="unexpected field"):
+        build_review_artifacts(
+            packet.read_bytes(),
+            raw_submissions,
+            patch_payloads=_agent_patch_payloads(tmp_path, decisions),
+        )
+
+
+def test_agent_review_source_sha_is_bound_to_analyzed_raw_bytes(tmp_path):
+    from research.defects.real_corpus_v1.agent_review import build_review_artifacts
+
+    packet, paths, _, decisions = _agent_review_fixture(tmp_path)
+    raw_submissions = _raw_agent_submissions(paths)
+    raw_submissions["A2"] = b" \n" + raw_submissions["A2"] + b"\n"
+
+    _, human_packet = build_review_artifacts(
+        packet.read_bytes(),
+        raw_submissions,
+        patch_payloads=_agent_patch_payloads(tmp_path, decisions),
+    )
+
+    assert human_packet["source_submissions"]["A2"]["sha256"] == hashlib.sha256(
+        raw_submissions["A2"]
+    ).hexdigest()
+
+
+@pytest.mark.parametrize("field_name", ["boundaries", "evidence_ids"])
+def test_agent_review_rejects_duplicate_entry_multivalue_fields(
+    tmp_path,
+    field_name,
+):
+    from research.defects.real_corpus_v1.agent_review import analyze_agent_reviews
+
+    packet, paths, _, _ = _agent_review_fixture(tmp_path)
+    raw_submissions = _raw_agent_submissions(paths)
+    tampered = json.loads(raw_submissions["A1"])
+    tampered["entries"][0][field_name] *= 2
+    raw_submissions["A1"] = json.dumps(tampered).encode("utf-8")
+
+    with pytest.raises(ValueError, match=f"duplicate {field_name}"):
+        analyze_agent_reviews(packet.read_bytes(), raw_submissions)
+
+
 def test_agent_review_requires_exact_agents_and_reports_agreement(tmp_path):
     from research.defects.real_corpus_v1.agent_review import analyze_agent_reviews
 
     packet, paths, _, _ = _agent_review_fixture(tmp_path)
-    packet_payload = json.loads(packet.read_text(encoding="utf-8"))
-    submissions = {
-        agent_id: json.loads(path.read_text(encoding="utf-8"))
-        for agent_id, path in paths.items()
-    }
+    raw_submissions = _raw_agent_submissions(paths)
 
-    analysis = analyze_agent_reviews(packet.read_bytes(), packet_payload, submissions)
+    analysis = analyze_agent_reviews(packet.read_bytes(), raw_submissions)
 
     assert analysis["annotator_ids"] == ["A1", "A2", "A3"]
     assert analysis["pass_id"] == "pass_a"
@@ -975,8 +1045,7 @@ def test_agent_review_requires_exact_agents_and_reports_agreement(tmp_path):
     with pytest.raises(ValueError, match="exactly A1, A2, A3"):
         analyze_agent_reviews(
             packet.read_bytes(),
-            packet_payload,
-            {"A1": submissions["A1"], "A2": submissions["A2"]},
+            {"A1": raw_submissions["A1"], "A2": raw_submissions["A2"]},
         )
 
 
@@ -1026,9 +1095,13 @@ def test_agent_review_rejects_incomplete_or_inconsistent_formal_inputs(
         for agent_id, path in paths.items()
     }
     mutation(submissions["A3"])
+    raw_submissions = {
+        agent_id: json.dumps(submission).encode("utf-8")
+        for agent_id, submission in submissions.items()
+    }
 
     with pytest.raises(ValueError, match=message):
-        analyze_agent_reviews(packet.read_bytes(), packet_payload, submissions)
+        analyze_agent_reviews(packet.read_bytes(), raw_submissions)
 
 
 def test_agent_review_selects_union_with_reasons_and_is_order_independent(tmp_path):
@@ -1040,10 +1113,7 @@ def test_agent_review_selects_union_with_reasons_and_is_order_independent(tmp_pa
         agent_id: json.loads(path.read_text(encoding="utf-8"))
         for agent_id, path in paths.items()
     }
-    raw_digests = {
-        agent_id: hashlib.sha256(path.read_bytes()).hexdigest()
-        for agent_id, path in paths.items()
-    }
+    raw_submissions = _raw_agent_submissions(paths)
     patch_payloads = {
         defect_id: (tmp_path / f"patches/{defect_id}.patch").read_bytes()
         for defect_id in decisions
@@ -1051,24 +1121,25 @@ def test_agent_review_selects_union_with_reasons_and_is_order_independent(tmp_pa
 
     first = build_review_artifacts(
         packet.read_bytes(),
-        packet_payload,
-        submissions,
-        raw_submission_digests=raw_digests,
+        raw_submissions,
         patch_payloads=patch_payloads,
     )
     reversed_submissions = {
         agent_id: {**submission, "entries": list(reversed(submission["entries"]))}
         for agent_id, submission in reversed(list(submissions.items()))
     }
+    reversed_raw_submissions = {
+        agent_id: json.dumps(submission).encode("utf-8")
+        for agent_id, submission in reversed_submissions.items()
+    }
     second = build_review_artifacts(
         packet.read_bytes(),
-        {**packet_payload, "candidates": list(reversed(packet_payload["candidates"]))},
-        reversed_submissions,
-        raw_submission_digests=raw_digests,
+        reversed_raw_submissions,
         patch_payloads=patch_payloads,
     )
 
-    assert first == second
+    assert first[0] == second[0]
+    assert first[1]["candidates"] == second[1]["candidates"]
     agreement, human_packet = first
     selected = {item["defect_id"]: item for item in human_packet["candidates"]}
     assert {"D02", "D03", "D04", "D05"} < set(selected)
@@ -1137,7 +1208,7 @@ def test_agent_review_selects_union_with_reasons_and_is_order_independent(tmp_pa
     } for item in selected.values())
     assert human_packet["source_submissions"] == {
         agent_id: {
-            "sha256": raw_digests[agent_id],
+            "sha256": hashlib.sha256(raw_submissions[agent_id]).hexdigest(),
             "provenance": submissions[agent_id]["agent_provenance"],
             "completion": submissions[agent_id]["completion"],
         }
@@ -1173,30 +1244,11 @@ def test_agent_review_rejects_forbidden_human_packet_material(
         for agent_id, path in paths.items()
     }
 
+    forbidden_packet_bytes = json.dumps(packet_payload).encode("utf-8")
     with pytest.raises(ValueError, match="forbidden blind packet material"):
-        build_review_artifacts(packet.read_bytes(), packet_payload, submissions)
-
-
-def test_agent_review_requires_true_raw_submission_digests(tmp_path):
-    from research.defects.real_corpus_v1.agent_review import build_review_artifacts
-
-    packet, paths, _, decisions = _agent_review_fixture(tmp_path)
-    packet_payload = json.loads(packet.read_text(encoding="utf-8"))
-    submissions = {
-        agent_id: json.loads(path.read_text(encoding="utf-8"))
-        for agent_id, path in paths.items()
-    }
-    patch_payloads = {
-        defect_id: (tmp_path / f"patches/{defect_id}.patch").read_bytes()
-        for defect_id in decisions
-    }
-
-    with pytest.raises(ValueError, match="raw submission digests are required"):
         build_review_artifacts(
-            packet.read_bytes(),
-            packet_payload,
-            submissions,
-            patch_payloads=patch_payloads,
+            forbidden_packet_bytes,
+            _raw_agent_submissions(paths),
         )
 
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import math
 from collections import Counter
 from itertools import combinations
@@ -22,6 +23,16 @@ FORBIDDEN_PACKET_KEY_FRAGMENTS = (
     "machine",
     "selection",
 )
+PROVENANCE_FIELDS = {
+    "protocol_id",
+    "annotator_id",
+    "model_id",
+    "prompt_sha256",
+    "input_sha256",
+    "artifact_revision",
+    "started_at",
+}
+COMPLETION_FIELDS = {"completed_at", "independent", "packet_sha256"}
 
 
 def _unique_by_id(items: Sequence[Mapping[str, Any]], label: str) -> dict[str, Any]:
@@ -46,6 +57,42 @@ def _reject_forbidden_material(value: Any) -> None:
             _reject_forbidden_material(nested)
 
 
+def _parse_raw_inputs(
+    packet_bytes: bytes,
+    submission_bytes: Mapping[str, bytes],
+) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
+    if set(submission_bytes) != set(AGENT_IDS) or len(submission_bytes) != len(
+        AGENT_IDS
+    ):
+        raise ValueError("submissions must contain exactly A1, A2, A3")
+    packet = json.loads(packet_bytes)
+    if not isinstance(packet, dict):
+        raise ValueError("packet must be a JSON object")
+    submissions = {}
+    for agent_id in AGENT_IDS:
+        submission = json.loads(submission_bytes[agent_id])
+        if not isinstance(submission, dict):
+            raise ValueError(f"{agent_id} submission must be a JSON object")
+        submissions[agent_id] = submission
+    return packet, submissions
+
+
+def _reject_unexpected_source_fields(
+    agent_id: str,
+    submission: Mapping[str, Any],
+) -> None:
+    for container, allowed in (
+        ("agent_provenance", PROVENANCE_FIELDS),
+        ("completion", COMPLETION_FIELDS),
+    ):
+        value = submission.get(container)
+        if isinstance(value, Mapping):
+            extras = set(value) - allowed
+            if extras:
+                raise ValueError(
+                    f"{agent_id} {container} has unexpected field: "
+                    f"{sorted(extras)[0]}"
+                )
 def _validate_inputs(
     packet_bytes: bytes,
     packet: Mapping[str, Any],
@@ -63,6 +110,7 @@ def _validate_inputs(
 
     validated: dict[str, DefectCodingSubmission] = {}
     for agent_id in AGENT_IDS:
+        _reject_unexpected_source_fields(agent_id, submissions[agent_id])
         submission = DefectCodingSubmission.model_validate(submissions[agent_id])
         if submission.coder_id != agent_id:
             raise ValueError(f"{agent_id} submission coder ID mismatch")
@@ -80,6 +128,10 @@ def _validate_inputs(
         if entry_ids != packet_ids:
             raise ValueError("submission IDs must exactly match packet IDs")
         for entry in submission.entries:
+            if len(entry.boundaries) != len(set(entry.boundaries)):
+                raise ValueError(f"{entry.defect_id} has duplicate boundaries")
+            if len(entry.evidence_ids) != len(set(entry.evidence_ids)):
+                raise ValueError(f"{entry.defect_id} has duplicate evidence_ids")
             candidate_evidence_ids = {
                 evidence["evidence_id"]
                 for evidence in candidate_by_id[entry.defect_id].get("evidence", [])
@@ -203,7 +255,7 @@ def _selection_reasons(
     return {defect_id: reasons[defect_id] for defect_id in sorted(reasons)}
 
 
-def analyze_agent_reviews(
+def _analyze_parsed_reviews(
     packet_bytes: bytes,
     packet: Mapping[str, Any],
     submissions: Mapping[str, Mapping[str, Any]],
@@ -316,26 +368,31 @@ def analyze_agent_reviews(
     }
 
 
+def analyze_agent_reviews(
+    packet_bytes: bytes,
+    submission_bytes: Mapping[str, bytes],
+) -> dict[str, Any]:
+    """Parse, validate, and analyze one immutable raw-input snapshot."""
+
+    packet, submissions = _parse_raw_inputs(packet_bytes, submission_bytes)
+    return _analyze_parsed_reviews(packet_bytes, packet, submissions)
+
+
 def build_review_artifacts(
     packet_bytes: bytes,
-    packet: Mapping[str, Any],
-    submissions: Mapping[str, Mapping[str, Any]],
+    submission_bytes: Mapping[str, bytes],
     *,
-    raw_submission_digests: Mapping[str, str] | None = None,
     patch_payloads: Mapping[str, bytes] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """Return the agreement report and selected, partition-blind human packet."""
 
-    agreement = analyze_agent_reviews(packet_bytes, packet, submissions)
+    packet, submissions = _parse_raw_inputs(packet_bytes, submission_bytes)
+    agreement = _analyze_parsed_reviews(packet_bytes, packet, submissions)
     candidate_by_id, validated = _validate_inputs(packet_bytes, packet, submissions)
-    if raw_submission_digests is None:
-        raise ValueError("raw submission digests are required")
-    if set(raw_submission_digests) != set(AGENT_IDS) or any(
-        len(digest) != 64
-        or any(character not in "0123456789abcdef" for character in digest)
-        for digest in raw_submission_digests.values()
-    ):
-        raise ValueError("raw submission digests must cover exactly A1, A2, A3")
+    raw_submission_digests = {
+        agent_id: hashlib.sha256(submission_bytes[agent_id]).hexdigest()
+        for agent_id in AGENT_IDS
+    }
     entries = _entry_maps(validated)
     reasons = agreement["human_audit_selection"]["reasons_by_defect_id"]
     if patch_payloads is None or not set(reasons) <= set(patch_payloads):
@@ -396,8 +453,10 @@ def build_review_artifacts(
         "source_submissions": {
             agent_id: {
                 "sha256": raw_submission_digests[agent_id],
-                "provenance": submissions[agent_id]["agent_provenance"],
-                "completion": submissions[agent_id]["completion"],
+                "provenance": validated[agent_id].agent_provenance.model_dump(
+                    mode="json"
+                ),
+                "completion": validated[agent_id].completion.model_dump(mode="json"),
             }
             for agent_id in AGENT_IDS
         },

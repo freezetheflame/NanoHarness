@@ -39,12 +39,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             raise ValueError("output directory must not already exist")
         packet_bytes = args.packet.read_bytes()
         packet = json.loads(packet_bytes)
-        submissions = {
-            "A1": json.loads(args.a1.read_text(encoding="utf-8")),
-            "A2": json.loads(args.a2.read_text(encoding="utf-8")),
-            "A3": json.loads(args.a3.read_text(encoding="utf-8")),
+        submission_bytes = {
+            "A1": args.a1.read_bytes(),
+            "A2": args.a2.read_bytes(),
+            "A3": args.a3.read_bytes(),
         }
-        analysis = analyze_agent_reviews(packet_bytes, packet, submissions)
+        analysis = analyze_agent_reviews(packet_bytes, submission_bytes)
         candidates = {
             candidate["defect_id"]: candidate
             for candidate in packet.get("candidates", [])
@@ -68,16 +68,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     f"{defect_id} patch_path escapes packet directory"
                 ) from error
             patch_payloads[defect_id] = resolved_patch.read_bytes()
-        raw_submission_digests = {
-            "A1": hashlib.sha256(args.a1.read_bytes()).hexdigest(),
-            "A2": hashlib.sha256(args.a2.read_bytes()).hexdigest(),
-            "A3": hashlib.sha256(args.a3.read_bytes()).hexdigest(),
-        }
         agreement, human_packet = build_review_artifacts(
             packet_bytes,
-            packet,
-            submissions,
-            raw_submission_digests=raw_submission_digests,
+            submission_bytes,
             patch_payloads=patch_payloads,
         )
         artifacts = {
