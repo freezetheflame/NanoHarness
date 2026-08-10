@@ -2,7 +2,9 @@ import hashlib
 import json
 import os
 import subprocess
+import sys
 from collections import Counter
+from datetime import datetime, timezone
 
 import pytest
 
@@ -820,3 +822,330 @@ def test_human_package_is_deterministic_and_rejects_forbidden_material(tmp_path)
 
     with pytest.raises(ValueError, match="forbidden blind-coding material"):
         build_package({"private/machine_precode.json": packet}, tmp_path / "bad.zip", metadata=metadata)
+
+
+def _agent_review_fixture(tmp_path):
+    decisions = {
+        "D01": ("include", "include", "include"),
+        "D02": ("include", "include", "exclude"),
+        "D03": ("include", "exclude", "uncertain"),
+        "D04": ("uncertain", "uncertain", "uncertain"),
+        "D05": ("include", "include", "include"),
+        "D06": ("exclude", "exclude", "exclude"),
+        "D07": ("include", "include", "include"),
+        "D08": ("exclude", "exclude", "exclude"),
+        "D09": ("include", "include", "include"),
+        "D10": ("exclude", "exclude", "exclude"),
+    }
+    candidates = [
+        {
+            "defect_id": defect_id,
+            "title": f"Candidate {defect_id}",
+            "repository": "owner/runtime",
+            "canonical_locator": f"https://example.test/{defect_id}",
+            "patch_path": f"patches/{defect_id}.patch",
+            "patch_sha256": hashlib.sha256(defect_id.encode()).hexdigest(),
+            "evidence": [{
+                "evidence_id": f"{defect_id}-fix",
+                "kind": "fixing_change",
+                "locator": f"https://example.test/{defect_id}/fix",
+            }],
+        }
+        for defect_id in decisions
+    ]
+    packet = tmp_path / "packet.json"
+    packet.write_text(
+        json.dumps({"schema_version": 1, "candidates": candidates}, sort_keys=True),
+        encoding="utf-8",
+    )
+    packet_digest = hashlib.sha256(packet.read_bytes()).hexdigest()
+    annotation_paths = {}
+    for agent_index, agent_id in enumerate(("A1", "A2", "A3")):
+        entries = []
+        for defect_id, agent_decisions in decisions.items():
+            decision = agent_decisions[agent_index]
+            boundaries = []
+            if decision == "include":
+                boundaries = [
+                    "context" if defect_id == "D09" else "tool"
+                ]
+            if defect_id == "D05" and agent_id == "A3":
+                boundaries = ["context"]
+            entries.append({
+                "defect_id": defect_id,
+                "decision": decision,
+                "exclusion_reason": "not in scope" if decision == "exclude" else "",
+                "boundaries": boundaries,
+                "operator_ids": [],
+                "trigger": "trigger",
+                "symptom": "symptom",
+                "root_cause": "root cause",
+                "impact": "impact",
+                "evidence_ids": [f"{defect_id}-fix"],
+                "rationale": f"{agent_id} reviewed {defect_id}",
+            })
+        submission = {
+            "schema_version": 1,
+            "corpus_id": "agent-real-defects-v1",
+            "pass_id": "pass_a",
+            "coder_id": agent_id,
+            "manual_version": "2.0",
+            "packet_sha256": packet_digest,
+            "entries": entries,
+            "completion": None,
+            "agent_provenance": {
+                "protocol_id": "agent-review-v1",
+                "annotator_id": agent_id,
+                "model_id": "gpt-test",
+                "prompt_sha256": "b" * 64,
+                "input_sha256": packet_digest,
+                "artifact_revision": f"{agent_index + 1}" * 7,
+                "started_at": datetime.now(timezone.utc).isoformat(),
+            },
+        }
+        path = tmp_path / f"{agent_id}.json"
+        path.write_text(json.dumps(submission), encoding="utf-8")
+        annotation_paths[agent_id] = path
+    return packet, annotation_paths, candidates, decisions
+
+
+def test_agent_review_requires_exact_agents_and_reports_agreement(tmp_path):
+    from research.defects.real_corpus_v1.agent_review import analyze_agent_reviews
+
+    packet, paths, _, _ = _agent_review_fixture(tmp_path)
+    packet_payload = json.loads(packet.read_text(encoding="utf-8"))
+    submissions = {
+        agent_id: json.loads(path.read_text(encoding="utf-8"))
+        for agent_id, path in paths.items()
+    }
+
+    analysis = analyze_agent_reviews(packet.read_bytes(), packet_payload, submissions)
+
+    assert analysis["annotator_ids"] == ["A1", "A2", "A3"]
+    assert analysis["pass_id"] == "pass_a"
+    assert analysis["sample_size"] == 10
+    assert analysis["decision_agreement"]["fleiss_kappa"] == pytest.approx(
+        0.7211895911
+    )
+    assert analysis["decision_agreement"]["pairwise_cohen_kappa"] == pytest.approx({
+        "A1:A2": 0.8245614035,
+        "A1:A3": 0.6774193548,
+        "A2:A3": 0.6774193548,
+    })
+    assert analysis["decision_agreement"]["counts"] == {
+        "unanimous": 8,
+        "two_to_one": 1,
+        "three_way": 1,
+        "any_uncertain": 2,
+    }
+    assert analysis["boundary_agreement"]["common_include_denominator"] == 4
+    assert analysis["boundary_agreement"]["pairwise_mean_jaccard"] == pytest.approx({
+        "A1:A2": 1.0,
+        "A1:A3": 0.75,
+        "A2:A3": 0.75,
+    })
+    assert analysis["boundary_agreement"]["mean_pairwise_jaccard"] == pytest.approx(
+        5 / 6
+    )
+
+    with pytest.raises(ValueError, match="exactly A1, A2, A3"):
+        analyze_agent_reviews(
+            packet.read_bytes(),
+            packet_payload,
+            {"A1": submissions["A1"], "A2": submissions["A2"]},
+        )
+
+
+def test_agent_review_selects_union_with_reasons_and_is_order_independent(tmp_path):
+    from research.defects.real_corpus_v1.agent_review import build_review_artifacts
+
+    packet, paths, _, _ = _agent_review_fixture(tmp_path)
+    packet_payload = json.loads(packet.read_text(encoding="utf-8"))
+    submissions = {
+        agent_id: json.loads(path.read_text(encoding="utf-8"))
+        for agent_id, path in paths.items()
+    }
+
+    first = build_review_artifacts(packet.read_bytes(), packet_payload, submissions)
+    reversed_submissions = {
+        agent_id: {**submission, "entries": list(reversed(submission["entries"]))}
+        for agent_id, submission in reversed(list(submissions.items()))
+    }
+    second = build_review_artifacts(
+        packet.read_bytes(),
+        {**packet_payload, "candidates": list(reversed(packet_payload["candidates"]))},
+        reversed_submissions,
+    )
+
+    assert first == second
+    agreement, human_packet = first
+    selected = {item["defect_id"]: item for item in human_packet["candidates"]}
+    assert {"D02", "D03", "D04", "D05"} < set(selected)
+    assert len(selected) == 5
+    assert agreement["human_audit_selection"]["selected_count"] == 5
+    assert agreement["human_audit_selection"]["reasons_by_defect_id"]["D02"] == [
+        "decision_disagreement",
+        "boundary_disagreement",
+    ]
+    assert "any_uncertain" in agreement["human_audit_selection"][
+        "reasons_by_defect_id"
+    ]["D03"]
+    assert agreement["human_audit_selection"]["reasons_by_defect_id"]["D04"] == [
+        "any_uncertain"
+    ]
+    assert agreement["human_audit_selection"]["reasons_by_defect_id"]["D05"] == [
+        "boundary_disagreement"
+    ]
+    random_ids = [
+        defect_id
+        for defect_id, reasons in agreement["human_audit_selection"][
+            "reasons_by_defect_id"
+        ].items()
+        if reasons == ["deterministic_consistency_audit"]
+    ]
+    expected_random = min(
+        {"D01", "D06", "D07", "D08", "D09", "D10"},
+        key=lambda defect_id: hashlib.sha256(
+            f"agent-defect-human-audit-v1|{defect_id}".encode()
+        ).hexdigest(),
+    )
+    assert random_ids == [expected_random]
+    serialized = json.dumps(human_packet)
+    for forbidden in ("partition", "operator_catalog", "machine_precode", "private"):
+        assert forbidden not in serialized
+    assert all(set(item) == {
+        "defect_id", "candidate", "annotations", "selection_reasons", "human_review"
+    } for item in human_packet["candidates"])
+    assert all(list(item["annotations"]) == ["A1", "A2", "A3"] for item in selected.values())
+    assert all(item["human_review"] == {
+        "decision": None,
+        "boundaries": [],
+        "rationale": "",
+    } for item in selected.values())
+
+
+@pytest.mark.parametrize("forbidden_key", ["partition", "operator_catalog", "private"])
+def test_agent_review_rejects_forbidden_human_packet_material(
+    tmp_path,
+    forbidden_key,
+):
+    from research.defects.real_corpus_v1.agent_review import build_review_artifacts
+
+    packet, paths, _, _ = _agent_review_fixture(tmp_path)
+    packet_payload = json.loads(packet.read_text(encoding="utf-8"))
+    packet_payload["candidates"][0][forbidden_key] = "must-not-leak"
+    submissions = {
+        agent_id: json.loads(path.read_text(encoding="utf-8"))
+        for agent_id, path in paths.items()
+    }
+
+    with pytest.raises(ValueError, match="forbidden blind packet material"):
+        build_review_artifacts(packet.read_bytes(), packet_payload, submissions)
+
+
+def test_agent_review_cli_writes_deterministic_artifacts_and_checksums(tmp_path):
+    packet, paths, _, _ = _agent_review_fixture(tmp_path)
+    script = (
+        __import__("pathlib").Path(__file__).parents[1]
+        / "research" / "defects" / "real_corpus_v1" / "agent_review_cli.py"
+    )
+
+    outputs = []
+    for name in ("first", "second"):
+        output = tmp_path / name
+        completed = subprocess.run([
+            sys.executable,
+            str(script),
+            "--packet", str(packet),
+            "--a1", str(paths["A1"]),
+            "--a2", str(paths["A2"]),
+            "--a3", str(paths["A3"]),
+            "--output", str(output),
+        ], text=True, capture_output=True)
+        assert completed.returncode == 0, completed.stderr
+        outputs.append(output)
+
+    expected_names = {
+        "pass_a_agreement.json", "human_audit_packet.json", "SHA256SUMS"
+    }
+    assert {path.name for path in outputs[0].iterdir()} == expected_names
+    assert all(
+        (outputs[0] / name).read_bytes() == (outputs[1] / name).read_bytes()
+        for name in expected_names
+    )
+    checksum_lines = (outputs[0] / "SHA256SUMS").read_text().splitlines()
+    assert checksum_lines == [
+        f"{hashlib.sha256((outputs[0] / name).read_bytes()).hexdigest()}  {name}"
+        for name in ("human_audit_packet.json", "pass_a_agreement.json")
+    ]
+
+
+@pytest.mark.parametrize(
+    ("field_name", "invalid_value", "provenance_field"),
+    [
+        ("manual_version", "3.0", False),
+        ("protocol_id", "agent-review-v2", True),
+        ("model_id", "different-model", True),
+        ("prompt_sha256", "C" * 64, True),
+    ],
+)
+def test_agent_review_cli_rejects_invalid_inputs_before_writing(
+    tmp_path,
+    field_name,
+    invalid_value,
+    provenance_field,
+):
+    packet, paths, _, _ = _agent_review_fixture(tmp_path)
+    script = (
+        __import__("pathlib").Path(__file__).parents[1]
+        / "research" / "defects" / "real_corpus_v1" / "agent_review_cli.py"
+    )
+    invalid = json.loads(paths["A3"].read_text(encoding="utf-8"))
+    target = invalid["agent_provenance"] if provenance_field else invalid
+    target[field_name] = invalid_value
+    invalid_path = tmp_path / "invalid-a3.json"
+    invalid_path.write_text(json.dumps(invalid), encoding="utf-8")
+    output = tmp_path / "invalid-output"
+
+    completed = subprocess.run([
+        sys.executable, str(script),
+        "--packet", str(packet), "--a1", str(paths["A1"]),
+        "--a2", str(paths["A2"]), "--a3", str(invalid_path),
+        "--output", str(output),
+    ], text=True, capture_output=True)
+
+    assert completed.returncode != 0
+    assert not output.exists()
+
+    existing = tmp_path / "existing"
+    existing.mkdir()
+    completed = subprocess.run([
+        sys.executable, str(script),
+        "--packet", str(packet), "--a1", str(paths["A1"]),
+        "--a2", str(paths["A2"]), "--a3", str(paths["A3"]),
+        "--output", str(existing),
+    ], text=True, capture_output=True)
+    assert completed.returncode != 0
+
+
+def test_agent_review_cli_rejects_mismatched_input_id_set(tmp_path):
+    packet, paths, _, _ = _agent_review_fixture(tmp_path)
+    script = (
+        __import__("pathlib").Path(__file__).parents[1]
+        / "research" / "defects" / "real_corpus_v1" / "agent_review_cli.py"
+    )
+    mismatched = json.loads(paths["A3"].read_text(encoding="utf-8"))
+    mismatched["entries"].pop()
+    mismatched_path = tmp_path / "mismatched-a3.json"
+    mismatched_path.write_text(json.dumps(mismatched), encoding="utf-8")
+    output = tmp_path / "mismatched-output"
+
+    completed = subprocess.run([
+        sys.executable, str(script),
+        "--packet", str(packet), "--a1", str(paths["A1"]),
+        "--a2", str(paths["A2"]), "--a3", str(mismatched_path),
+        "--output", str(output),
+    ], text=True, capture_output=True)
+
+    assert completed.returncode != 0
+    assert not output.exists()
