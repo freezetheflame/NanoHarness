@@ -413,6 +413,7 @@ def test_build_packets_creates_three_structurally_identical_agent_templates(
 
 def test_agent_review_protocol_freezes_identical_dispatch_prompt_and_provenance():
     import hashlib
+    import subprocess
     from datetime import datetime
 
     root = (
@@ -478,11 +479,47 @@ def test_agent_review_protocol_freezes_identical_dispatch_prompt_and_provenance(
         },
     }
     assert protocol["input_revisions"]["packet"]["sha256"] == protocol["packet_sha256"]
-    assert protocol["input_revisions"]["manual"]["version"] == "2.0"
-    assert (
-        protocol["input_revisions"]["manual"]["paper_revision"]
-        == provenance["paper_revision"]
+    paper_revision = provenance["paper_revision"]
+    manual_revision = protocol["input_revisions"]["manual"]
+    assert manual_revision == {
+        "version": "2.0",
+        "paper_revision": paper_revision,
+        "path": "experiments/design/DEFECT_CODING_MANUAL.md",
+        "sha256": (
+            "8d08350e8630dc1eb1bd35b5d572499b8c9f3800e757657010858409b509132a"
+        ),
+        "instructions_path": (
+            "experiments/defects/real-corpus-v1/AGENT_ANNOTATOR_INSTRUCTIONS.md"
+        ),
+        "instructions_sha256": (
+            "6ede37faf1ff01f81ba1c5e6adc4b63b988c50e1854fe9d6cefdbaa8fcef62e7"
+        ),
+    }
+    workspace_root = next(
+        parent
+        for parent in __import__("pathlib").Path(__file__).resolve().parents
+        if (parent / "AgentMutationTestingPaper").is_dir()
     )
+    paper_root = workspace_root / "AgentMutationTestingPaper"
+    for path_field, digest_field in (
+        ("path", "sha256"),
+        ("instructions_path", "instructions_sha256"),
+    ):
+        revision_bytes = subprocess.run(
+            [
+                "git",
+                "-C",
+                paper_root,
+                "show",
+                f"{paper_revision}:{manual_revision[path_field]}",
+            ],
+            check=True,
+            stdout=subprocess.PIPE,
+        ).stdout
+        assert (
+            hashlib.sha256(revision_bytes).hexdigest()
+            == manual_revision[digest_field]
+        )
     assert protocol["input_revisions"]["protocol"] == {
         "protocol_id": "agent-review-v1",
         "schema_version": 1,

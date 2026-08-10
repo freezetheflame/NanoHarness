@@ -57,8 +57,10 @@
   "input_revisions": {
     "manual": {
       "instructions_path": "experiments/defects/real-corpus-v1/AGENT_ANNOTATOR_INSTRUCTIONS.md",
+      "instructions_sha256": "6ede37faf1ff01f81ba1c5e6adc4b63b988c50e1854fe9d6cefdbaa8fcef62e7",
       "paper_revision": "91674e63aab0cf9da599ae52f341cf99004ddd4a",
       "path": "experiments/design/DEFECT_CODING_MANUAL.md",
+      "sha256": "8d08350e8630dc1eb1bd35b5d572499b8c9f3800e757657010858409b509132a",
       "version": "2.0"
     },
     "packet": {
