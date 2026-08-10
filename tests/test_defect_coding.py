@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 import pytest
 from pydantic import ValidationError
 
+import nanoharness.testing as nh_testing
 from nanoharness.testing import (
     AnnotationDecision,
     CoderCompletionDeclaration,
@@ -38,6 +39,20 @@ def _completion(**changes):
     }
     values.update(changes)
     return CoderCompletionDeclaration(**values)
+
+
+def _agent_provenance(**changes):
+    values = {
+        "protocol_id": "agent-review-v1",
+        "annotator_id": "A1",
+        "model_id": "gpt-5",
+        "prompt_sha256": "b" * 64,
+        "input_sha256": PACKET_DIGEST,
+        "artifact_revision": "7a76952",
+        "started_at": datetime.now(timezone.utc),
+    }
+    values.update(changes)
+    return nh_testing.AgentAnnotationProvenance(**values)
 
 
 def test_pass_a_rejects_operator_labels():
@@ -123,6 +138,65 @@ def test_valid_pass_a_round_trips():
     assert restored == submission
 
 
+def test_agent_provenance_round_trips_with_submission():
+    submission = DefectCodingSubmission(
+        corpus_id="agent-defects-v1",
+        pass_id=CodingPass.PASS_A,
+        coder_id="A1",
+        manual_version="1.0",
+        packet_sha256=PACKET_DIGEST,
+        entries=[_entry()],
+        agent_provenance=_agent_provenance(),
+    )
+
+    restored = DefectCodingSubmission.model_validate_json(
+        submission.model_dump_json()
+    )
+
+    assert restored == submission
+    assert restored.agent_provenance.protocol_id == "agent-review-v1"
+
+
+@pytest.mark.parametrize(
+    ("changes", "field_name"),
+    [
+        ({"protocol_id": ""}, "protocol_id"),
+        ({"annotator_id": "H1"}, "annotator_id"),
+        ({"model_id": ""}, "model_id"),
+        ({"prompt_sha256": "A" * 64}, "prompt_sha256"),
+        ({"input_sha256": "a" * 63}, "input_sha256"),
+        ({"artifact_revision": "abcdef"}, "artifact_revision"),
+        ({"started_at": datetime.now()}, "started_at"),
+    ],
+)
+def test_agent_provenance_rejects_invalid_fields(changes, field_name):
+    with pytest.raises(ValidationError, match=field_name):
+        _agent_provenance(**changes)
+
+
+@pytest.mark.parametrize(
+    ("provenance_changes", "message"),
+    [
+        ({"annotator_id": "A2"}, "annotator ID must match coder ID"),
+        ({"input_sha256": "c" * 64}, "input digest must match packet digest"),
+    ],
+)
+def test_submission_rejects_mismatched_agent_provenance(
+    provenance_changes,
+    message,
+):
+    with pytest.raises(ValidationError, match=message):
+        DefectCodingSubmission(
+            corpus_id="agent-defects-v1",
+            pass_id=CodingPass.PASS_A,
+            coder_id="A1",
+            manual_version="1.0",
+            packet_sha256=PACKET_DIGEST,
+            entries=[_entry()],
+            agent_provenance=_agent_provenance(**provenance_changes),
+        )
+
+
 def test_coding_cli_accepts_complete_digest_bound_submission(tmp_path, capsys):
     packet = tmp_path / "evidence_packet.json"
     packet.write_text(
@@ -189,3 +263,97 @@ def test_coding_cli_rejects_missing_candidate_and_wrong_digest(tmp_path, capsys)
         "submission IDs do not exactly match packet IDs",
         "completion declaration is required",
     ]
+
+
+def test_coding_cli_requires_agent_provenance_when_requested(tmp_path, capsys):
+    packet = tmp_path / "evidence_packet.json"
+    packet.write_text(
+        json.dumps({"candidates": [{"defect_id": "LG-1"}]}) + "\n",
+        encoding="utf-8",
+    )
+    digest = __import__("hashlib").sha256(packet.read_bytes()).hexdigest()
+    submission = DefectCodingSubmission(
+        corpus_id="agent-defects-v1",
+        pass_id=CodingPass.PASS_A,
+        coder_id="A1",
+        manual_version="1.0",
+        packet_sha256=digest,
+        entries=[_entry()],
+    )
+    submission_path = tmp_path / "pass_a.json"
+    submission_path.write_text(submission.model_dump_json(), encoding="utf-8")
+
+    exit_code = coding_cli_main([
+        str(packet),
+        str(submission_path),
+        "--require-agent-provenance",
+    ])
+    output = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 1
+    assert output["errors"] == ["agent provenance is required"]
+
+
+def test_coding_cli_rejects_wrong_agent_protocol(tmp_path, capsys):
+    packet = tmp_path / "evidence_packet.json"
+    packet.write_text(
+        json.dumps({"candidates": [{"defect_id": "LG-1"}]}) + "\n",
+        encoding="utf-8",
+    )
+    digest = __import__("hashlib").sha256(packet.read_bytes()).hexdigest()
+    submission = DefectCodingSubmission(
+        corpus_id="agent-defects-v1",
+        pass_id=CodingPass.PASS_A,
+        coder_id="A1",
+        manual_version="1.0",
+        packet_sha256=digest,
+        entries=[_entry()],
+        agent_provenance=_agent_provenance(
+            protocol_id="agent-review-v2",
+            input_sha256=digest,
+        ),
+    )
+    submission_path = tmp_path / "pass_a.json"
+    submission_path.write_text(submission.model_dump_json(), encoding="utf-8")
+
+    exit_code = coding_cli_main([
+        str(packet),
+        str(submission_path),
+        "--require-agent-provenance",
+    ])
+    output = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 1
+    assert output["errors"] == [
+        "agent provenance protocol must be agent-review-v1"
+    ]
+
+
+def test_coding_cli_accepts_required_agent_provenance(tmp_path, capsys):
+    packet = tmp_path / "evidence_packet.json"
+    packet.write_text(
+        json.dumps({"candidates": [{"defect_id": "LG-1"}]}) + "\n",
+        encoding="utf-8",
+    )
+    digest = __import__("hashlib").sha256(packet.read_bytes()).hexdigest()
+    submission = DefectCodingSubmission(
+        corpus_id="agent-defects-v1",
+        pass_id=CodingPass.PASS_A,
+        coder_id="A1",
+        manual_version="1.0",
+        packet_sha256=digest,
+        entries=[_entry()],
+        agent_provenance=_agent_provenance(input_sha256=digest),
+    )
+    submission_path = tmp_path / "pass_a.json"
+    submission_path.write_text(submission.model_dump_json(), encoding="utf-8")
+
+    exit_code = coding_cli_main([
+        str(packet),
+        str(submission_path),
+        "--require-agent-provenance",
+    ])
+    output = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 0
+    assert output == {"errors": [], "valid": True}

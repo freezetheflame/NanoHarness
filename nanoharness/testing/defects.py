@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections import Counter
 from datetime import date, datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Literal, Optional, Sequence
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -87,6 +87,24 @@ class CoderCompletionDeclaration(BaseModel):
         return self
 
 
+class AgentAnnotationProvenance(BaseModel):
+    """Reproducible identity and input record for an agent annotation."""
+
+    protocol_id: str = Field(min_length=1)
+    annotator_id: Literal["A1", "A2", "A3"]
+    model_id: str = Field(min_length=1)
+    prompt_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    input_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_revision: str = Field(min_length=7)
+    started_at: datetime
+
+    @model_validator(mode="after")
+    def require_started_at_timezone(self):
+        if self.started_at.utcoffset() is None:
+            raise ValueError("started_at must include a timezone offset")
+        return self
+
+
 class DefectCodingEntry(BaseModel):
     """One independent human judgment in a blind coding submission."""
 
@@ -114,6 +132,7 @@ class DefectCodingSubmission(BaseModel):
     packet_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     entries: List[DefectCodingEntry]
     completion: Optional[CoderCompletionDeclaration] = None
+    agent_provenance: Optional[AgentAnnotationProvenance] = None
 
     @model_validator(mode="after")
     def validate_pass(self):
@@ -133,6 +152,13 @@ class DefectCodingSubmission(BaseModel):
             and self.completion.packet_sha256 != self.packet_sha256
         ):
             raise ValueError("completion packet digest must match submission")
+        if self.agent_provenance is not None:
+            if self.agent_provenance.annotator_id != self.coder_id:
+                raise ValueError("agent provenance annotator ID must match coder ID")
+            if self.agent_provenance.input_sha256 != self.packet_sha256:
+                raise ValueError(
+                    "agent provenance input digest must match packet digest"
+                )
         return self
 
 

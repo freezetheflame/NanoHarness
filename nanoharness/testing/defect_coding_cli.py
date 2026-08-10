@@ -16,6 +16,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("packet", type=Path)
     parser.add_argument("submission", type=Path)
     parser.add_argument("--require-complete", action="store_true")
+    parser.add_argument("--require-agent-provenance", action="store_true")
     return parser
 
 
@@ -38,6 +39,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         errors.append("submission IDs do not exactly match packet IDs")
     if args.require_complete and submission.completion is None:
         errors.append("completion declaration is required")
+    if args.require_agent_provenance:
+        if submission.agent_provenance is None:
+            errors.append("agent provenance is required")
+        elif submission.agent_provenance.protocol_id != "agent-review-v1":
+            errors.append("agent provenance protocol must be agent-review-v1")
     print(json.dumps({"valid": not errors, "errors": errors}, indent=2, sort_keys=True))
     return 0 if not errors else 1
 

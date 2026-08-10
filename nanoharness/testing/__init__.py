@@ -86,6 +86,7 @@ from nanoharness.testing.faults import (
 from nanoharness.testing.defects import (
     DEFECT_CORPUS_SCHEMA_VERSION,
     AgreementSummary,
+    AgentAnnotationProvenance,
     AnnotationDecision,
     CoderCompletionDeclaration,
     CodingPass,
@@ -310,6 +311,7 @@ __all__ = [
     "InjectedFaultError",
     "DEFECT_CORPUS_SCHEMA_VERSION",
     "AgreementSummary",
+    "AgentAnnotationProvenance",
     "AnnotationDecision",
     "CoderCompletionDeclaration",
     "CodingPass",
