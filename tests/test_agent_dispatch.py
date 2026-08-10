@@ -442,6 +442,27 @@ def test_preflight_rejects_dirty_tracked_files(frozen_dispatch):
         manifest.write_bytes(original)
 
 
+def test_retained_dispatch_binding_preflights_all_assignments():
+    from research.defects.real_corpus_v1.agent_dispatch import preflight_dispatch
+
+    repo = Path(__file__).parents[1]
+    formal = repo / "research/defects/real_corpus_v1/formal/agent-review-v1"
+    binding = formal / "DISPATCH_BINDING.json"
+    payload = json.loads(binding.read_text(encoding="utf-8"))
+    for suffix, assignment in payload["canonical_task_mapping"].items():
+        result = preflight_dispatch(
+            binding_path=binding,
+            task_name=f"/root/{suffix}",
+            expected_annotator=assignment["annotator_id"],
+            expected_template=assignment["template"],
+            expected_output=assignment["output"],
+            phase="start",
+        )
+        assert result["freeze_payload_revision"] == (
+            "0dfaae11c7a35a15d24c711d8888b21a30c7679b"
+        )
+
+
 def test_frozen_submission_validation_accepts_exact_bound_submission(
     frozen_dispatch,
 ):
