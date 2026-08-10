@@ -70,6 +70,8 @@ def frozen_dispatch(tmp_path_factory):
         attributes,
         corpus / "agent_dispatch.py",
         corpus / "agent_dispatch_cli.py",
+        corpus / "agent_review.py",
+        corpus / "agent_review_cli.py",
     ]
     for path in tooling_paths:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -79,14 +81,6 @@ def frozen_dispatch(tmp_path_factory):
     prompt.write_text("identical prompt\n", encoding="utf-8", newline="\n")
     packet = corpus / "evidence_packet.json"
     defect_ids = [f"D{index:03d}" for index in range(1, 78)]
-    candidates = [
-        {
-            "defect_id": defect_id,
-            "evidence": [{"evidence_id": f"{defect_id}-fix"}],
-        }
-        for defect_id in defect_ids
-    ]
-    _write_json(packet, {"candidates": candidates})
     patch_paths = {}
     for defect_id in defect_ids:
         path = corpus / f"patches/{defect_id}.patch"
@@ -95,6 +89,16 @@ def frozen_dispatch(tmp_path_factory):
             f"patch {defect_id}\n", encoding="utf-8", newline="\n"
         )
         patch_paths[defect_id] = path
+    candidates = [
+        {
+            "defect_id": defect_id,
+            "evidence": [{"evidence_id": f"{defect_id}-fix"}],
+            "patch_path": f"patches/{defect_id}.patch",
+            "patch_sha256": _sha(patch_paths[defect_id]),
+        }
+        for defect_id in defect_ids
+    ]
+    _write_json(packet, {"candidates": candidates})
 
     template_paths = {}
     for annotator_id in ("A1", "A2", "A3"):
@@ -250,11 +254,9 @@ def frozen_dispatch(tmp_path_factory):
             "model_id": "gpt-5.6-sol",
             "prompt_sha256": _sha(prompt),
             "artifact_revision": freeze_revision,
-            "started_at": "2026-08-10T09:00:00+08:00",
+            "started_at": "2026-08-10T09:01:00+08:00",
         }
     )
-    _write_json(submission, submission_payload)
-
     return {
         "nano": nano,
         "paper": paper,
@@ -270,31 +272,344 @@ def frozen_dispatch(tmp_path_factory):
         "prompt": prompt,
         "nested": nested,
         "patch": patch_paths[defect_ids[0]],
+        "review_code": corpus / "agent_review.py",
+        "review_cli": corpus / "agent_review_cli.py",
         "top_manifest": top_manifest,
     }
 
 
-def test_preflight_returns_machine_readable_frozen_assignment(frozen_dispatch):
-    from research.defects.real_corpus_v1.agent_dispatch import preflight_dispatch
+def _validation_identity(frozen_dispatch, dispatch_record=None):
+    from research.defects.real_corpus_v1.agent_dispatch import (
+        workspace_snapshot_sha256,
+    )
 
-    result = preflight_dispatch(
+    if dispatch_record is not None:
+        payload = json.loads(dispatch_record.read_text(encoding="utf-8"))
+        return {
+            "expected_binding_sha256": payload["binding_sha256"],
+            "expected_freeze_payload_revision": payload[
+                "freeze_payload_revision"
+            ],
+            "expected_start_workspace_sha256": payload[
+                "workspace_snapshot_sha256"
+            ],
+        }
+    output = frozen_dispatch["binding_payload"]["canonical_task_mapping"][
+        "formal_a1"
+    ]["output"]
+    return {
+        "expected_binding_sha256": _sha(frozen_dispatch["binding"]),
+        "expected_freeze_payload_revision": frozen_dispatch["freeze_revision"],
+        "expected_start_workspace_sha256": workspace_snapshot_sha256(
+            frozen_dispatch["nano"], exclude_untracked=output
+        ),
+    }
+
+
+def _create_test_dispatch_record(frozen_dispatch):
+    from research.defects.real_corpus_v1.agent_dispatch import create_dispatch_record
+
+    record = frozen_dispatch["formal"] / "DISPATCH_RECORD.json"
+    batch_preflight, assignments = _dispatch_receipts(frozen_dispatch)
+    create_dispatch_record(
         binding_path=frozen_dispatch["binding"],
-        task_name="/root/formal_a1",
-        expected_annotator="A1",
-        expected_template=frozen_dispatch["binding_payload"]["canonical_task_mapping"][
-            "formal_a1"
-        ]["template"],
-        expected_output=frozen_dispatch["binding_payload"]["canonical_task_mapping"][
-            "formal_a1"
-        ]["output"],
-        phase="start",
+        record_path=record,
+        actual_payload_path=frozen_dispatch["prompt"],
+        batch_preflight=batch_preflight,
+        assignments=assignments,
         paper_repo=frozen_dispatch["paper"],
     )
+    return record
+
+
+def _dispatch_assignments():
+    return [
+        {
+            "annotator_id": annotator_id,
+            "canonical_task_name": f"formal_a{index}",
+            "returned_task_id": f"task-{index}",
+            "started_at": f"2026-08-10T09:0{index}:00+08:00",
+        }
+        for index, annotator_id in enumerate(("A1", "A2", "A3"), start=1)
+    ]
+
+
+def _dispatch_receipts(frozen_dispatch):
+    from research.defects.real_corpus_v1.agent_dispatch import (
+        preflight_batch,
+        preflight_dispatch,
+    )
+
+    batch = preflight_batch(
+        binding_path=frozen_dispatch["binding"],
+        checked_at="2026-08-10T09:00:00+08:00",
+        paper_repo=frozen_dispatch["paper"],
+    )
+    assignments = _dispatch_assignments()
+    mapping = frozen_dispatch["binding_payload"]["canonical_task_mapping"]
+    for index, assignment in enumerate(assignments, start=1):
+        mapped = mapping[assignment["canonical_task_name"]]
+        start = preflight_dispatch(
+            binding_path=frozen_dispatch["binding"],
+            task_name=assignment["canonical_task_name"],
+            expected_annotator=assignment["annotator_id"],
+            expected_template=mapped["template"],
+            expected_output=mapped["output"],
+            phase="start",
+            checked_at=f"2026-08-10T09:1{index}:00+08:00",
+            paper_repo=frozen_dispatch["paper"],
+        )
+        assignment["start_preflight"] = {
+            "checked_at": start["checked_at"],
+            "workspace_snapshot_sha256": start["workspace_snapshot_sha256"],
+        }
+    return batch["batch_preflight"], assignments
+
+
+def test_create_and_validate_dispatch_record(frozen_dispatch):
+    from research.defects.real_corpus_v1.agent_dispatch import (
+        create_dispatch_record,
+        validate_dispatch_record,
+    )
+
+    record = frozen_dispatch["formal"] / "DISPATCH_RECORD.json"
+    try:
+        batch_preflight, assignments = _dispatch_receipts(frozen_dispatch)
+        created = create_dispatch_record(
+            binding_path=frozen_dispatch["binding"],
+            record_path=record,
+            actual_payload_path=frozen_dispatch["prompt"],
+            batch_preflight=batch_preflight,
+            assignments=assignments,
+            paper_repo=frozen_dispatch["paper"],
+        )
+        payload = json.loads(record.read_text(encoding="utf-8"))
+        assert created == payload
+        assert payload["schema_version"] == 1
+        assert payload["protocol_id"] == "agent-review-v1"
+        assert payload["binding_sha256"] == _sha(frozen_dispatch["binding"])
+        assert payload["freeze_payload_revision"] == frozen_dispatch["freeze_revision"]
+        assert payload["prompt_sha256"] == _sha(frozen_dispatch["prompt"])
+        assert payload["actual_payload_sha256"] == _sha(frozen_dispatch["prompt"])
+        assert payload["batch_preflight"] == batch_preflight
+        assert len(payload["workspace_snapshot_sha256"]) == 64
+        assert validate_dispatch_record(
+            binding_path=frozen_dispatch["binding"],
+            record_path=record,
+            paper_repo=frozen_dispatch["paper"],
+        ) == {
+            "valid": True,
+            "binding_sha256": payload["binding_sha256"],
+            "freeze_payload_revision": payload["freeze_payload_revision"],
+            "workspace_snapshot_sha256": payload["workspace_snapshot_sha256"],
+            "batch_preflight": payload["batch_preflight"],
+            "assignments": payload["assignments"],
+        }
+    finally:
+        if record.exists():
+            record.unlink()
+
+
+def test_create_dispatch_record_rejects_non_prompt_payload(frozen_dispatch):
+    from research.defects.real_corpus_v1.agent_dispatch import create_dispatch_record
+
+    record = frozen_dispatch["formal"] / "DISPATCH_RECORD.json"
+    wrong_payload = frozen_dispatch["formal"] / "wrong-payload.md"
+    wrong_payload.write_text("different bytes\n", encoding="utf-8", newline="\n")
+    try:
+        batch_preflight, assignments = _dispatch_receipts(frozen_dispatch)
+        with pytest.raises(ValueError, match="actual payload must equal prompt bytes"):
+            create_dispatch_record(
+                binding_path=frozen_dispatch["binding"],
+                record_path=record,
+                actual_payload_path=wrong_payload,
+                batch_preflight=batch_preflight,
+                assignments=assignments,
+                paper_repo=frozen_dispatch["paper"],
+            )
+    finally:
+        wrong_payload.unlink()
+        if record.exists():
+            record.unlink()
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    [
+        (
+            lambda item: item["assignments"][0].update(
+                canonical_task_name="formal_a2"
+            ),
+            "canonical task mapping",
+        ),
+        (
+            lambda item: item["assignments"][1].update(returned_task_id="task-1"),
+            "returned task IDs must be unique",
+        ),
+        (lambda item: item["assignments"].pop(), "exactly A1, A2, A3"),
+        (lambda item: item.update(model_id="wrong"), "frozen model"),
+        (
+            lambda item: item.update(model_configuration={"reasoning_effort": "low"}),
+            "model configuration",
+        ),
+        (lambda item: item.update(fork_turns="all"), "fork_turns"),
+        (lambda item: item.update(prompt_sha256="0" * 64), "prompt digest"),
+        (lambda item: item.update(binding_sha256="0" * 64), "binding digest"),
+        (
+            lambda item: item.update(freeze_payload_revision="a" * 40),
+            "freeze payload revision",
+        ),
+        (
+            lambda item: item.update(actual_payload_sha256="0" * 64),
+            "actual payload digest",
+        ),
+        (
+            lambda item: item["assignments"][0].update(
+                started_at="2026-08-10T09:01:00"
+            ),
+            "timezone-aware",
+        ),
+        (
+            lambda item: item["batch_preflight"].update(receipt_sha256="0" * 64),
+            "batch preflight receipt digest",
+        ),
+        (
+            lambda item: item["assignments"][0]["start_preflight"].update(
+                workspace_snapshot_sha256="0" * 64
+            ),
+            "start preflight workspace snapshot",
+        ),
+        (
+            lambda item: item["assignments"][0].update(
+                started_at="2026-08-10T08:59:59+08:00"
+            ),
+            "dispatch timestamp order",
+        ),
+        (
+            lambda item: item["assignments"][0]["start_preflight"].update(
+                checked_at="2026-08-10T09:00:30+08:00"
+            ),
+            "dispatch timestamp order",
+        ),
+    ],
+)
+def test_validate_dispatch_record_rejects_tampering(
+    frozen_dispatch, mutation, message
+):
+    from research.defects.real_corpus_v1.agent_dispatch import (
+        create_dispatch_record,
+        validate_dispatch_record,
+    )
+
+    record = frozen_dispatch["formal"] / "DISPATCH_RECORD.json"
+    try:
+        batch_preflight, assignments = _dispatch_receipts(frozen_dispatch)
+        payload = create_dispatch_record(
+            binding_path=frozen_dispatch["binding"],
+            record_path=record,
+            actual_payload_path=frozen_dispatch["prompt"],
+            batch_preflight=batch_preflight,
+            assignments=assignments,
+            paper_repo=frozen_dispatch["paper"],
+        )
+        mutation(payload)
+        _write_json(record, payload)
+        with pytest.raises(ValueError, match=message):
+            validate_dispatch_record(
+                binding_path=frozen_dispatch["binding"],
+                record_path=record,
+                paper_repo=frozen_dispatch["paper"],
+            )
+    finally:
+        if record.exists():
+            record.unlink()
+
+
+@pytest.mark.parametrize(
+    ("task_started_at", "start_checked_at", "valid"),
+    [
+        ("2026-08-10T00:59:59Z", "2026-08-10T09:11:00+08:00", False),
+        ("2026-08-10T03:12:00Z", "2026-08-10T09:11:00+08:00", False),
+        ("2026-08-10T02:00:00Z", "2026-08-10T11:00:00+08:00", True),
+        ("2026-08-10T09:00:00+08:00", "2026-08-10T09:00:00+08:00", True),
+    ],
+)
+def test_create_dispatch_record_enforces_absolute_timestamp_order(
+    frozen_dispatch, task_started_at, start_checked_at, valid
+):
+    from research.defects.real_corpus_v1.agent_dispatch import create_dispatch_record
+
+    batch, assignments = _dispatch_receipts(frozen_dispatch)
+    assignments[0]["started_at"] = task_started_at
+    assignments[0]["start_preflight"]["checked_at"] = start_checked_at
+    record = frozen_dispatch["formal"] / "DISPATCH_RECORD.json"
+    try:
+        if valid:
+            assert create_dispatch_record(
+                binding_path=frozen_dispatch["binding"],
+                record_path=record,
+                actual_payload_path=frozen_dispatch["prompt"],
+                batch_preflight=batch,
+                assignments=assignments,
+                paper_repo=frozen_dispatch["paper"],
+            )["assignments"][0]["started_at"] == task_started_at
+        else:
+            with pytest.raises(ValueError, match="dispatch timestamp order"):
+                create_dispatch_record(
+                    binding_path=frozen_dispatch["binding"],
+                    record_path=record,
+                    actual_payload_path=frozen_dispatch["prompt"],
+                    batch_preflight=batch,
+                    assignments=assignments,
+                    paper_repo=frozen_dispatch["paper"],
+                )
+    finally:
+        if record.exists():
+            record.unlink()
+
+
+def test_preflight_returns_machine_readable_frozen_assignment(frozen_dispatch):
+    from research.defects.real_corpus_v1.agent_dispatch import (
+        create_dispatch_record,
+        preflight_dispatch,
+    )
+
+    record = frozen_dispatch["formal"] / "DISPATCH_RECORD.json"
+    try:
+        batch_preflight, assignments = _dispatch_receipts(frozen_dispatch)
+        dispatch = create_dispatch_record(
+            binding_path=frozen_dispatch["binding"],
+            record_path=record,
+            actual_payload_path=frozen_dispatch["prompt"],
+            batch_preflight=batch_preflight,
+            assignments=assignments,
+            paper_repo=frozen_dispatch["paper"],
+        )
+        result = preflight_dispatch(
+            binding_path=frozen_dispatch["binding"],
+            dispatch_record_path=record,
+            task_name="/root/formal_a1",
+            expected_annotator="A1",
+            expected_template=frozen_dispatch["binding_payload"][
+                "canonical_task_mapping"
+            ]["formal_a1"]["template"],
+            expected_output=frozen_dispatch["binding_payload"][
+                "canonical_task_mapping"
+            ]["formal_a1"]["output"],
+            phase="start",
+            paper_repo=frozen_dispatch["paper"],
+        )
+    finally:
+        if record.exists():
+            record.unlink()
 
     assert result["valid"] is True
     assert result["assignment"]["annotator_id"] == "A1"
     assert result["binding_sha256"] == _sha(frozen_dispatch["binding"])
     assert result["freeze_payload_revision"] == frozen_dispatch["freeze_revision"]
+    assert result["workspace_snapshot_sha256"] == dispatch[
+        "workspace_snapshot_sha256"
+    ]
 
 
 def test_end_preflight_rejects_replaced_binding_identity(frozen_dispatch):
@@ -314,8 +629,231 @@ def test_end_preflight_rejects_replaced_binding_identity(frozen_dispatch):
             phase="end",
             expected_binding_sha256="0" * 64,
             expected_freeze_payload_revision=frozen_dispatch["freeze_revision"],
+            expected_start_workspace_sha256="0" * 64,
             paper_repo=frozen_dispatch["paper"],
         )
+
+
+def test_preflight_start_rejects_existing_agent_output(frozen_dispatch):
+    from research.defects.real_corpus_v1.agent_dispatch import preflight_dispatch
+
+    output = frozen_dispatch["submission"]
+    _write_json(output, frozen_dispatch["submission_payload"])
+    assignment = frozen_dispatch["binding_payload"]["canonical_task_mapping"][
+        "formal_a1"
+    ]
+    try:
+        with pytest.raises(ValueError, match="output already exists"):
+            preflight_dispatch(
+                binding_path=frozen_dispatch["binding"],
+                task_name="formal_a1",
+                expected_annotator="A1",
+                expected_template=assignment["template"],
+                expected_output=assignment["output"],
+                phase="start",
+                paper_repo=frozen_dispatch["paper"],
+            )
+    finally:
+        output.unlink()
+
+
+def test_end_preflight_requires_only_mapped_output_change(frozen_dispatch):
+    from research.defects.real_corpus_v1.agent_dispatch import preflight_dispatch
+
+    assignment = frozen_dispatch["binding_payload"]["canonical_task_mapping"][
+        "formal_a1"
+    ]
+    start = preflight_dispatch(
+        binding_path=frozen_dispatch["binding"],
+        task_name="formal_a1",
+        expected_annotator="A1",
+        expected_template=assignment["template"],
+        expected_output=assignment["output"],
+        phase="start",
+        paper_repo=frozen_dispatch["paper"],
+    )
+    _write_json(frozen_dispatch["submission"], frozen_dispatch["submission_payload"])
+    try:
+        end = preflight_dispatch(
+            binding_path=frozen_dispatch["binding"],
+            task_name="formal_a1",
+            expected_annotator="A1",
+            expected_template=assignment["template"],
+            expected_output=assignment["output"],
+            phase="end",
+            expected_binding_sha256=start["binding_sha256"],
+            expected_freeze_payload_revision=start["freeze_payload_revision"],
+            expected_start_workspace_sha256=start["workspace_snapshot_sha256"],
+            paper_repo=frozen_dispatch["paper"],
+        )
+        assert end["workspace_snapshot_sha256"] == start["workspace_snapshot_sha256"]
+    finally:
+        frozen_dispatch["submission"].unlink()
+
+
+def test_end_preflight_rejects_missing_output_or_extra_untracked(frozen_dispatch):
+    from research.defects.real_corpus_v1.agent_dispatch import preflight_dispatch
+
+    assignment = frozen_dispatch["binding_payload"]["canonical_task_mapping"][
+        "formal_a1"
+    ]
+    start = preflight_dispatch(
+        binding_path=frozen_dispatch["binding"],
+        task_name="formal_a1",
+        expected_annotator="A1",
+        expected_template=assignment["template"],
+        expected_output=assignment["output"],
+        phase="start",
+        paper_repo=frozen_dispatch["paper"],
+    )
+    end_args = {
+        "binding_path": frozen_dispatch["binding"],
+        "task_name": "formal_a1",
+        "expected_annotator": "A1",
+        "expected_template": assignment["template"],
+        "expected_output": assignment["output"],
+        "phase": "end",
+        "expected_binding_sha256": start["binding_sha256"],
+        "expected_freeze_payload_revision": start["freeze_payload_revision"],
+        "expected_start_workspace_sha256": start["workspace_snapshot_sha256"],
+        "paper_repo": frozen_dispatch["paper"],
+    }
+    with pytest.raises(ValueError, match="mapped output is missing"):
+        preflight_dispatch(**end_args)
+    _write_json(frozen_dispatch["submission"], frozen_dispatch["submission_payload"])
+    extra = frozen_dispatch["formal"] / "unexpected.tmp"
+    extra.write_text("extra", encoding="utf-8")
+    try:
+        with pytest.raises(ValueError, match="workspace changed since start"):
+            preflight_dispatch(**end_args)
+    finally:
+        frozen_dispatch["submission"].unlink()
+        extra.unlink()
+
+
+def test_concurrent_outputs_are_allowlisted_after_batch_gate(frozen_dispatch):
+    from research.defects.real_corpus_v1.agent_dispatch import (
+        create_dispatch_record,
+        preflight_batch,
+        preflight_dispatch,
+    )
+
+    mapping = frozen_dispatch["binding_payload"]["canonical_task_mapping"]
+    batch = preflight_batch(
+        binding_path=frozen_dispatch["binding"],
+        checked_at="2026-08-10T09:00:00+08:00",
+        paper_repo=frozen_dispatch["paper"],
+    )["batch_preflight"]
+    starts = {}
+    outputs = []
+    for index, (task_name, mapped) in enumerate(mapping.items(), start=1):
+        start = preflight_dispatch(
+            binding_path=frozen_dispatch["binding"],
+            task_name=task_name,
+            expected_annotator=mapped["annotator_id"],
+            expected_template=mapped["template"],
+            expected_output=mapped["output"],
+            phase="start",
+            checked_at=f"2026-08-10T09:1{index}:00+08:00",
+            paper_repo=frozen_dispatch["paper"],
+        )
+        starts[task_name] = start
+        output = frozen_dispatch["nano"] / mapped["output"]
+        _write_json(output, {"annotator": mapped["annotator_id"]})
+        outputs.append(output)
+    assignments = _dispatch_assignments()
+    for assignment in assignments:
+        start = starts[assignment["canonical_task_name"]]
+        assignment["start_preflight"] = {
+            "checked_at": start["checked_at"],
+            "workspace_snapshot_sha256": start["workspace_snapshot_sha256"],
+        }
+    record = frozen_dispatch["formal"] / "DISPATCH_RECORD.json"
+    try:
+        create_dispatch_record(
+            binding_path=frozen_dispatch["binding"],
+            record_path=record,
+            actual_payload_path=frozen_dispatch["prompt"],
+            batch_preflight=batch,
+            assignments=assignments,
+            paper_repo=frozen_dispatch["paper"],
+        )
+        for task_name, mapped in mapping.items():
+            start = starts[task_name]
+            result = preflight_dispatch(
+                binding_path=frozen_dispatch["binding"],
+                dispatch_record_path=record,
+                task_name=task_name,
+                expected_annotator=mapped["annotator_id"],
+                expected_template=mapped["template"],
+                expected_output=mapped["output"],
+                phase="end",
+                expected_binding_sha256=start["binding_sha256"],
+                expected_freeze_payload_revision=start["freeze_payload_revision"],
+                expected_start_workspace_sha256=start[
+                    "workspace_snapshot_sha256"
+                ],
+                paper_repo=frozen_dispatch["paper"],
+            )
+            assert result["valid"] is True
+    finally:
+        for output in outputs:
+            if output.exists():
+                output.unlink()
+        if record.exists():
+            record.unlink()
+
+
+@pytest.mark.parametrize("change", ["modify", "delete"])
+def test_workspace_snapshot_rejects_preexisting_untracked_metadata_change(
+    frozen_dispatch, change
+):
+    from research.defects.real_corpus_v1.agent_dispatch import preflight_dispatch
+
+    existing = frozen_dispatch["formal"] / "preexisting.tmp"
+    existing.write_text("before", encoding="utf-8")
+    mapped = frozen_dispatch["binding_payload"]["canonical_task_mapping"][
+        "formal_a1"
+    ]
+    output = frozen_dispatch["nano"] / mapped["output"]
+    try:
+        start = preflight_dispatch(
+            binding_path=frozen_dispatch["binding"],
+            task_name="formal_a1",
+            expected_annotator="A1",
+            expected_template=mapped["template"],
+            expected_output=mapped["output"],
+            phase="start",
+            checked_at="2026-08-10T09:11:00+08:00",
+            paper_repo=frozen_dispatch["paper"],
+        )
+        _write_json(output, {"annotator": "A1"})
+        if change == "modify":
+            existing.write_text("after-and-larger", encoding="utf-8")
+        else:
+            existing.unlink()
+        with pytest.raises(ValueError, match="workspace changed since start"):
+            preflight_dispatch(
+                binding_path=frozen_dispatch["binding"],
+                task_name="formal_a1",
+                expected_annotator="A1",
+                expected_template=mapped["template"],
+                expected_output=mapped["output"],
+                phase="end",
+                expected_binding_sha256=start["binding_sha256"],
+                expected_freeze_payload_revision=start[
+                    "freeze_payload_revision"
+                ],
+                expected_start_workspace_sha256=start[
+                    "workspace_snapshot_sha256"
+                ],
+                paper_repo=frozen_dispatch["paper"],
+            )
+    finally:
+        if output.exists():
+            output.unlink()
+        if existing.exists():
+            existing.unlink()
 
 
 def test_preflight_rejects_unknown_task_and_tampered_binding(frozen_dispatch):
@@ -356,7 +894,16 @@ def test_preflight_rejects_unknown_task_and_tampered_binding(frozen_dispatch):
 
 @pytest.mark.parametrize(
     "path_key",
-    ["prompt", "protocol", "nested", "template", "packet", "patch"],
+    [
+        "prompt",
+        "protocol",
+        "nested",
+        "template",
+        "packet",
+        "patch",
+        "review_code",
+        "review_cli",
+    ],
 )
 def test_preflight_rejects_tampered_nanoharness_input(
     frozen_dispatch, path_key
@@ -458,9 +1005,9 @@ def test_retained_dispatch_binding_preflights_all_assignments():
             expected_output=assignment["output"],
             phase="start",
         )
-        assert result["freeze_payload_revision"] == (
-            "0dfaae11c7a35a15d24c711d8888b21a30c7679b"
-        )
+        assert result["freeze_payload_revision"] == payload[
+            "freeze_payload_revision"
+        ]
 
 
 def test_frozen_submission_validation_accepts_exact_bound_submission(
@@ -470,15 +1017,54 @@ def test_frozen_submission_validation_accepts_exact_bound_submission(
         validate_frozen_submission,
     )
 
-    result = validate_frozen_submission(
-        binding_path=frozen_dispatch["binding"],
-        protocol_path=frozen_dispatch["protocol"],
-        expected_annotator="A1",
-        template_path=frozen_dispatch["template"],
-        submission_path=frozen_dispatch["submission"],
+    record = _create_test_dispatch_record(frozen_dispatch)
+    _write_json(
+        frozen_dispatch["submission"], frozen_dispatch["submission_payload"]
     )
+    try:
+        result = validate_frozen_submission(
+            binding_path=frozen_dispatch["binding"],
+            dispatch_record_path=record,
+            protocol_path=frozen_dispatch["protocol"],
+            expected_annotator="A1",
+            template_path=frozen_dispatch["template"],
+            submission_path=frozen_dispatch["submission"],
+            **_validation_identity(frozen_dispatch, record),
+        )
+    finally:
+        frozen_dispatch["submission"].unlink()
+        record.unlink()
 
     assert result == {"annotator_id": "A1", "entry_count": 77, "valid": True}
+
+
+def test_frozen_submission_validation_rejects_saved_identity_swap(
+    frozen_dispatch,
+):
+    from research.defects.real_corpus_v1.agent_dispatch import (
+        validate_frozen_submission,
+    )
+
+    record = _create_test_dispatch_record(frozen_dispatch)
+    _write_json(
+        frozen_dispatch["submission"], frozen_dispatch["submission_payload"]
+    )
+    identity = _validation_identity(frozen_dispatch, record)
+    identity["expected_binding_sha256"] = "0" * 64
+    try:
+        with pytest.raises(ValueError, match="saved binding identity"):
+            validate_frozen_submission(
+                binding_path=frozen_dispatch["binding"],
+                dispatch_record_path=record,
+                protocol_path=frozen_dispatch["protocol"],
+                expected_annotator="A1",
+                template_path=frozen_dispatch["template"],
+                submission_path=frozen_dispatch["submission"],
+                **identity,
+            )
+    finally:
+        frozen_dispatch["submission"].unlink()
+        record.unlink()
 
 
 def test_dispatch_cli_runs_preflight_and_submission_validation(
@@ -490,11 +1076,42 @@ def test_dispatch_cli_runs_preflight_and_submission_validation(
     assignment = frozen_dispatch["binding_payload"]["canonical_task_mapping"][
         "formal_a1"
     ]
+    record = frozen_dispatch["formal"] / "DISPATCH_RECORD.json"
+    batch_preflight, dispatch_assignments = _dispatch_receipts(frozen_dispatch)
+    create_args = [
+        "create-dispatch-record",
+        "--binding",
+        str(frozen_dispatch["binding"]),
+        "--record",
+        str(record),
+        "--actual-payload",
+        str(frozen_dispatch["prompt"]),
+        "--batch-preflight-json",
+        json.dumps(batch_preflight),
+    ]
+    for item in dispatch_assignments:
+        create_args.extend(
+            [
+                "--assignment",
+                item["annotator_id"],
+                item["canonical_task_name"],
+                item["returned_task_id"],
+                item["started_at"],
+                item["start_preflight"]["checked_at"],
+                item["start_preflight"]["workspace_snapshot_sha256"],
+            ]
+        )
+    create_args.extend(["--paper-repo", str(frozen_dispatch["paper"])])
+    assert main(create_args) == 0
+    dispatch = json.loads(capsys.readouterr().out)
+
     exit_code = main(
         [
             "preflight",
             "--binding",
             str(frozen_dispatch["binding"]),
+            "--dispatch-record",
+            str(record),
             "--task-name",
             "formal_a1",
             "--expected-annotator",
@@ -514,11 +1131,16 @@ def test_dispatch_cli_runs_preflight_and_submission_validation(
         frozen_dispatch["binding"]
     )
 
+    _write_json(
+        frozen_dispatch["submission"], frozen_dispatch["submission_payload"]
+    )
     exit_code = main(
         [
             "validate-submission",
             "--binding",
             str(frozen_dispatch["binding"]),
+            "--dispatch-record",
+            str(record),
             "--protocol",
             str(frozen_dispatch["protocol"]),
             "--expected-annotator",
@@ -527,10 +1149,113 @@ def test_dispatch_cli_runs_preflight_and_submission_validation(
             str(frozen_dispatch["template"]),
             "--submission",
             str(frozen_dispatch["submission"]),
+            "--expected-binding-sha256",
+            dispatch["binding_sha256"],
+            "--expected-freeze-payload-revision",
+            dispatch["freeze_payload_revision"],
+            "--expected-start-workspace-sha256",
+            dispatch["workspace_snapshot_sha256"],
         ]
     )
     assert exit_code == 0
     assert json.loads(capsys.readouterr().out)["valid"] is True
+    frozen_dispatch["submission"].unlink()
+    record.unlink()
+
+
+def test_agent_review_cli_requires_bound_dispatch_before_analysis(
+    frozen_dispatch,
+):
+    from research.defects.real_corpus_v1.agent_review_cli import main
+
+    record = _create_test_dispatch_record(frozen_dispatch)
+    mapping = frozen_dispatch["binding_payload"]["canonical_task_mapping"]
+    outputs = []
+    for task_name, assignment in mapping.items():
+        annotator_id = assignment["annotator_id"]
+        template = frozen_dispatch["formal"] / assignment["template"].split(
+            "formal/agent-review-v1/", 1
+        )[1]
+        payload = deepcopy(json.loads(template.read_text(encoding="utf-8")))
+        for entry in payload["entries"]:
+            entry.update(
+                {
+                    "decision": "include",
+                    "boundaries": ["tool"],
+                    "trigger": "trigger",
+                    "symptom": "symptom",
+                    "root_cause": "root cause",
+                    "impact": "impact",
+                    "evidence_ids": [f"{entry['defect_id']}-fix"],
+                    "rationale": "reason",
+                }
+            )
+        payload["completion"] = {
+            "completed_at": "2026-08-10T10:00:00+08:00",
+            "independent": True,
+            "packet_sha256": _sha(frozen_dispatch["packet"]),
+        }
+        payload["agent_provenance"].update(
+            {
+                "model_id": "gpt-5.6-sol",
+                "prompt_sha256": _sha(frozen_dispatch["prompt"]),
+                "artifact_revision": frozen_dispatch["freeze_revision"],
+                "started_at": next(
+                    item["started_at"]
+                    for item in _dispatch_assignments()
+                    if item["canonical_task_name"] == task_name
+                ),
+            }
+        )
+        path = frozen_dispatch["nano"] / assignment["output"]
+        _write_json(path, payload)
+        outputs.append(path)
+    analysis_output = frozen_dispatch["formal"] / "analysis-test"
+    try:
+        assert main(
+            [
+                "--binding",
+                str(frozen_dispatch["binding"]),
+                "--dispatch-record",
+                str(record),
+                "--output",
+                str(analysis_output),
+            ]
+        ) == 0
+        assert {
+            path.name for path in analysis_output.iterdir()
+        } == {"pass_a_agreement.json", "human_audit_packet.json", "SHA256SUMS"}
+        for path in analysis_output.iterdir():
+            path.unlink()
+        analysis_output.rmdir()
+        a3_path = frozen_dispatch["nano"] / mapping["formal_a3"]["output"]
+        tampered = json.loads(a3_path.read_text(encoding="utf-8"))
+        tampered["agent_provenance"]["started_at"] = (
+            "2026-08-10T09:04:00+08:00"
+        )
+        _write_json(a3_path, tampered)
+        invalid_output = frozen_dispatch["formal"] / "invalid-analysis-test"
+        assert main(
+            [
+                "--binding",
+                str(frozen_dispatch["binding"]),
+                "--dispatch-record",
+                str(record),
+                "--output",
+                str(invalid_output),
+            ]
+        ) == 1
+        assert not invalid_output.exists()
+    finally:
+        for path in outputs:
+            if path.exists():
+                path.unlink()
+        if record.exists():
+            record.unlink()
+        if analysis_output.exists():
+            for path in analysis_output.iterdir():
+                path.unlink()
+            analysis_output.rmdir()
 
 
 @pytest.mark.parametrize(
@@ -549,6 +1274,24 @@ def test_dispatch_cli_runs_preflight_and_submission_validation(
             lambda item: item["agent_provenance"].update(artifact_revision="a" * 40),
             "artifact revision",
         ),
+        (
+            lambda item: item["agent_provenance"].update(
+                started_at="2026-08-10T09:02:00+08:00"
+            ),
+            "dispatch assignment started_at",
+        ),
+        (
+            lambda item: item["agent_provenance"].update(
+                started_at="2026-08-10T01:01:00Z"
+            ),
+            "dispatch assignment started_at",
+        ),
+        (
+            lambda item: item["completion"].update(
+                completed_at="2026-08-10T09:00:59+08:00"
+            ),
+            "completion timestamp",
+        ),
         (lambda item: item.update(manual_version="1.0"), "manual version"),
         (lambda item: item["entries"].reverse(), "template entry order"),
         (
@@ -558,6 +1301,51 @@ def test_dispatch_cli_runs_preflight_and_submission_validation(
         (
             lambda item: item["entries"][0].update(operator_ids=["operator"]),
             "operator_ids",
+        ),
+        (
+            lambda item: item["entries"][0].update(trigger=""),
+            "include requires trigger",
+        ),
+        (
+            lambda item: item["entries"][0].update(exclusion_reason="not empty"),
+            "include requires empty exclusion_reason",
+        ),
+        (
+            lambda item: item["entries"][0].update(
+                decision="exclude",
+                boundaries=[],
+                trigger="",
+                symptom="",
+                root_cause="",
+                impact="",
+                exclusion_reason="",
+            ),
+            "exclude requires exclusion_reason",
+        ),
+        (
+            lambda item: item["entries"][0].update(
+                decision="uncertain", exclusion_reason="reason", boundaries=[]
+            ),
+            "uncertain requires empty exclusion_reason",
+        ),
+        (
+            lambda item: item["entries"][0].update(
+                decision="uncertain", exclusion_reason="", boundaries=["tool"]
+            ),
+            "uncertain requires empty boundaries",
+        ),
+        (
+            lambda item: item["entries"][0].update(
+                evidence_ids=[
+                    item["entries"][0]["evidence_ids"][0],
+                    item["entries"][0]["evidence_ids"][0],
+                ]
+            ),
+            "duplicate evidence_ids",
+        ),
+        (
+            lambda item: item["entries"][0].update(boundaries=["tool", "tool"]),
+            "duplicate boundaries",
         ),
         (lambda item: item.update(hidden_partition="leak"), "unexpected field"),
     ],
@@ -571,6 +1359,7 @@ def test_frozen_submission_validation_rejects_unbound_values(
         validate_frozen_submission,
     )
 
+    record = _create_test_dispatch_record(frozen_dispatch)
     payload = deepcopy(frozen_dispatch["submission_payload"])
     mutation(payload)
     _write_json(frozen_dispatch["submission"], payload)
@@ -579,13 +1368,78 @@ def test_frozen_submission_validation_rejects_unbound_values(
         with pytest.raises(ValueError, match=message):
             validate_frozen_submission(
                 binding_path=frozen_dispatch["binding"],
+                dispatch_record_path=record,
                 protocol_path=frozen_dispatch["protocol"],
                 expected_annotator="A1",
                 template_path=frozen_dispatch["template"],
                 submission_path=frozen_dispatch["submission"],
+                **_validation_identity(frozen_dispatch, record),
             )
     finally:
-        _write_json(
-            frozen_dispatch["submission"],
-            frozen_dispatch["submission_payload"],
-        )
+        frozen_dispatch["submission"].unlink()
+        record.unlink()
+
+
+@pytest.mark.parametrize("decision", ["exclude", "uncertain"])
+def test_frozen_submission_accepts_supported_narrative_for_noninclude(
+    frozen_dispatch, decision
+):
+    from research.defects.real_corpus_v1.agent_dispatch import (
+        validate_frozen_submission,
+    )
+
+    record = _create_test_dispatch_record(frozen_dispatch)
+    payload = deepcopy(frozen_dispatch["submission_payload"])
+    payload["entries"][0].update(
+        decision=decision,
+        exclusion_reason="reason" if decision == "exclude" else "",
+        boundaries=[],
+        trigger="supported trigger",
+        symptom="supported symptom",
+        root_cause="supported root cause",
+        impact="supported impact",
+    )
+    _write_json(frozen_dispatch["submission"], payload)
+    try:
+        assert validate_frozen_submission(
+            binding_path=frozen_dispatch["binding"],
+            dispatch_record_path=record,
+            protocol_path=frozen_dispatch["protocol"],
+            expected_annotator="A1",
+            template_path=frozen_dispatch["template"],
+            submission_path=frozen_dispatch["submission"],
+            **_validation_identity(frozen_dispatch, record),
+        )["valid"] is True
+    finally:
+        frozen_dispatch["submission"].unlink()
+        record.unlink()
+
+
+@pytest.mark.parametrize(
+    "completed_at",
+    ["2026-08-10T09:01:00+08:00", "2026-08-10T02:00:00Z"],
+)
+def test_frozen_submission_accepts_equal_or_later_completion(
+    frozen_dispatch, completed_at
+):
+    from research.defects.real_corpus_v1.agent_dispatch import (
+        validate_frozen_submission,
+    )
+
+    record = _create_test_dispatch_record(frozen_dispatch)
+    payload = deepcopy(frozen_dispatch["submission_payload"])
+    payload["completion"]["completed_at"] = completed_at
+    _write_json(frozen_dispatch["submission"], payload)
+    try:
+        assert validate_frozen_submission(
+            binding_path=frozen_dispatch["binding"],
+            dispatch_record_path=record,
+            protocol_path=frozen_dispatch["protocol"],
+            expected_annotator="A1",
+            template_path=frozen_dispatch["template"],
+            submission_path=frozen_dispatch["submission"],
+            **_validation_identity(frozen_dispatch, record),
+        )["valid"] is True
+    finally:
+        frozen_dispatch["submission"].unlink()
+        record.unlink()

@@ -455,17 +455,76 @@ def test_agent_review_protocol_freezes_identical_dispatch_prompt_and_provenance(
             "required": True,
             "must_precede_raw_output_commit": True,
             "required_fields": [
-                "canonical_task_names",
-                "returned_task_ids",
+                "schema_version",
+                "protocol_id",
+                "assignments",
                 "model_id",
                 "model_configuration",
                 "fork_turns",
                 "prompt_sha256",
                 "binding_sha256",
-                "started_at_by_annotator",
-            ],
-        },
+                "freeze_payload_revision",
+                    "actual_payload_sha256",
+                    "workspace_snapshot_sha256",
+                    "batch_preflight",
+                ],
+            },
+            "coordinator_batch_preflight": {
+                "must_precede_task_creation": True,
+                "requires_all_canonical_outputs_absent": True,
+                "receipt_fields": [
+                    "checked_at",
+                    "workspace_snapshot_sha256",
+                    "canonical_outputs_absent",
+                    "receipt_sha256",
+                ],
+            },
+            "per_annotator_start_preflight": {
+                "own_output_must_be_absent": True,
+                "other_canonical_outputs_may_exist": True,
+                "receipt_fields": [
+                    "checked_at",
+                    "workspace_snapshot_sha256",
+                ],
+            },
+            "dispatch_timestamp_order": {
+                "comparison": "absolute_time_after_offset_normalization",
+                "inclusive_order": [
+                    "batch_preflight.checked_at",
+                    "assignment.started_at",
+                    "assignment.start_preflight.checked_at",
+                ],
+            },
+            "submission_timestamp_binding": {
+                "independent_start_field": "agent_provenance.started_at",
+                "separate_completion_independent_started_at_field": False,
+                "provenance_start_rule": "exact_dispatch_assignment_iso_string",
+                "completion_rule": (
+                    "timezone_aware_absolute_time_greater_than_or_equal_to_start"
+                ),
+            },
+            "concurrent_workspace_policy": {
+                "allowlisted_new_paths": [
+                    "research/defects/real_corpus_v1/formal/agent-review-v1/pass_a/A1.json",
+                    "research/defects/real_corpus_v1/formal/agent-review-v1/pass_a/A2.json",
+                    "research/defects/real_corpus_v1/formal/agent-review-v1/pass_a/A3.json",
+                    "research/defects/real_corpus_v1/formal/agent-review-v1/DISPATCH_RECORD.json",
+                ],
+                "author_attribution_guarantee": False,
+                "preexisting_untracked_metadata_fields": [
+                    "path",
+                    "size",
+                    "mtime_ns",
+                ],
+                "untracked_file_bytes_read": False,
+            },
         "downstream_analysis_requires_binding_validation": True,
+        "downstream_analysis_requires_dispatch_record_validation": True,
+        "end_preflight_requires_saved_start_identities": [
+            "binding_sha256",
+            "freeze_payload_revision",
+            "workspace_snapshot_sha256",
+        ],
     }
 
     provenance = protocol["dispatch_time_provenance"]
@@ -566,7 +625,8 @@ def test_agent_review_protocol_freezes_identical_dispatch_prompt_and_provenance(
     assert prompt_sha256 not in prompt_text
     assert "77" in prompt_text
     assert "operator_ids" in prompt_text
-    assert "independent_started_at" in prompt_text
+    assert "DISPATCH_RECORD.json" in prompt_text
+    assert "workspace_snapshot_sha256" in prompt_text
     assert "completed_at" in prompt_text
     assert "private" in prompt_text.lower()
     assert "machine precode" in prompt_text.lower()
@@ -1049,16 +1109,17 @@ def _agent_review_fixture(tmp_path):
                 ]
             if defect_id == "D05" and agent_id == "A3":
                 boundaries = ["context"]
+            include = decision == "include"
             entries.append({
                 "defect_id": defect_id,
                 "decision": decision,
                 "exclusion_reason": "not in scope" if decision == "exclude" else "",
                 "boundaries": boundaries,
                 "operator_ids": [],
-                "trigger": "trigger",
-                "symptom": "symptom",
-                "root_cause": "root cause",
-                "impact": "impact",
+                "trigger": "trigger" if include else "",
+                "symptom": "symptom" if include else "",
+                "root_cause": "root cause" if include else "",
+                "impact": "impact" if include else "",
                 "evidence_ids": [f"{defect_id}-fix"],
                 "rationale": f"{agent_id} reviewed {defect_id}",
             })
@@ -1286,7 +1347,7 @@ def test_agent_review_requires_exact_agents_and_reports_agreement(tmp_path):
         (lambda item: item["entries"][0].update(impact=""), "impact"),
         (
             lambda item: item["entries"][5].update(exclusion_reason=""),
-            "exclusion reason",
+            "exclusion_reason",
         ),
         (
             lambda item: item["entries"][5].update(boundaries=["tool"]),
@@ -1337,10 +1398,7 @@ def test_agent_review_selects_union_with_reasons_and_is_order_independent(tmp_pa
         raw_submissions,
         patch_payloads=patch_payloads,
     )
-    reversed_submissions = {
-        agent_id: {**submission, "entries": list(reversed(submission["entries"]))}
-        for agent_id, submission in reversed(list(submissions.items()))
-    }
+    reversed_submissions = dict(reversed(list(submissions.items())))
     reversed_raw_submissions = {
         agent_id: json.dumps(submission).encode("utf-8")
         for agent_id, submission in reversed_submissions.items()
@@ -1465,56 +1523,28 @@ def test_agent_review_rejects_forbidden_human_packet_material(
         )
 
 
-def test_agent_review_cli_writes_deterministic_artifacts_and_checksums(tmp_path):
+def test_agent_review_cli_rejects_unbound_analysis_inputs(tmp_path):
     packet, paths, _, _ = _agent_review_fixture(tmp_path)
     script = (
         __import__("pathlib").Path(__file__).parents[1]
         / "research" / "defects" / "real_corpus_v1" / "agent_review_cli.py"
     )
 
-    outputs = []
-    for name in ("first", "second"):
-        output = tmp_path / name
-        completed = subprocess.run([
-            sys.executable,
-            str(script),
-            "--packet", str(packet),
-            "--a1", str(paths["A1"]),
-            "--a2", str(paths["A2"]),
-            "--a3", str(paths["A3"]),
-            "--output", str(output),
-        ], text=True, capture_output=True)
-        assert completed.returncode == 0, completed.stderr
-        outputs.append(output)
+    output = tmp_path / "unbound-output"
+    completed = subprocess.run([
+        sys.executable,
+        str(script),
+        "--packet", str(packet),
+        "--a1", str(paths["A1"]),
+        "--a2", str(paths["A2"]),
+        "--a3", str(paths["A3"]),
+        "--output", str(output),
+    ], text=True, capture_output=True)
 
-    expected_names = {
-        "pass_a_agreement.json", "human_audit_packet.json", "SHA256SUMS"
-    }
-    assert {path.name for path in outputs[0].iterdir()} == expected_names
-    assert all(
-        (outputs[0] / name).read_bytes() == (outputs[1] / name).read_bytes()
-        for name in expected_names
-    )
-    checksum_lines = (outputs[0] / "SHA256SUMS").read_text().splitlines()
-    assert checksum_lines == [
-        f"{hashlib.sha256((outputs[0] / name).read_bytes()).hexdigest()}  {name}"
-        for name in ("human_audit_packet.json", "pass_a_agreement.json")
-    ]
-    human_packet = json.loads(
-        (outputs[0] / "human_audit_packet.json").read_text(encoding="utf-8")
-    )
-    assert all(
-        item["candidate"]["patch_text"] == item["defect_id"]
-        for item in human_packet["candidates"]
-    )
-    assert human_packet["source_submissions"] == {
-        agent_id: {
-            "sha256": hashlib.sha256(paths[agent_id].read_bytes()).hexdigest(),
-            "provenance": json.loads(paths[agent_id].read_text())["agent_provenance"],
-            "completion": json.loads(paths[agent_id].read_text())["completion"],
-        }
-        for agent_id in ("A1", "A2", "A3")
-    }
+    assert completed.returncode != 0
+    assert "--binding" in completed.stderr
+    assert "--dispatch-record" in completed.stderr
+    assert not output.exists()
 
 
 @pytest.mark.parametrize("failure", ["missing", "wrong_hash"])

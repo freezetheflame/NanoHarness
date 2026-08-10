@@ -132,6 +132,72 @@ def _reject_unexpected_source_fields(
                     f"{agent_id} {container} has unexpected field: "
                     f"{sorted(extras)[0]}"
                 )
+
+
+def validate_pass_a_semantics(
+    submission: DefectCodingSubmission,
+    candidate_by_id: Mapping[str, Mapping[str, Any]],
+    *,
+    expected_order: Sequence[str],
+) -> None:
+    """Validate one complete Pass A judgment against defect-local evidence."""
+
+    if submission.pass_id.value != "pass_a":
+        raise ValueError("submission must be Pass A")
+    entry_ids = [entry.defect_id for entry in submission.entries]
+    if entry_ids != list(expected_order):
+        raise ValueError("submission IDs must exactly match packet order")
+    for entry in submission.entries:
+        if entry.operator_ids:
+            raise ValueError(f"{entry.defect_id} Pass A operator_ids must be empty")
+        if len(entry.boundaries) != len(set(entry.boundaries)):
+            raise ValueError(f"{entry.defect_id} has duplicate boundaries")
+        if len(entry.evidence_ids) != len(set(entry.evidence_ids)):
+            raise ValueError(f"{entry.defect_id} has duplicate evidence_ids")
+        candidate_evidence_ids = {
+            evidence["evidence_id"]
+            for evidence in candidate_by_id[entry.defect_id].get("evidence", [])
+        }
+        if (
+            not entry.evidence_ids
+            or not set(entry.evidence_ids) <= candidate_evidence_ids
+        ):
+            raise ValueError(f"{entry.defect_id} has invalid evidence IDs")
+        if not entry.rationale.strip():
+            raise ValueError(f"{entry.defect_id} requires rationale")
+        decision = entry.decision.value
+        if decision == "include":
+            if entry.exclusion_reason.strip():
+                raise ValueError(
+                    f"{entry.defect_id} include requires empty exclusion_reason"
+                )
+            if not entry.boundaries:
+                raise ValueError(f"{entry.defect_id} include requires boundaries")
+            for field_name in ("trigger", "symptom", "root_cause", "impact"):
+                if not getattr(entry, field_name).strip():
+                    raise ValueError(
+                        f"{entry.defect_id} include requires {field_name}"
+                    )
+        elif decision == "exclude":
+            if not entry.exclusion_reason.strip():
+                raise ValueError(
+                    f"{entry.defect_id} exclude requires exclusion_reason"
+                )
+            if entry.boundaries:
+                raise ValueError(
+                    f"{entry.defect_id} exclude requires empty boundaries"
+                )
+        else:
+            if entry.exclusion_reason.strip():
+                raise ValueError(
+                    f"{entry.defect_id} uncertain requires empty exclusion_reason"
+                )
+            if entry.boundaries:
+                raise ValueError(
+                    f"{entry.defect_id} uncertain requires empty boundaries"
+                )
+
+
 def _validate_inputs(
     packet_bytes: bytes,
     packet: Mapping[str, Any],
@@ -163,39 +229,11 @@ def _validate_inputs(
             raise ValueError("all submissions must use protocol agent-review-v1")
         if submission.completion is None:
             raise ValueError("all submissions require completion")
-        entry_ids = {entry.defect_id for entry in submission.entries}
-        if entry_ids != packet_ids:
-            raise ValueError("submission IDs must exactly match packet IDs")
-        for entry in submission.entries:
-            if len(entry.boundaries) != len(set(entry.boundaries)):
-                raise ValueError(f"{entry.defect_id} has duplicate boundaries")
-            if len(entry.evidence_ids) != len(set(entry.evidence_ids)):
-                raise ValueError(f"{entry.defect_id} has duplicate evidence_ids")
-            candidate_evidence_ids = {
-                evidence["evidence_id"]
-                for evidence in candidate_by_id[entry.defect_id].get("evidence", [])
-            }
-            if not entry.evidence_ids or not set(entry.evidence_ids) <= candidate_evidence_ids:
-                raise ValueError(f"{entry.defect_id} has invalid evidence IDs")
-            if not entry.rationale.strip():
-                raise ValueError(f"{entry.defect_id} requires rationale")
-            if entry.decision.value == "include":
-                if not entry.boundaries:
-                    raise ValueError(f"{entry.defect_id} include requires boundaries")
-                for field_name in ("trigger", "symptom", "root_cause", "impact"):
-                    if not getattr(entry, field_name).strip():
-                        raise ValueError(
-                            f"{entry.defect_id} include requires {field_name}"
-                        )
-            elif entry.decision.value == "exclude":
-                if not entry.exclusion_reason.strip():
-                    raise ValueError(
-                        f"{entry.defect_id} exclude requires exclusion reason"
-                    )
-                if entry.boundaries:
-                    raise ValueError(
-                        f"{entry.defect_id} exclude must not have boundaries"
-                    )
+        validate_pass_a_semantics(
+            submission,
+            candidate_by_id,
+            expected_order=[candidate["defect_id"] for candidate in candidates],
+        )
         validated[agent_id] = submission
 
     shared_fields = (

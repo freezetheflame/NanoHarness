@@ -5,10 +5,12 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Mapping, Optional
+from typing import Any, Mapping, Optional, Sequence
 
 from nanoharness.testing.defects import DefectCodingSubmission
+from research.defects.real_corpus_v1.agent_review import validate_pass_a_semantics
 
 
 FROZEN_MODEL_ID = "gpt-5.6-sol"
@@ -49,6 +51,34 @@ PROVENANCE_FIELDS = {
     "started_at",
 }
 COMPLETION_FIELDS = {"completed_at", "independent", "packet_sha256"}
+DISPATCH_RECORD_FIELDS = {
+    "schema_version",
+    "protocol_id",
+    "binding_sha256",
+    "freeze_payload_revision",
+    "prompt_sha256",
+    "actual_payload_sha256",
+    "model_id",
+    "model_configuration",
+    "fork_turns",
+    "workspace_snapshot_sha256",
+    "batch_preflight",
+    "assignments",
+}
+DISPATCH_ASSIGNMENT_FIELDS = {
+    "annotator_id",
+    "canonical_task_name",
+    "returned_task_id",
+    "started_at",
+    "start_preflight",
+}
+PREFLIGHT_RECEIPT_FIELDS = {"checked_at", "workspace_snapshot_sha256"}
+BATCH_PREFLIGHT_FIELDS = {
+    "checked_at",
+    "workspace_snapshot_sha256",
+    "canonical_outputs_absent",
+    "receipt_sha256",
+}
 
 
 def _sha256_bytes(payload: bytes) -> str:
@@ -170,6 +200,58 @@ def _find_paper_repo(repo: Path) -> Path:
     raise ValueError("AgentMutationTestingPaper repository not found")
 
 
+def _untracked_paths(repo: Path) -> list[str]:
+    completed = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repo),
+            "ls-files",
+            "--others",
+            "--exclude-standard",
+            "-z",
+        ],
+        check=True,
+        stdout=subprocess.PIPE,
+    )
+    return sorted(
+        path.decode("utf-8")
+        for path in completed.stdout.split(b"\0")
+        if path
+    )
+
+
+def workspace_snapshot_sha256(
+    repo: Path,
+    *,
+    exclude_untracked: Optional[str] = None,
+    exclude_untracked_paths: Sequence[str] = (),
+) -> str:
+    """Hash untracked path metadata without reading any untracked file bytes."""
+
+    excluded = set(exclude_untracked_paths)
+    if exclude_untracked is not None:
+        excluded.add(exclude_untracked)
+    entries = []
+    for relative in _untracked_paths(repo):
+        if relative in excluded:
+            continue
+        metadata = (repo / relative).stat()
+        entries.append(
+            {
+                "path": relative,
+                "size": metadata.st_size,
+                "mtime_ns": metadata.st_mtime_ns,
+            }
+        )
+    payload = json.dumps(
+        {"tracked_clean": True, "untracked": entries},
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode()
+    return _sha256_bytes(payload)
+
+
 def _validate_binding_payload(
     binding_path: Path,
     *,
@@ -241,6 +323,8 @@ def _validate_binding_payload(
         ".gitattributes",
         "research/defects/real_corpus_v1/agent_dispatch.py",
         "research/defects/real_corpus_v1/agent_dispatch_cli.py",
+        "research/defects/real_corpus_v1/agent_review.py",
+        "research/defects/real_corpus_v1/agent_review_cli.py",
     }
     if (
         not isinstance(tooling, list)
@@ -336,9 +420,282 @@ def _validate_binding_payload(
     return binding, repo, binding_sha256
 
 
+def _record_relative_path(repo: Path, binding_path: Path, record_path: Path) -> str:
+    expected = binding_path.resolve().parent / "DISPATCH_RECORD.json"
+    if record_path.resolve() != expected:
+        raise ValueError("dispatch record path is not canonical")
+    return expected.relative_to(repo).as_posix()
+
+
+def _canonical_workspace_exclusions(
+    repo: Path, binding_path: Path, binding: Mapping[str, Any]
+) -> tuple[str, ...]:
+    record_relative = (binding_path.resolve().parent / "DISPATCH_RECORD.json").relative_to(
+        repo
+    ).as_posix()
+    return (
+        record_relative,
+        *(item["output"] for item in binding["canonical_task_mapping"].values()),
+    )
+
+
+def _require_aware_timestamp(value: Any, label: str) -> datetime:
+    if not isinstance(value, str):
+        raise ValueError(f"{label} must be timezone-aware")
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError as error:
+        raise ValueError(f"{label} must be timezone-aware") from error
+    if parsed.utcoffset() is None:
+        raise ValueError(f"{label} must be timezone-aware")
+    return parsed
+
+
+def _batch_receipt_sha256(receipt: Mapping[str, Any]) -> str:
+    bound = {
+        field: receipt[field]
+        for field in (
+            "checked_at",
+            "workspace_snapshot_sha256",
+            "canonical_outputs_absent",
+        )
+    }
+    return _sha256_bytes(
+        json.dumps(bound, sort_keys=True, separators=(",", ":")).encode()
+    )
+
+
+def preflight_batch(
+    *,
+    binding_path: Path,
+    checked_at: str,
+    paper_repo: Optional[Path] = None,
+) -> dict[str, Any]:
+    """Prove all three canonical outputs are absent before concurrent dispatch."""
+
+    _require_aware_timestamp(checked_at, "batch preflight timestamp")
+    binding_path = Path(binding_path)
+    binding, repo, binding_sha256 = _validate_binding_payload(
+        binding_path,
+        paper_repo=Path(paper_repo) if paper_repo else None,
+        require_clean=True,
+    )
+    outputs = [
+        item["output"] for item in binding["canonical_task_mapping"].values()
+    ]
+    if any(_resolve_repo_path(repo, output).exists() for output in outputs):
+        raise ValueError("batch preflight requires all canonical outputs absent")
+    workspace_sha256 = workspace_snapshot_sha256(
+        repo,
+        exclude_untracked_paths=_canonical_workspace_exclusions(
+            repo, binding_path, binding
+        ),
+    )
+    receipt = {
+        "checked_at": checked_at,
+        "workspace_snapshot_sha256": workspace_sha256,
+        "canonical_outputs_absent": outputs,
+    }
+    receipt["receipt_sha256"] = _batch_receipt_sha256(receipt)
+    return {
+        "valid": True,
+        "binding_sha256": binding_sha256,
+        "freeze_payload_revision": binding["freeze_payload_revision"],
+        "batch_preflight": receipt,
+    }
+
+
+def _validate_dispatch_record_payload(
+    *,
+    payload: Mapping[str, Any],
+    binding: Mapping[str, Any],
+    binding_sha256: str,
+    workspace_sha256: str,
+) -> None:
+    if set(payload) != DISPATCH_RECORD_FIELDS:
+        raise ValueError("dispatch record fields do not match schema")
+    if payload.get("schema_version") != 1:
+        raise ValueError("unexpected dispatch record schema")
+    if payload.get("protocol_id") != binding["protocol_id"]:
+        raise ValueError("dispatch record protocol mismatch")
+    if payload.get("binding_sha256") != binding_sha256:
+        raise ValueError("dispatch record binding digest mismatch")
+    if payload.get("freeze_payload_revision") != binding["freeze_payload_revision"]:
+        raise ValueError("dispatch record freeze payload revision mismatch")
+    prompt_sha256 = binding["inputs"]["prompt"]["sha256"]
+    if payload.get("prompt_sha256") != prompt_sha256:
+        raise ValueError("dispatch record prompt digest mismatch")
+    if payload.get("actual_payload_sha256") != prompt_sha256:
+        raise ValueError("dispatch record actual payload digest mismatch")
+    if payload.get("model_id") != binding["model_id"]:
+        raise ValueError("dispatch record frozen model mismatch")
+    if payload.get("model_configuration") != binding["model_configuration"]:
+        raise ValueError("dispatch record model configuration mismatch")
+    if payload.get("fork_turns") != binding["fork_turns"]:
+        raise ValueError("dispatch record fork_turns mismatch")
+    if payload.get("workspace_snapshot_sha256") != workspace_sha256:
+        raise ValueError("dispatch record workspace snapshot mismatch")
+    batch = payload.get("batch_preflight")
+    expected_outputs = [
+        item["output"] for item in binding["canonical_task_mapping"].values()
+    ]
+    if not isinstance(batch, dict) or set(batch) != BATCH_PREFLIGHT_FIELDS:
+        raise ValueError("dispatch record batch preflight fields do not match schema")
+    batch_checked_at = _require_aware_timestamp(
+        batch.get("checked_at"), "batch preflight timestamp"
+    )
+    if batch.get("workspace_snapshot_sha256") != workspace_sha256:
+        raise ValueError("batch preflight workspace snapshot mismatch")
+    if batch.get("canonical_outputs_absent") != expected_outputs:
+        raise ValueError("batch preflight canonical output set mismatch")
+    if batch.get("receipt_sha256") != _batch_receipt_sha256(batch):
+        raise ValueError("batch preflight receipt digest mismatch")
+
+    assignments = payload.get("assignments")
+    if not isinstance(assignments, list) or len(assignments) != len(AGENT_IDS):
+        raise ValueError("dispatch record must contain exactly A1, A2, A3")
+    expected = [
+        (assignment["annotator_id"], task_name)
+        for task_name, assignment in binding["canonical_task_mapping"].items()
+    ]
+    actual = []
+    task_ids = []
+    for assignment in assignments:
+        if not isinstance(assignment, dict) or set(assignment) != (
+            DISPATCH_ASSIGNMENT_FIELDS
+        ):
+            raise ValueError("dispatch record assignment fields do not match schema")
+        actual.append(
+            (assignment.get("annotator_id"), assignment.get("canonical_task_name"))
+        )
+        task_id = assignment.get("returned_task_id")
+        if not isinstance(task_id, str) or not task_id:
+            raise ValueError("returned task IDs must be non-empty strings")
+        task_ids.append(task_id)
+        task_started_at = _require_aware_timestamp(
+            assignment.get("started_at"), "dispatch start timestamps"
+        )
+        start = assignment.get("start_preflight")
+        if not isinstance(start, dict) or set(start) != PREFLIGHT_RECEIPT_FIELDS:
+            raise ValueError("start preflight fields do not match schema")
+        start_checked_at = _require_aware_timestamp(
+            start.get("checked_at"), "start preflight timestamp"
+        )
+        if not batch_checked_at <= task_started_at <= start_checked_at:
+            raise ValueError(
+                "dispatch timestamp order must satisfy "
+                "batch checked_at <= task started_at <= start checked_at"
+            )
+        if start.get("workspace_snapshot_sha256") != workspace_sha256:
+            raise ValueError("start preflight workspace snapshot mismatch")
+    if actual != expected:
+        raise ValueError("dispatch record canonical task mapping mismatch")
+    if len(set(task_ids)) != len(task_ids):
+        raise ValueError("returned task IDs must be unique")
+
+
+def create_dispatch_record(
+    *,
+    binding_path: Path,
+    record_path: Path,
+    actual_payload_path: Path,
+    batch_preflight: Mapping[str, Any],
+    assignments: Sequence[Mapping[str, Any]],
+    paper_repo: Optional[Path] = None,
+) -> dict[str, Any]:
+    """Create the external record for one exact three-agent dispatch."""
+
+    binding_path = Path(binding_path)
+    record_path = Path(record_path)
+    if record_path.exists():
+        raise ValueError("dispatch record already exists")
+    binding, repo, binding_sha256 = _validate_binding_payload(
+        binding_path,
+        paper_repo=Path(paper_repo) if paper_repo else None,
+        require_clean=True,
+    )
+    _record_relative_path(repo, binding_path, record_path)
+    actual_payload_sha256 = _sha256_file(Path(actual_payload_path))
+    prompt_sha256 = binding["inputs"]["prompt"]["sha256"]
+    if actual_payload_sha256 != prompt_sha256:
+        raise ValueError("actual payload must equal prompt bytes")
+    workspace_sha256 = workspace_snapshot_sha256(
+        repo,
+        exclude_untracked_paths=_canonical_workspace_exclusions(
+            repo, binding_path, binding
+        ),
+    )
+    payload = {
+        "schema_version": 1,
+        "protocol_id": binding["protocol_id"],
+        "binding_sha256": binding_sha256,
+        "freeze_payload_revision": binding["freeze_payload_revision"],
+        "prompt_sha256": prompt_sha256,
+        "actual_payload_sha256": actual_payload_sha256,
+        "model_id": binding["model_id"],
+        "model_configuration": binding["model_configuration"],
+        "fork_turns": binding["fork_turns"],
+        "workspace_snapshot_sha256": workspace_sha256,
+        "batch_preflight": dict(batch_preflight),
+        "assignments": [dict(assignment) for assignment in assignments],
+    }
+    _validate_dispatch_record_payload(
+        payload=payload,
+        binding=binding,
+        binding_sha256=binding_sha256,
+        workspace_sha256=workspace_sha256,
+    )
+    record_path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    return payload
+
+
+def validate_dispatch_record(
+    *,
+    binding_path: Path,
+    record_path: Path,
+    paper_repo: Optional[Path] = None,
+) -> dict[str, Any]:
+    """Validate the external record against the frozen binding and workspace."""
+
+    binding_path = Path(binding_path)
+    record_path = Path(record_path)
+    binding, repo, binding_sha256 = _validate_binding_payload(
+        binding_path,
+        paper_repo=Path(paper_repo) if paper_repo else None,
+        require_clean=True,
+    )
+    _record_relative_path(repo, binding_path, record_path)
+    payload = _load_object(record_path, "dispatch record")
+    workspace_sha256 = workspace_snapshot_sha256(
+        repo,
+        exclude_untracked_paths=_canonical_workspace_exclusions(
+            repo, binding_path, binding
+        ),
+    )
+    _validate_dispatch_record_payload(
+        payload=payload,
+        binding=binding,
+        binding_sha256=binding_sha256,
+        workspace_sha256=workspace_sha256,
+    )
+    return {
+        "valid": True,
+        "binding_sha256": binding_sha256,
+        "freeze_payload_revision": binding["freeze_payload_revision"],
+        "workspace_snapshot_sha256": workspace_sha256,
+        "batch_preflight": payload["batch_preflight"],
+        "assignments": payload["assignments"],
+    }
+
+
 def preflight_dispatch(
     *,
     binding_path: Path,
+    dispatch_record_path: Optional[Path] = None,
     task_name: str,
     expected_annotator: str,
     expected_template: str,
@@ -346,23 +703,31 @@ def preflight_dispatch(
     phase: str,
     expected_binding_sha256: Optional[str] = None,
     expected_freeze_payload_revision: Optional[str] = None,
+    expected_start_workspace_sha256: Optional[str] = None,
+    checked_at: Optional[str] = None,
     paper_repo: Optional[Path] = None,
 ) -> dict[str, Any]:
     """Validate frozen dispatch bytes and resolve one canonical assignment."""
 
     binding_path = Path(binding_path)
-    binding, _, binding_sha256 = _validate_binding_payload(
+    binding, repo, binding_sha256 = _validate_binding_payload(
         binding_path,
         paper_repo=Path(paper_repo) if paper_repo else None,
         require_clean=True,
     )
+    dispatch = None
+    record_relative = None
+    if dispatch_record_path is not None:
+        dispatch = validate_dispatch_record(
+            binding_path=binding_path,
+            record_path=Path(dispatch_record_path),
+            paper_repo=Path(paper_repo) if paper_repo else None,
+        )
+        record_relative = _record_relative_path(
+            repo, binding_path, Path(dispatch_record_path)
+        )
     if phase not in {"start", "end"}:
         raise ValueError("phase must be start or end")
-    if phase == "end":
-        if binding_sha256 != expected_binding_sha256:
-            raise ValueError("binding changed since start")
-        if binding["freeze_payload_revision"] != expected_freeze_payload_revision:
-            raise ValueError("freeze payload revision changed since start")
     suffix = task_name.rsplit("/", 1)[-1]
     mapping = binding.get("canonical_task_mapping", {})
     assignment = mapping.get(suffix)
@@ -375,6 +740,45 @@ def preflight_dispatch(
     }
     if assignment != expected:
         raise ValueError("expected assignment does not match canonical task mapping")
+    if phase == "start":
+        if _resolve_repo_path(repo, assignment["output"]).exists():
+            raise ValueError("own mapped output already exists")
+        checked_at = checked_at or datetime.now().astimezone().isoformat()
+        _require_aware_timestamp(checked_at, "start preflight timestamp")
+        workspace_sha256 = workspace_snapshot_sha256(
+            repo,
+            exclude_untracked_paths=_canonical_workspace_exclusions(
+                repo, binding_path, binding
+            ),
+        )
+    else:
+        if binding_sha256 != expected_binding_sha256:
+            raise ValueError("binding changed since start")
+        if binding["freeze_payload_revision"] != expected_freeze_payload_revision:
+            raise ValueError("freeze payload revision changed since start")
+        output_path = _resolve_repo_path(repo, assignment["output"])
+        if not output_path.is_file():
+            raise ValueError("mapped output is missing")
+        if assignment["output"] not in _untracked_paths(repo):
+            raise ValueError("mapped output must be an untracked canonical output")
+        workspace_sha256 = workspace_snapshot_sha256(
+            repo,
+            exclude_untracked_paths=_canonical_workspace_exclusions(
+                repo, binding_path, binding
+            ),
+        )
+        if workspace_sha256 != expected_start_workspace_sha256:
+            raise ValueError("workspace changed since start")
+        if dispatch is not None:
+            recorded = next(
+                item
+                for item in dispatch["assignments"]
+                if item["canonical_task_name"] == suffix
+            )["start_preflight"]
+            if recorded["workspace_snapshot_sha256"] != (
+                expected_start_workspace_sha256
+            ):
+                raise ValueError("saved start snapshot does not match dispatch record")
     return {
         "valid": True,
         "phase": phase,
@@ -383,6 +787,8 @@ def preflight_dispatch(
         "model_id": binding["model_id"],
         "model_configuration": binding["model_configuration"],
         "fork_turns": binding["fork_turns"],
+        "workspace_snapshot_sha256": workspace_sha256,
+        "checked_at": checked_at,
         "assignment": assignment,
     }
 
@@ -409,19 +815,47 @@ def _reject_unexpected_fields(payload: Mapping[str, Any]) -> None:
 def validate_frozen_submission(
     *,
     binding_path: Path,
+    dispatch_record_path: Path,
     protocol_path: Path,
     expected_annotator: str,
     template_path: Path,
     submission_path: Path,
+    expected_binding_sha256: str,
+    expected_freeze_payload_revision: str,
+    expected_start_workspace_sha256: str,
 ) -> dict[str, Any]:
     """Validate one raw Pass A submission against external frozen values."""
 
-    binding, repo, _ = _validate_binding_payload(
-        Path(binding_path), paper_repo=None, require_clean=False
+    dispatch = validate_dispatch_record(
+        binding_path=Path(binding_path),
+        record_path=Path(dispatch_record_path),
     )
+    binding, repo, binding_sha256 = _validate_binding_payload(
+        Path(binding_path), paper_repo=None, require_clean=True
+    )
+    if binding_sha256 != expected_binding_sha256:
+        raise ValueError("saved binding identity does not match current binding")
+    if binding["freeze_payload_revision"] != expected_freeze_payload_revision:
+        raise ValueError("saved freeze payload revision does not match binding")
+    if dispatch["binding_sha256"] != expected_binding_sha256:
+        raise ValueError("saved binding identity does not match dispatch record")
+    if dispatch["freeze_payload_revision"] != expected_freeze_payload_revision:
+        raise ValueError("saved freeze payload revision does not match dispatch record")
+    if dispatch["workspace_snapshot_sha256"] != expected_start_workspace_sha256:
+        raise ValueError("saved workspace identity does not match dispatch record")
     inputs = binding["inputs"]
     if expected_annotator not in AGENT_IDS:
         raise ValueError("invalid expected annotator")
+    dispatch_assignment = next(
+        (
+            item
+            for item in dispatch["assignments"]
+            if item["annotator_id"] == expected_annotator
+        ),
+        None,
+    )
+    if dispatch_assignment is None:
+        raise ValueError("expected annotator has no dispatch assignment")
     if Path(protocol_path).resolve() != _resolve_repo_path(
         repo, inputs["protocol"]["path"]
     ):
@@ -430,6 +864,35 @@ def validate_frozen_submission(
         repo, inputs["templates"][expected_annotator]["path"]
     ):
         raise ValueError("template path is not bound to expected annotator")
+    assignment = next(
+        (
+            item
+            for item in binding["canonical_task_mapping"].values()
+            if item["annotator_id"] == expected_annotator
+        ),
+        None,
+    )
+    if assignment is None:
+        raise ValueError("expected annotator has no canonical assignment")
+    if Path(submission_path).resolve() != _resolve_repo_path(
+        repo, assignment["output"]
+    ):
+        raise ValueError("submission path is not the mapped output")
+    record_relative = _record_relative_path(
+        repo, Path(binding_path), Path(dispatch_record_path)
+    )
+    current_workspace_sha256 = workspace_snapshot_sha256(
+        repo,
+        exclude_untracked_paths=(
+            record_relative,
+            *(
+                mapped["output"]
+                for mapped in binding["canonical_task_mapping"].values()
+            ),
+        ),
+    )
+    if current_workspace_sha256 != expected_start_workspace_sha256:
+        raise ValueError("workspace changed since saved start snapshot")
 
     protocol = _load_object(Path(protocol_path), "protocol")
     template = _load_object(Path(template_path), "template")
@@ -478,27 +941,36 @@ def validate_frozen_submission(
         raise ValueError("frozen packet digest mismatch")
     if provenance.get("artifact_revision") != binding["freeze_payload_revision"]:
         raise ValueError("frozen artifact revision mismatch")
-    if raw.get("completion") is None:
+    expected_started_at = dispatch_assignment["started_at"]
+    if provenance.get("started_at") != expected_started_at:
+        raise ValueError(
+            "agent provenance started_at must exactly match dispatch assignment started_at"
+        )
+    completion = raw.get("completion")
+    if completion is None:
         raise ValueError("completion is required")
+    started_at = _require_aware_timestamp(
+        expected_started_at, "dispatch assignment started_at"
+    )
+    completed_at = _require_aware_timestamp(
+        completion.get("completed_at") if isinstance(completion, dict) else None,
+        "completion timestamp",
+    )
+    if completed_at < started_at:
+        raise ValueError("completion timestamp must not precede independent start")
 
     packet = _load_object(
         _resolve_repo_path(repo, inputs["packet"]["path"]), "evidence packet"
     )
-    evidence_by_defect = {
-        candidate["defect_id"]: {
-            evidence["evidence_id"] for evidence in candidate.get("evidence", [])
-        }
-        for candidate in packet["candidates"]
-    }
-    for entry in raw_entries:
-        evidence_ids = entry.get("evidence_ids")
-        if (
-            not isinstance(evidence_ids, list)
-            or not evidence_ids
-            or not set(evidence_ids) <= evidence_by_defect[entry["defect_id"]]
-        ):
-            raise ValueError(f"invalid evidence IDs for {entry['defect_id']}")
-    DefectCodingSubmission.model_validate(raw)
+    submission = DefectCodingSubmission.model_validate(raw)
+    validate_pass_a_semantics(
+        submission,
+        {
+            candidate["defect_id"]: candidate
+            for candidate in packet["candidates"]
+        },
+        expected_order=[candidate["defect_id"] for candidate in packet["candidates"]],
+    )
     return {
         "valid": True,
         "annotator_id": expected_annotator,

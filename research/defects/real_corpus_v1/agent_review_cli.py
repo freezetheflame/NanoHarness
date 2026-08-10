@@ -16,18 +16,25 @@ from research.defects.real_corpus_v1.agent_review import (
     analyze_agent_reviews,
     build_review_artifacts,
 )
+from research.defects.real_corpus_v1.agent_dispatch import (
+    _load_object,
+    _repo_root,
+    _resolve_repo_path,
+    validate_dispatch_record,
+    validate_frozen_submission,
+)
 
 
 def _json_bytes(payload: Any) -> bytes:
-    return (json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False) + "\n").encode("utf-8")
+    return (
+        json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+    ).encode("utf-8")
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--packet", type=Path, required=True)
-    parser.add_argument("--a1", type=Path, required=True)
-    parser.add_argument("--a2", type=Path, required=True)
-    parser.add_argument("--a3", type=Path, required=True)
+    parser.add_argument("--binding", type=Path, required=True)
+    parser.add_argument("--dispatch-record", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     return parser
 
@@ -37,19 +44,51 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     try:
         if args.output.exists():
             raise ValueError("output directory must not already exist")
-        packet_bytes = args.packet.read_bytes()
+        dispatch = validate_dispatch_record(
+            binding_path=args.binding,
+            record_path=args.dispatch_record,
+        )
+        binding = _load_object(args.binding, "dispatch binding")
+        repo = _repo_root(args.binding)
+        inputs = binding["inputs"]
+        packet_path = _resolve_repo_path(repo, inputs["packet"]["path"])
+        protocol_path = _resolve_repo_path(repo, inputs["protocol"]["path"])
+        submission_paths = {}
+        for task_name, assignment in binding["canonical_task_mapping"].items():
+            annotator_id = assignment["annotator_id"]
+            submission_path = _resolve_repo_path(repo, assignment["output"])
+            validate_frozen_submission(
+                binding_path=args.binding,
+                dispatch_record_path=args.dispatch_record,
+                protocol_path=protocol_path,
+                expected_annotator=annotator_id,
+                template_path=_resolve_repo_path(
+                    repo, inputs["templates"][annotator_id]["path"]
+                ),
+                submission_path=submission_path,
+                expected_binding_sha256=dispatch["binding_sha256"],
+                expected_freeze_payload_revision=dispatch[
+                    "freeze_payload_revision"
+                ],
+                expected_start_workspace_sha256=dispatch[
+                    "workspace_snapshot_sha256"
+                ],
+            )
+            submission_paths[annotator_id] = submission_path
+        if set(submission_paths) != {"A1", "A2", "A3"}:
+            raise ValueError("binding must resolve exactly A1, A2, A3 submissions")
+        packet_bytes = packet_path.read_bytes()
         packet = json.loads(packet_bytes)
         submission_bytes = {
-            "A1": args.a1.read_bytes(),
-            "A2": args.a2.read_bytes(),
-            "A3": args.a3.read_bytes(),
+            annotator_id: submission_paths[annotator_id].read_bytes()
+            for annotator_id in ("A1", "A2", "A3")
         }
         analysis = analyze_agent_reviews(packet_bytes, submission_bytes)
         candidates = {
             candidate["defect_id"]: candidate
             for candidate in packet.get("candidates", [])
         }
-        packet_parent = args.packet.resolve().parent
+        packet_parent = packet_path.parent
         patch_payloads = {}
         for defect_id in analysis["human_audit_selection"][
             "reasons_by_defect_id"

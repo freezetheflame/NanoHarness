@@ -46,17 +46,74 @@
       "path": "research/defects/real_corpus_v1/formal/agent-review-v1/DISPATCH_RECORD.json",
       "required": true,
       "required_fields": [
-        "canonical_task_names",
-        "returned_task_ids",
+        "schema_version",
+        "protocol_id",
+        "assignments",
         "model_id",
         "model_configuration",
         "fork_turns",
         "prompt_sha256",
         "binding_sha256",
-        "started_at_by_annotator"
+        "freeze_payload_revision",
+        "actual_payload_sha256",
+        "workspace_snapshot_sha256",
+        "batch_preflight"
       ]
     },
+    "coordinator_batch_preflight": {
+      "must_precede_task_creation": true,
+      "requires_all_canonical_outputs_absent": true,
+      "receipt_fields": [
+        "checked_at",
+        "workspace_snapshot_sha256",
+        "canonical_outputs_absent",
+        "receipt_sha256"
+      ]
+    },
+    "per_annotator_start_preflight": {
+      "own_output_must_be_absent": true,
+      "other_canonical_outputs_may_exist": true,
+      "receipt_fields": [
+        "checked_at",
+        "workspace_snapshot_sha256"
+      ]
+    },
+    "dispatch_timestamp_order": {
+      "comparison": "absolute_time_after_offset_normalization",
+      "inclusive_order": [
+        "batch_preflight.checked_at",
+        "assignment.started_at",
+        "assignment.start_preflight.checked_at"
+      ]
+    },
+    "submission_timestamp_binding": {
+      "independent_start_field": "agent_provenance.started_at",
+      "separate_completion_independent_started_at_field": false,
+      "provenance_start_rule": "exact_dispatch_assignment_iso_string",
+      "completion_rule": "timezone_aware_absolute_time_greater_than_or_equal_to_start"
+    },
+    "concurrent_workspace_policy": {
+      "allowlisted_new_paths": [
+        "research/defects/real_corpus_v1/formal/agent-review-v1/pass_a/A1.json",
+        "research/defects/real_corpus_v1/formal/agent-review-v1/pass_a/A2.json",
+        "research/defects/real_corpus_v1/formal/agent-review-v1/pass_a/A3.json",
+        "research/defects/real_corpus_v1/formal/agent-review-v1/DISPATCH_RECORD.json"
+      ],
+      "author_attribution_guarantee": false,
+      "preexisting_untracked_metadata_fields": [
+        "path",
+        "size",
+        "mtime_ns"
+      ],
+      "untracked_file_bytes_read": false
+    },
     "downstream_analysis_requires_binding_validation": true,
+    "downstream_analysis_requires_dispatch_record_validation": true,
+    "end_preflight_requires_saved_start_identities": [
+      "binding_sha256",
+      "freeze_payload_revision",
+      "workspace_snapshot_sha256"
+    ],
     "fork_turns": "none"
   },
   "dispatch_status": "frozen_ready",
@@ -68,7 +125,7 @@
     "nanoharness_revision": "8ea573b71ba8c7b7016a4436cec5d304292d44ee",
     "nanoharness_revision_kind": "pre-freeze_code_and_artifact_revision",
     "paper_revision": "91674e63aab0cf9da599ae52f341cf99004ddd4a",
-    "prompt_sha256": "8f7eb31df4379574c8c87337938755273d3bf822f3387cbdc1d3072c7ee5cadb",
+    "prompt_sha256": "db24b8a1a539762fadf75a96638622529fe1be44cdca9b769e1671796d9e8a94",
     "started_at": "2026-08-10T17:58:25.7202961+08:00"
   },
   "formal_prior_outputs_excluded": [
