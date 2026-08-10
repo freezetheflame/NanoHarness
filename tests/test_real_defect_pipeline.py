@@ -299,6 +299,119 @@ def test_build_packets_creates_identical_blind_coder_templates(tmp_path):
     assert "machine_precode" not in packet_text
 
 
+def test_build_packets_creates_three_structurally_identical_agent_templates(
+    tmp_path,
+):
+    selected = select_and_partition([
+        _candidate("owner/runtime", 1),
+        _candidate("owner/runtime", 2),
+    ])
+
+    baseline_outputs = build_packets(selected, tmp_path)
+    legacy_bytes = {
+        "evidence_packet": baseline_outputs.evidence_packet.read_bytes(),
+        "h1_pass_a": baseline_outputs.h1_pass_a.read_bytes(),
+        "h2_pass_a": baseline_outputs.h2_pass_a.read_bytes(),
+    }
+    outputs = build_packets(
+        selected,
+        tmp_path,
+        agent_annotators=("A1", "A2", "A3"),
+    )
+
+    templates = [
+        json.loads(outputs.agent_pass_a[annotator_id].read_text(encoding="utf-8"))
+        for annotator_id in ("A1", "A2", "A3")
+    ]
+    normalized = []
+    for template in templates:
+        annotator_id = template["coder_id"]
+        assert template["agent_provenance"]["annotator_id"] == annotator_id
+        assert template["manual_version"] == "2.0"
+        assert template["packet_sha256"] == sha256_file(outputs.evidence_packet)
+        assert template["agent_provenance"] == {
+            "protocol_id": "agent-review-v1",
+            "annotator_id": annotator_id,
+            "model_id": None,
+            "prompt_sha256": None,
+            "input_sha256": template["packet_sha256"],
+            "artifact_revision": None,
+            "started_at": None,
+        }
+        assert template["completion"] is None
+        assert all(entry["operator_ids"] == [] for entry in template["entries"])
+        serialized = json.dumps(template)
+        assert "partition" not in serialized
+        assert "selection_rank" not in serialized
+        assert "machine_precode" not in serialized
+        template["coder_id"] = "ANNOTATOR"
+        template["agent_provenance"]["annotator_id"] = "ANNOTATOR"
+        normalized.append(template)
+
+    assert normalized[0] == normalized[1] == normalized[2]
+    assert outputs.agent_pass_a == {
+        annotator_id: (
+            tmp_path
+            / "formal"
+            / "agent-review-v1"
+            / "templates"
+            / annotator_id
+            / "pass_a.json"
+        )
+        for annotator_id in ("A1", "A2", "A3")
+    }
+    assert outputs.evidence_packet.read_bytes() == legacy_bytes["evidence_packet"]
+    assert outputs.h1_pass_a.read_bytes() == legacy_bytes["h1_pass_a"]
+    assert outputs.h2_pass_a.read_bytes() == legacy_bytes["h2_pass_a"]
+
+    repeated = build_packets(
+        selected,
+        tmp_path / "repeated",
+        agent_annotators=("A1", "A2", "A3"),
+    )
+    assert all(
+        outputs.agent_pass_a[annotator_id].read_bytes()
+        == repeated.agent_pass_a[annotator_id].read_bytes()
+        for annotator_id in ("A1", "A2", "A3")
+    )
+
+
+def test_agent_review_protocol_freezes_only_known_pre_dispatch_values():
+    root = (
+        __import__("pathlib").Path(__file__).parents[1]
+        / "research"
+        / "defects"
+        / "real_corpus_v1"
+    )
+    protocol = json.loads(
+        (root / "formal" / "agent-review-v1" / "protocol.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert protocol == {
+        "schema_version": 1,
+        "protocol_id": "agent-review-v1",
+        "annotator_ids": ["A1", "A2", "A3"],
+        "manual_version": "2.0",
+        "packet_sha256": (
+            "92fc19ca1f96e183dfb21087aae966445ce46e3ae75e81dbdbacfa1f74f82593"
+        ),
+        "audit_namespace": "agent-defect-human-audit-v1",
+        "audit_fraction": 0.1,
+        "formal_prior_outputs_excluded": ["H2-CODEX", "machine_precode"],
+        "dispatch_time_provenance": {
+            field: "unfrozen_until_dispatch"
+            for field in (
+                "model_id",
+                "prompt_sha256",
+                "artifact_revision",
+                "started_at",
+            )
+        },
+    }
+
+
 def test_frozen_queries_respect_github_boolean_operator_limit():
     manifest_path = (
         __import__("pathlib").Path(__file__).parents[1]
@@ -544,7 +657,7 @@ def test_retained_real_defect_snapshot_checksums_match():
     )
     lines = (root / "SHA256SUMS").read_text(encoding="utf-8").splitlines()
 
-    assert len(lines) == 121
+    assert len(lines) == 125
     for line in lines:
         expected, relative = line.split("  ", 1)
         path = root / relative

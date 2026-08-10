@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping, Optional, Sequence
 
@@ -20,6 +20,7 @@ class PacketOutputs:
     evidence_packet: Path
     h1_pass_a: Path
     h2_pass_a: Path
+    agent_pass_a: Mapping[str, Path] = field(default_factory=dict)
 
 
 def _write_json(path: Path, payload: Any) -> None:
@@ -63,11 +64,32 @@ def _pass_a_template(
     }
 
 
+def _agent_pass_a_template(
+    annotator_id: str,
+    packet_digest: str,
+    candidates: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    template = _pass_a_template(annotator_id, packet_digest, candidates)
+    template["manual_version"] = "2.0"
+    template["agent_provenance"] = {
+        "protocol_id": "agent-review-v1",
+        "annotator_id": annotator_id,
+        "model_id": None,
+        "prompt_sha256": None,
+        "input_sha256": packet_digest,
+        "artifact_revision": None,
+        "started_at": None,
+    }
+    return template
+
+
 def build_packets(
     selected: Sequence[Mapping[str, Any]],
     output_dir: Path,
+    *,
+    agent_annotators: Sequence[str] = (),
 ) -> PacketOutputs:
-    """Write one blind packet and byte-equivalent H1/H2 blank judgments."""
+    """Write one blind packet and partition-blind blank judgments."""
 
     candidates = blind_packet(selected)
     evidence_packet = output_dir / "evidence_packet.json"
@@ -85,7 +107,28 @@ def build_packets(
     h2 = output_dir / "coding_templates" / "H2" / "pass_a.json"
     _write_json(h1, _pass_a_template("H1", packet_digest, candidates))
     _write_json(h2, _pass_a_template("H2", packet_digest, candidates))
-    return PacketOutputs(evidence_packet=evidence_packet, h1_pass_a=h1, h2_pass_a=h2)
+    agent_pass_a = {
+        annotator_id: (
+            output_dir
+            / "formal"
+            / "agent-review-v1"
+            / "templates"
+            / annotator_id
+            / "pass_a.json"
+        )
+        for annotator_id in agent_annotators
+    }
+    for annotator_id, path in agent_pass_a.items():
+        _write_json(
+            path,
+            _agent_pass_a_template(annotator_id, packet_digest, candidates),
+        )
+    return PacketOutputs(
+        evidence_packet=evidence_packet,
+        h1_pass_a=h1,
+        h2_pass_a=h2,
+        agent_pass_a=agent_pass_a,
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
