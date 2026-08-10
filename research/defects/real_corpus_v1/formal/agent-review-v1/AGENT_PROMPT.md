@@ -2,6 +2,8 @@
 
 You are one of three independent formal annotators operating in a fresh, isolated context. Perform the complete 77-item Pass A annotation under frozen protocol `agent-review-v1`. Do not rely on memory or context from any earlier task.
 
+The dispatcher must create this task with model `gpt-5.6-sol`, reasoning effort `high`, and `fork_turns: "none"`. The actual spawn message payload must be the exact bytes of this `AGENT_PROMPT.md`; it must not be quoted, prefixed, suffixed, templated, or otherwise transformed.
+
 ## Resolve your assignment from your canonical task name
 
 Inspect your own canonical task name and use its final path component. Apply exactly this fixed mapping:
@@ -14,16 +16,28 @@ Inspect your own canonical task name and use its final path component. Apply exa
 
 The suffix must match exactly one row. If it does not, refuse the task with `unknown canonical task name`; do not guess an annotator, template, or output path. The dispatcher sends these exact prompt bytes to every annotator: no annotator ID, task-specific instruction, or output path is substituted into the message.
 
+## Mandatory byte-level preflight
+
+The external binding is `research/defects/real_corpus_v1/formal/agent-review-v1/DISPATCH_BINDING.json`. Before reading annotation inputs, choose exactly one start command below from your canonical mapping row and run it from the NanoHarness repository root:
+
+```text
+python research/defects/real_corpus_v1/agent_dispatch_cli.py preflight --binding research/defects/real_corpus_v1/formal/agent-review-v1/DISPATCH_BINDING.json --task-name formal_a1 --expected-annotator A1 --expected-template research/defects/real_corpus_v1/formal/agent-review-v1/templates/A1/pass_a.json --expected-output research/defects/real_corpus_v1/formal/agent-review-v1/pass_a/A1.json --phase start
+python research/defects/real_corpus_v1/agent_dispatch_cli.py preflight --binding research/defects/real_corpus_v1/formal/agent-review-v1/DISPATCH_BINDING.json --task-name formal_a2 --expected-annotator A2 --expected-template research/defects/real_corpus_v1/formal/agent-review-v1/templates/A2/pass_a.json --expected-output research/defects/real_corpus_v1/formal/agent-review-v1/pass_a/A2.json --phase start
+python research/defects/real_corpus_v1/agent_dispatch_cli.py preflight --binding research/defects/real_corpus_v1/formal/agent-review-v1/DISPATCH_BINDING.json --task-name formal_a3 --expected-annotator A3 --expected-template research/defects/real_corpus_v1/formal/agent-review-v1/templates/A3/pass_a.json --expected-output research/defects/real_corpus_v1/formal/agent-review-v1/pass_a/A3.json --phase start
+```
+
+Stop without reading annotation inputs or writing output unless it returns `"valid": true`. Save its `binding_sha256` and `freeze_payload_revision` exactly. The preflight verifies the top-level and nested checksum manifests, frozen Git payload, exact model/configuration/fork policy, prompt, protocol, packet, all three templates, all 77 patches, and revision-bound Paper inputs. Only read paths and Paper revision bytes approved by this binding. Do not substitute a working-tree Paper file or any unbound content. Every patch SHA-256 must have passed preflight before you use that patch.
+
 ## Frozen inputs you must read
 
 Locate the NanoHarness and AgentMutationTestingPaper repositories in the provided workspace. Before judging any item, read all of the following:
 
-1. `research/defects/real_corpus_v1/formal/agent-review-v1/protocol.json` in NanoHarness.
-2. Paper manual 2.0 at exact Paper revision `91674e63aab0cf9da599ae52f341cf99004ddd4a`, path `experiments/design/DEFECT_CODING_MANUAL.md`. Read the revision-bound bytes (for example, with `git show <revision>:<path>`), not a different working-tree revision.
-3. Paper instructions at the same exact Paper revision, path `experiments/defects/real-corpus-v1/AGENT_ANNOTATOR_INSTRUCTIONS.md`, also using revision-bound bytes.
-4. NanoHarness `research/defects/real_corpus_v1/evidence_packet.json`.
-5. Only the assigned canonical template selected by the mapping above.
-6. All 77 patches in `research/defects/real_corpus_v1/patches/`, matching the 77 `defect_id` values in the assigned template. Do not omit an item.
+1. The binding-approved `research/defects/real_corpus_v1/formal/agent-review-v1/protocol.json` in NanoHarness.
+2. The binding-approved Paper manual 2.0 revision and path `experiments/design/DEFECT_CODING_MANUAL.md`. Read its revision-bound bytes (for example, with `git show <binding revision>:<path>`), not a working-tree revision.
+3. The binding-approved Paper instructions at path `experiments/defects/real-corpus-v1/AGENT_ANNOTATOR_INSTRUCTIONS.md`, also using only its revision-bound bytes.
+4. The binding-approved NanoHarness `research/defects/real_corpus_v1/evidence_packet.json`.
+5. Only the assigned binding-approved canonical template selected by the mapping above.
+6. All 77 binding-approved patches in `research/defects/real_corpus_v1/patches/`, matching the 77 `defect_id` values in the assigned template. Do not omit an item.
 
 Verify that the SHA-256 of the evidence-packet bytes equals both the protocol `packet_sha256` and the assigned template `packet_sha256` before annotating. Stop without writing output if this or any other frozen identity check fails.
 
@@ -33,10 +47,22 @@ Verify that the SHA-256 of the evidence-packet bytes equals both the protocol `p
 - Write exactly one file: the sole permitted output from your mapping row. Do not modify the assigned template in place.
 - This is Pass A. Every `operator_ids` value must remain `[]`. Do not perform operator mapping or projection.
 - Every `evidence_ids` value must contain only evidence IDs present for that same defect in `evidence_packet.json`. Do not invent IDs or cite a patch path as an evidence ID.
-- Populate `agent_provenance.protocol_id`, `annotator_id`, `model_id`, `prompt_sha256`, `input_sha256`, `artifact_revision`, and `started_at` from your resolved identity, actual execution, and the frozen protocol. Use `gpt-5.6-sol` as `model_id`; `input_sha256` is the verified packet SHA; `artifact_revision` is the protocol's pre-freeze NanoHarness code/artifact revision. Copy `prompt_sha256` from the frozen protocol. Do not embed or recompute a prompt hash from this file, because the prompt cannot self-contain its own digest.
+- Populate `agent_provenance.protocol_id`, `annotator_id`, `model_id`, `prompt_sha256`, `input_sha256`, `artifact_revision`, and `started_at` from your resolved identity, actual execution, and the frozen binding/protocol. Use `gpt-5.6-sol` as `model_id`; `input_sha256` is the verified packet SHA; `artifact_revision` is the saved binding `freeze_payload_revision`. Copy `prompt_sha256` from the frozen protocol and verify it equals the binding prompt digest. Do not embed or recompute a prompt hash from this file, because the prompt cannot self-contain its own digest.
 - Record the actual start of your independent work as timezone-aware `agent_provenance.started_at` (the independent_started_at) and the actual finish as timezone-aware `completion.completed_at`. Set `completion.independent` to `true` and copy the verified packet SHA to `completion.packet_sha256`. Do not use the protocol's common dispatch timestamp as your independent start time.
 - The frozen model configuration is reasoning effort `high`. The output schema has no reasoning-effort field, so do not add one.
 - Validate the completed JSON against the assigned canonical shape and Pass A constraints before finishing.
+
+Immediately before final submission, rerun your same preflight command with `--phase end` instead of `--phase start`, and append `--expected-binding-sha256 <saved-binding_sha256> --expected-freeze-payload-revision <saved-freeze_payload_revision>`. Stop if it does not return `"valid": true`; this detects any mid-run replacement.
+
+Then run exactly your mapped frozen submission-validation command:
+
+```text
+python research/defects/real_corpus_v1/agent_dispatch_cli.py validate-submission --binding research/defects/real_corpus_v1/formal/agent-review-v1/DISPATCH_BINDING.json --protocol research/defects/real_corpus_v1/formal/agent-review-v1/protocol.json --expected-annotator A1 --template research/defects/real_corpus_v1/formal/agent-review-v1/templates/A1/pass_a.json --submission research/defects/real_corpus_v1/formal/agent-review-v1/pass_a/A1.json
+python research/defects/real_corpus_v1/agent_dispatch_cli.py validate-submission --binding research/defects/real_corpus_v1/formal/agent-review-v1/DISPATCH_BINDING.json --protocol research/defects/real_corpus_v1/formal/agent-review-v1/protocol.json --expected-annotator A2 --template research/defects/real_corpus_v1/formal/agent-review-v1/templates/A2/pass_a.json --submission research/defects/real_corpus_v1/formal/agent-review-v1/pass_a/A2.json
+python research/defects/real_corpus_v1/agent_dispatch_cli.py validate-submission --binding research/defects/real_corpus_v1/formal/agent-review-v1/DISPATCH_BINDING.json --protocol research/defects/real_corpus_v1/formal/agent-review-v1/protocol.json --expected-annotator A3 --template research/defects/real_corpus_v1/formal/agent-review-v1/templates/A3/pass_a.json --submission research/defects/real_corpus_v1/formal/agent-review-v1/pass_a/A3.json
+```
+
+Do not report completion unless this command returns `"valid": true`.
 
 ## Blindness and isolation restrictions
 

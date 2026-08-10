@@ -440,6 +440,33 @@ def test_agent_review_protocol_freezes_identical_dispatch_prompt_and_provenance(
     assert protocol["audit_namespace"] == "agent-defect-human-audit-v1"
     assert protocol["audit_fraction"] == 0.1
     assert protocol["dispatch_status"] == "frozen_ready"
+    assert protocol["dispatch_execution_policy"] == {
+        "fork_turns": "none",
+        "actual_payload_must_equal_prompt_bytes": True,
+        "dispatch_binding_path": (
+            "research/defects/real_corpus_v1/formal/agent-review-v1/"
+            "DISPATCH_BINDING.json"
+        ),
+        "dispatch_record": {
+            "path": (
+                "research/defects/real_corpus_v1/formal/agent-review-v1/"
+                "DISPATCH_RECORD.json"
+            ),
+            "required": True,
+            "must_precede_raw_output_commit": True,
+            "required_fields": [
+                "canonical_task_names",
+                "returned_task_ids",
+                "model_id",
+                "model_configuration",
+                "fork_turns",
+                "prompt_sha256",
+                "binding_sha256",
+                "started_at_by_annotator",
+            ],
+        },
+        "downstream_analysis_requires_binding_validation": True,
+    }
 
     provenance = protocol["dispatch_time_provenance"]
     assert provenance == {
@@ -543,6 +570,12 @@ def test_agent_review_protocol_freezes_identical_dispatch_prompt_and_provenance(
     assert "completed_at" in prompt_text
     assert "private" in prompt_text.lower()
     assert "machine precode" in prompt_text.lower()
+    assert 'fork_turns: "none"' in prompt_text
+    assert "agent_dispatch_cli.py preflight" in prompt_text
+    assert "--phase start" in prompt_text
+    assert "--phase end" in prompt_text
+    assert "agent_dispatch_cli.py validate-submission" in prompt_text
+    assert "DISPATCH_BINDING.json" in prompt_text
 
 
 def test_frozen_queries_respect_github_boolean_operator_limit():
@@ -835,14 +868,22 @@ def test_retained_real_defect_snapshot_checksums_match():
     )
     lines = (root / "SHA256SUMS").read_text(encoding="utf-8").splitlines()
 
-    assert len(lines) == 125
+    relative_paths = []
     for line in lines:
         expected, relative = line.split("  ", 1)
-        if relative.startswith("formal/agent-review-v1/"):
-            continue
+        relative_paths.append(relative)
         path = root / relative
         assert path.is_file(), relative
         assert hashlib.sha256(path.read_bytes()).hexdigest() == expected, relative
+    formal_paths = {
+        relative
+        for relative in relative_paths
+        if relative.startswith("formal/agent-review-v1/")
+    }
+    expected_formal_paths = {"formal/agent-review-v1/SHA256SUMS"}
+    if (root / "formal/agent-review-v1/DISPATCH_BINDING.json").exists():
+        expected_formal_paths.add("formal/agent-review-v1/DISPATCH_BINDING.json")
+    assert formal_paths == expected_formal_paths
 
 
 def test_frozen_agent_input_checksums_are_complete_sorted_and_match_bytes():
@@ -863,6 +904,7 @@ def test_frozen_agent_input_checksums_are_complete_sorted_and_match_bytes():
         for path in root.rglob("*")
         if path.is_file()
         and path != inventory
+        and path.name != "DISPATCH_BINDING.json"
         and not path.relative_to(root).as_posix().startswith("pass_a/")
     )
     assert relative_paths == expected_paths

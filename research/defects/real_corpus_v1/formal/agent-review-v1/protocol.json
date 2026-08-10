@@ -38,6 +38,27 @@
     "path": "research/defects/real_corpus_v1/formal/agent-review-v1/AGENT_PROMPT.md",
     "protocol_bytes_immutable_for_all_annotators": true
   },
+  "dispatch_execution_policy": {
+    "actual_payload_must_equal_prompt_bytes": true,
+    "dispatch_binding_path": "research/defects/real_corpus_v1/formal/agent-review-v1/DISPATCH_BINDING.json",
+    "dispatch_record": {
+      "must_precede_raw_output_commit": true,
+      "path": "research/defects/real_corpus_v1/formal/agent-review-v1/DISPATCH_RECORD.json",
+      "required": true,
+      "required_fields": [
+        "canonical_task_names",
+        "returned_task_ids",
+        "model_id",
+        "model_configuration",
+        "fork_turns",
+        "prompt_sha256",
+        "binding_sha256",
+        "started_at_by_annotator"
+      ]
+    },
+    "downstream_analysis_requires_binding_validation": true,
+    "fork_turns": "none"
+  },
   "dispatch_status": "frozen_ready",
   "dispatch_time_provenance": {
     "model_configuration": {
@@ -47,7 +68,7 @@
     "nanoharness_revision": "8ea573b71ba8c7b7016a4436cec5d304292d44ee",
     "nanoharness_revision_kind": "pre-freeze_code_and_artifact_revision",
     "paper_revision": "91674e63aab0cf9da599ae52f341cf99004ddd4a",
-    "prompt_sha256": "ccc0b852c65793e6848f9d8f57c557ad5184b8caf018ab91eb94c640757de629",
+    "prompt_sha256": "8f7eb31df4379574c8c87337938755273d3bf822f3387cbdc1d3072c7ee5cadb",
     "started_at": "2026-08-10T17:58:25.7202961+08:00"
   },
   "formal_prior_outputs_excluded": [

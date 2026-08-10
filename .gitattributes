@@ -3,3 +3,5 @@
 **/SHA256SUMS text eol=lf
 research/defects/real_corpus_v1/patches/*.patch -text
 research/defects/real_corpus_v1/raw/*.zip binary
+research/defects/real_corpus_v1/agent_dispatch*.py text eol=lf
+research/defects/real_corpus_v1/formal/agent-review-v1/AGENT_PROMPT.md text eol=lf
