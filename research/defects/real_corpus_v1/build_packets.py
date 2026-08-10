@@ -15,6 +15,9 @@ if __package__ in {None, ""}:
 from research.defects.real_corpus_v1.pipeline import blind_packet, sha256_file
 
 
+AGENT_ANNOTATORS = ("A1", "A2", "A3")
+
+
 @dataclass(frozen=True)
 class PacketOutputs:
     evidence_packet: Path
@@ -87,9 +90,12 @@ def build_packets(
     selected: Sequence[Mapping[str, Any]],
     output_dir: Path,
     *,
-    agent_annotators: Sequence[str] = (),
+    agent_annotators: Sequence[str] = AGENT_ANNOTATORS,
 ) -> PacketOutputs:
     """Write one blind packet and partition-blind blank judgments."""
+
+    if tuple(agent_annotators) != AGENT_ANNOTATORS:
+        raise ValueError("agent_annotators must be exactly A1, A2, A3")
 
     candidates = blind_packet(selected)
     evidence_packet = output_dir / "evidence_packet.json"

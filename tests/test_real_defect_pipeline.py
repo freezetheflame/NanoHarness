@@ -297,6 +297,35 @@ def test_build_packets_creates_identical_blind_coder_templates(tmp_path):
     assert "selection_rank" not in packet_text
     assert "operator_ids" not in packet_text
     assert "machine_precode" not in packet_text
+    assert tuple(outputs.agent_pass_a) == ("A1", "A2", "A3")
+    assert all(path.is_file() for path in outputs.agent_pass_a.values())
+
+
+@pytest.mark.parametrize(
+    "agent_annotators",
+    [
+        ("A1", "A2", "A3", "A4"),
+        ("A1", "A2", "A2"),
+        ("A1", "A2", "../escape"),
+        ("A3", "A2", "A1"),
+        (),
+    ],
+)
+def test_build_packets_rejects_noncanonical_agent_annotators_before_writing(
+    tmp_path,
+    agent_annotators,
+):
+    output_dir = tmp_path / "output"
+    selected = select_and_partition([_candidate("owner/runtime", 1)])
+
+    with pytest.raises(ValueError, match="exactly A1, A2, A3"):
+        build_packets(
+            selected,
+            output_dir,
+            agent_annotators=agent_annotators,
+        )
+
+    assert not output_dir.exists()
 
 
 def test_build_packets_creates_three_structurally_identical_agent_templates(
@@ -513,6 +542,8 @@ def test_build_candidate_index_uses_complete_git_histories(tmp_path):
     }
     assert all("partition" in item for item in selected["candidates"])
     assert outputs.packet.evidence_packet.exists()
+    assert tuple(outputs.packet.agent_pass_a) == ("A1", "A2", "A3")
+    assert all(path.is_file() for path in outputs.packet.agent_pass_a.values())
 
 
 @pytest.mark.parametrize("script_name", ["build_packets.py", "build_candidate_index.py"])
@@ -532,6 +563,49 @@ def test_nested_pipeline_scripts_support_direct_execution(script_name):
     )
 
     assert completed.returncode == 0, completed.stderr
+
+
+def test_build_packets_cli_regenerates_three_agent_templates(tmp_path):
+    script = (
+        __import__("pathlib").Path(__file__).parents[1]
+        / "research"
+        / "defects"
+        / "real_corpus_v1"
+        / "build_packets.py"
+    )
+    selected = tmp_path / "selected.json"
+    candidates = select_and_partition([_candidate("owner/runtime", 1)])
+    selected.write_text(
+        json.dumps({"candidates": candidates}),
+        encoding="utf-8",
+    )
+    output_dir = tmp_path / "output"
+
+    completed = subprocess.run(
+        [
+            __import__("sys").executable,
+            str(script),
+            "--selected",
+            str(selected),
+            "--output",
+            str(output_dir),
+        ],
+        text=True,
+        capture_output=True,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert all(
+        (
+            output_dir
+            / "formal"
+            / "agent-review-v1"
+            / "templates"
+            / annotator_id
+            / "pass_a.json"
+        ).is_file()
+        for annotator_id in ("A1", "A2", "A3")
+    )
 
 
 def test_enrich_candidates_archives_commit_evidence_and_patch(tmp_path):
