@@ -989,7 +989,7 @@ def test_preflight_rejects_dirty_tracked_files(frozen_dispatch):
         manifest.write_bytes(original)
 
 
-def test_retained_dispatch_binding_preflights_all_assignments():
+def test_retained_dispatch_binding_rejects_restart_after_raw_freeze():
     from research.defects.real_corpus_v1.agent_dispatch import preflight_dispatch
 
     repo = Path(__file__).parents[1]
@@ -997,17 +997,15 @@ def test_retained_dispatch_binding_preflights_all_assignments():
     binding = formal / "DISPATCH_BINDING.json"
     payload = json.loads(binding.read_text(encoding="utf-8"))
     for suffix, assignment in payload["canonical_task_mapping"].items():
-        result = preflight_dispatch(
-            binding_path=binding,
-            task_name=f"/root/{suffix}",
-            expected_annotator=assignment["annotator_id"],
-            expected_template=assignment["template"],
-            expected_output=assignment["output"],
-            phase="start",
-        )
-        assert result["freeze_payload_revision"] == payload[
-            "freeze_payload_revision"
-        ]
+        with pytest.raises(ValueError, match="own mapped output already exists"):
+            preflight_dispatch(
+                binding_path=binding,
+                task_name=f"/root/{suffix}",
+                expected_annotator=assignment["annotator_id"],
+                expected_template=assignment["template"],
+                expected_output=assignment["output"],
+                phase="start",
+            )
 
 
 def test_frozen_submission_validation_accepts_exact_bound_submission(

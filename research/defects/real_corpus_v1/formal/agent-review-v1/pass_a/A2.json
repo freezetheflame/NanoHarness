@@ -1,0 +1,1227 @@
+{
+  "agent_provenance": {
+    "annotator_id": "A2",
+    "artifact_revision": "b5095acc300d2376fca7afe8a253e3eb8f58e5d2",
+    "input_sha256": "92fc19ca1f96e183dfb21087aae966445ce46e3ae75e81dbdbacfa1f74f82593",
+    "model_id": "gpt-5.6-sol",
+    "prompt_sha256": "db24b8a1a539762fadf75a96638622529fe1be44cdca9b769e1671796d9e8a94",
+    "protocol_id": "agent-review-v1",
+    "started_at": "2026-08-10T22:45:39.0474514+08:00"
+  },
+  "coder_id": "A2",
+  "completion": {
+    "completed_at": "2026-08-10T15:47:13.366Z",
+    "independent": true,
+    "packet_sha256": "92fc19ca1f96e183dfb21087aae966445ce46e3ae75e81dbdbacfa1f74f82593"
+  },
+  "corpus_id": "agent-real-defects-v1",
+  "entries": [
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "CREWAIINC-CREWAI-04B202486C03",
+      "evidence_ids": [
+        "de5d2eaa9b12-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch corrects a corrupted documentation table label and changes no executable Agent behavior.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "CREWAIINC-CREWAI-18B7D0AAA5B0",
+      "evidence_ids": [
+        "b38f0825e7ac-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch only repairs an installation-guide hyperlink, so it does not change an Agent boundary.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [
+        "model",
+        "control_flow"
+      ],
+      "decision": "include",
+      "defect_id": "CREWAIINC-CREWAI-1E81F04FA0D3",
+      "evidence_ids": [
+        "f700e014c9e6-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "An Agent run can fail while invoking an LLM or emitting related output.",
+      "operator_ids": [],
+      "rationale": "The public commit message states the race trigger and mechanism, and the patch implements context-managed redirection at the LLM boundary.",
+      "root_cause": "Global stream replacement exposes a partially initialized wrapper; context-managed redirection plus defensive lock initialization closes the race.",
+      "symptom": "The LLM execution path can raise an attribute error because the stream's lock is not yet present.",
+      "trigger": "A write reaches redirected stdout or stderr while a FilteredStream instance is still being initialized."
+    },
+    {
+      "boundaries": [
+        "tool"
+      ],
+      "decision": "include",
+      "defect_id": "CREWAIINC-CREWAI-1E9135EB1AC6",
+      "evidence_ids": [
+        "f13d307534d3-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "Tool observations can be cached when the tool explicitly requested otherwise.",
+      "operator_ids": [],
+      "rationale": "The patch propagates cache_function and adds regression assertions for both storage and BaseTool conversion.",
+      "root_cause": "BaseTool.to_structured_tool omitted cache_function when constructing CrewStructuredTool.",
+      "symptom": "The structured tool loses the custom cache decision and may cache results contrary to the tool contract.",
+      "trigger": "A BaseTool with a custom cache_function is converted to CrewStructuredTool."
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "CREWAIINC-CREWAI-2250F67CC995",
+      "evidence_ids": [
+        "46be5e8097a4-fix"
+      ],
+      "exclusion_reason": "refactor_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "Both the lookup and translation key used the same misspelling before the patch; renaming both consistently does not evidence an incorrect external behavior.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [
+        "context"
+      ],
+      "decision": "include",
+      "defect_id": "CREWAIINC-CREWAI-39544CABB83E",
+      "evidence_ids": [
+        "b35c3e802492-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "A generated Crew project can start without the intended model-provider configuration.",
+      "operator_ids": [],
+      "rationale": "The patch uppercases serialized keys and adds a regression test asserting uppercase MODEL output.",
+      "root_cause": "write_env_file serialized keys without normalizing them to the expected uppercase environment-variable convention.",
+      "symptom": "The generated environment file contains lowercase variable names that runtime configuration does not recognize.",
+      "trigger": "Project creation writes provider configuration keys whose source spelling is lowercase."
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "CREWAIINC-CREWAI-3A3F746A0B2C",
+      "evidence_ids": [
+        "f4f32b5f7fff-fix"
+      ],
+      "exclusion_reason": "not_agent_boundary",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch globally suppresses Pydantic deprecation warnings during package initialization; it does not evidence an incorrect tool-using Agent boundary.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "CREWAIINC-CREWAI-509EBFDD10D0",
+      "evidence_ids": [
+        "cc129a0bce43-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The title alleges Docling issues, but the patch only adjusts forward-reference annotations and supplies no regression test, reproduction, or precise observable failure.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "CREWAIINC-CREWAI-5261DAF3C41F",
+      "evidence_ids": [
+        "1da7473f2621-fix"
+      ],
+      "exclusion_reason": "not_agent_boundary",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The change repairs and records project tests and formatting workflow behavior, not an implemented Agent-system boundary.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [
+        "state"
+      ],
+      "decision": "include",
+      "defect_id": "CREWAIINC-CREWAI-55CE9DCF5420",
+      "evidence_ids": [
+        "6b262f5a6de3-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "Agent persistence or other lock-protected state operations can crash in partially configured environments.",
+      "operator_ids": [],
+      "rationale": "The regression tests exercise the missing-package trigger and verify fallback to the file-lock backend.",
+      "root_cause": "The backend selector checked only REDIS_URL and did not verify that the Redis client was importable.",
+      "symptom": "Lock acquisition raises ImportError instead of falling back to a file lock.",
+      "trigger": "REDIS_URL is set while the optional redis package is absent and a CrewAI lock is requested."
+    },
+    {
+      "boundaries": [
+        "state"
+      ],
+      "decision": "include",
+      "defect_id": "CREWAIINC-CREWAI-64B8519A37DD",
+      "evidence_ids": [
+        "f89c2bfb7e54-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "Subsequent Agent runs can continue using stale or dimension-incompatible memory state.",
+      "operator_ids": [],
+      "rationale": "The patch enumerates all Crew instances and the regression test verifies reset is invoked for each Crew.",
+      "root_cause": "The CLI helper returned the first Crew it found instead of enumerating every Crew instance.",
+      "symptom": "Only one discovered Crew is reset, leaving other Crew memory stores untouched and allowing the mismatch to persist.",
+      "trigger": "A project exposes multiple Crew instances, including memories backed by incompatible embedding dimensions, and the reset-memories CLI is invoked."
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "CREWAIINC-CREWAI-767929542075",
+      "evidence_ids": [
+        "5abf9763735b-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch distinguishes URL sources from filesystem paths, but no regression test, reproduction, or additional public evidence role establishes the alleged RAG failure.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [
+        "model",
+        "tool",
+        "control_flow"
+      ],
+      "decision": "include",
+      "defect_id": "CREWAIINC-CREWAI-7FA995D027A5",
+      "evidence_ids": [
+        "a1033e4bfee1-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "Agents can emit malformed intermediate requests or expose formatting scaffolding instead of completing tool use normally.",
+      "operator_ids": [],
+      "rationale": "The patch changes executor response-model handling and adds regression tests covering structured output with native tool calls.",
+      "root_cause": "The executor applied the response model during intermediate tool turns instead of deferring structured conversion until tool execution completed.",
+      "symptom": "Structured-output instructions or intermediate structured data leak into the tool-calling loop and corrupt the final interaction.",
+      "trigger": "An Agent uses tools while also requesting structured output."
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "CREWAIINC-CREWAI-86560271EDF6",
+      "evidence_ids": [
+        "beef71264674-fix"
+      ],
+      "exclusion_reason": "not_agent_boundary",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch changes CLI credential-file locking and atomic writes; the evidence does not connect the defect to execution of a tool-using Agent boundary.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "CREWAIINC-CREWAI-A70EE6E80215",
+      "evidence_ids": [
+        "5a8649a97f9f-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch only corrects dictionary access in a documentation example for unstructured Flow state.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "CREWAIINC-CREWAI-A7BAD35DD871",
+      "evidence_ids": [
+        "c50d62b82f03-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The encoder change plausibly supports date values, but the packet provides no regression test, reproduction, or report showing an Agent-boundary failure.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "CREWAIINC-CREWAI-A8C087332C76",
+      "evidence_ids": [
+        "beddc7218900-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch exports LLMGuardrail and updates an import example, but no second evidence role demonstrates an incorrect runtime guardrail behavior.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "CREWAIINC-CREWAI-B357A08423FA",
+      "evidence_ids": [
+        "25fcf39cc103-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The one-line Bedrock argument fallback change has no regression test or public reproduction establishing the trigger and symptom.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "CREWAIINC-CREWAI-B54077DEA910",
+      "evidence_ids": [
+        "81bd81e5f5e7-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The adapter removes model from keyword arguments, but the packet supplies no test or report showing a concrete Agent failure caused by the previous initialization.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "CREWAIINC-CREWAI-D57AA34C799B",
+      "evidence_ids": [
+        "02718e291b6c-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The task-cloning implementation changes context remapping, but no regression test or public reproduction verifies the alleged cloning failure.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [
+        "context",
+        "control_flow"
+      ],
+      "decision": "include",
+      "defect_id": "CREWAIINC-CREWAI-DDB20ED36374",
+      "evidence_ids": [
+        "4c74dc0f86a2-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "A later Agent task can inherit stale conversation content or prematurely hit iteration limits.",
+      "operator_ids": [],
+      "rationale": "Sync and async regression tests seed stale executor state and assert it is reset while resume state is preserved.",
+      "root_cause": "The non-resume invocation path failed to clear executor.messages and executor.iterations.",
+      "symptom": "Messages and iteration count from the prior task remain active in the new invocation.",
+      "trigger": "The same CrewAgentExecutor instance is invoked for a new task after completing a previous invocation."
+    },
+    {
+      "boundaries": [
+        "context",
+        "state"
+      ],
+      "decision": "include",
+      "defect_id": "CREWAIINC-CREWAI-E2AB332A0BAA",
+      "evidence_ids": [
+        "1dbe8aab52b9-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "Agents cannot ingest or retrieve large knowledge sources needed for later reasoning.",
+      "operator_ids": [],
+      "rationale": "The patch adds batch_size propagation through storage clients and regression tests for batched document insertion.",
+      "root_cause": "RAG clients lacked configurable batching and forwarded the full document set to the embedder at once.",
+      "symptom": "The embedding provider rejects the request for exceeding its token limit, preventing storage of the context.",
+      "trigger": "A large memory or knowledge document set is embedded in one unbounded request."
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "CREWAIINC-CREWAI-E356CA9140AB",
+      "evidence_ids": [
+        "7122a29a20a3-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The Mistral message workaround is plausible, but the patch has no regression test or public reproduction establishing the rejected-message symptom.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "CREWAIINC-CREWAI-EB022D82C64B",
+      "evidence_ids": [
+        "baf91d8f0a15-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch changes only enterprise hyperlinks in localized installation documentation.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "CREWAIINC-CREWAI-EEDC3C0811C8",
+      "evidence_ids": [
+        "887adafd2c56-fix"
+      ],
+      "exclusion_reason": "feature_request",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch introduces a new Flow-wide usage_metrics accumulator and documents semantics distinct from the pre-existing final CrewOutput token usage; the evidence does not establish that the prior API violated an existing contract.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "FREEZETHEFLAME-NANOHARNESS-35B5B7782B53",
+      "evidence_ids": [
+        "43fd031f3d89-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch adds OpenAI-specific message formatting, but the packet provides no regression test or separate report verifying the claimed request error.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "uncertain",
+      "defect_id": "FREEZETHEFLAME-NANOHARNESS-ECE647477872",
+      "evidence_ids": [
+        "ddf582b12ff1-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "The coding-agent example may fail or behave differently, but the responsible defect cannot be stated independently.",
+      "operator_ids": [],
+      "rationale": "The patch is too broad to identify one implementation defect and one root cause, so neither inclusion nor a specific exclusion is defensible.",
+      "root_cause": "The evidence does not isolate one root cause among the many structural and behavioral changes.",
+      "symptom": "The title says the example was broken, but the patch combines a broad kernel refactor, copied package trees, application wiring, docs, and tests.",
+      "trigger": "Running the coding-agent example under the pre-change layout."
+    },
+    {
+      "boundaries": [
+        "state"
+      ],
+      "decision": "include",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-0182B80F458A",
+      "evidence_ids": [
+        "3c75e414e5d4-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "Forked Agent executions can begin from state that did not exist at the selected checkpoint.",
+      "operator_ids": [],
+      "rationale": "Sync and async regression tests verify that forking no longer applies pending writes.",
+      "root_cause": "The fork path applied saved pending writes while reconstructing the older checkpoint instead of using them only to discover task identities.",
+      "symptom": "Stale writes leak into the forked thread, including obsolete tool-call state.",
+      "trigger": "update_state forks from an older checkpoint that still has pending writes from later execution."
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-06C154D70011",
+      "evidence_ids": [
+        "df1917319184-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch updates README examples and links only; no executable Agent behavior changes.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-085B26BD19F0",
+      "evidence_ids": [
+        "520de30350e8-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "RemoteGraph now reconstructs Interrupt objects, but the packet provides no regression test or report that establishes a concrete deserialization failure.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-0C116E758515",
+      "evidence_ids": [
+        "36b6cd1493c0-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The empty-similarity guard has no regression test, reproduction, or report connecting the NumPy edge case to an Agent-boundary failure.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-1D85698F2DE2",
+      "evidence_ids": [
+        "470718381407-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The archived merge patch contains only a subject and no inspectable implementation diff or regression evidence for the alleged repeated-condition problem.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-2CCC5002E185",
+      "evidence_ids": [
+        "c87f9ab6b12b-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch removes a malformed fragment from a tutorial notebook and changes no runtime behavior.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-2F6D38B47498",
+      "evidence_ids": [
+        "151a38d6e93e-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The archived merge patch contains no implementation diff or regression evidence for the alleged stream-event output change.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-32E290AB59E2",
+      "evidence_ids": [
+        "be088801baa2-fix"
+      ],
+      "exclusion_reason": "not_agent_boundary",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch replaces a test print with an assertion and changes no production Agent behavior.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [
+        "state"
+      ],
+      "decision": "include",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-37CF01E19507",
+      "evidence_ids": [
+        "a1b34efdb000-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "Agents cannot initialize or use the PostgreSQL-backed persistent store in the affected deployment.",
+      "operator_ids": [],
+      "rationale": "The public patch description identifies the Azure trigger and observed setup failure, and the SQL change guards creation with an explicit catalog check.",
+      "root_cause": "Setup relied on CREATE EXTENSION IF NOT EXISTS rather than explicitly checking pg_extension before issuing CREATE EXTENSION.",
+      "symptom": "Checkpoint-store initialization fails even though the vector extension is installed.",
+      "trigger": "PostgreSQL setup runs against an Azure server where CREATE EXTENSION IF NOT EXISTS still errors despite the extension already existing."
+    },
+    {
+      "boundaries": [
+        "tool",
+        "context",
+        "state"
+      ],
+      "decision": "include",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-3A0A8FCFB120",
+      "evidence_ids": [
+        "19ca6b416bd3-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "Tools can fail or read incomplete run context after a model hook.",
+      "operator_ids": [],
+      "rationale": "The regression test exercises both Pydantic and typed-dict state schemas and verifies injected state and store values reach the tool.",
+      "root_cause": "The post-hook path forwarded pending tool calls without running ToolNode.inject_tool_args.",
+      "symptom": "The tool call reaches execution without the required state/store arguments.",
+      "trigger": "A ReAct agent uses post_model_hook and a tool parameter annotated for injected state or store access."
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-472044FDBEB7",
+      "evidence_ids": [
+        "e3a30a9b69ca-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch changes only a prompt in a tutorial notebook.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [
+        "tool",
+        "permission"
+      ],
+      "decision": "include",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-58B8EA28E2D3",
+      "evidence_ids": [
+        "57b314c5d7d0-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "An Agent can expose secrets or perform privileged tool behavior based on forged hidden arguments.",
+      "operator_ids": [],
+      "rationale": "Regression tests attempt to forge injected authorization values and verify that plain, custom, and state-injected arguments are stripped or overwritten.",
+      "root_cause": "ToolNode merged trusted injections over caller arguments but did not strip all caller-supplied injected keys when no trusted replacement existed.",
+      "symptom": "The untrusted model-provided value reaches the tool and can impersonate trusted authorization or hidden context.",
+      "trigger": "A model supplies a value for a parameter marked InjectedToolArg, including a custom injected-argument subclass."
+    },
+    {
+      "boundaries": [
+        "state"
+      ],
+      "decision": "include",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-5EE53C71D22E",
+      "evidence_ids": [
+        "b6cc0228616c-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "Checkpoint operations through the context-bound object can fail because callers receive the wrong type.",
+      "operator_ids": [],
+      "rationale": "The regression test asserts both context-manager forms return the original InMemorySaver instance.",
+      "root_cause": "__enter__ and __aenter__ returned the stack's enter result directly.",
+      "symptom": "The as-bound value is the internal ExitStack rather than the saver instance promised by the saver API.",
+      "trigger": "InMemorySaver is entered through a synchronous or asynchronous context manager."
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-68228EF073F3",
+      "evidence_ids": [
+        "3dac1894cc05-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The archived patch contains no implementation diff, test, or reproduction for the alleged non-concatenable React messages.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-68483D6E7574",
+      "evidence_ids": [
+        "18887e9f86a6-fix"
+      ],
+      "exclusion_reason": "refactor_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch removes a repeated ensure_config call but provides no evidenced incorrect observable behavior.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-6B253E912DAC",
+      "evidence_ids": [
+        "0b6a9e345d33-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The state_schema member replacement has no regression test or public reproduction establishing a concrete graph failure.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-8F1BDAD55A9B",
+      "evidence_ids": [
+        "30598cd9139c-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch only repairs images and notebook metadata in an example.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-9458C5809A2D",
+      "evidence_ids": [
+        "8daeb561946b-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch corrects a grammar typo in a documentation notebook.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-9588EEF71CEB",
+      "evidence_ids": [
+        "d6c6516f16ef-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch fixes syntax in a tutorial notebook and does not alter library execution.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-A9CD7093EC81",
+      "evidence_ids": [
+        "e3cb2dd23b1d-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch changes Markdown admonition indentation only.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-BDC1553450B9",
+      "evidence_ids": [
+        "220f9aaaabec-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch formats a documentation checklist as a list.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-C2ABDDA05120",
+      "evidence_ids": [
+        "460c52290218-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch adds a missing article in conceptual documentation.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [
+        "state",
+        "control_flow"
+      ],
+      "decision": "include",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-D5AA932E0F0D",
+      "evidence_ids": [
+        "a15f542a1f23-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "Later resumes can repeat interrupts or lose already supplied human input.",
+      "operator_ids": [],
+      "rationale": "The regression test parameterizes scalar and map-style resumes and verifies mapped values persist across multiple interrupts.",
+      "root_cause": "interrupt() used the mapped values without sending the updated resume list through the checkpoint write channel.",
+      "symptom": "Resume values are consumed for the current step but are not persisted for subsequent checkpointed execution.",
+      "trigger": "A graph with multiple interrupts is resumed by an interrupt-ID-to-value map."
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-D7C1D86F1B2E",
+      "evidence_ids": [
+        "217795eb7272-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The candidate is explicitly a broken documentation image repair and the archived patch contains no runtime change.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "LANGCHAIN-AI-LANGGRAPH-DF5A13F34BDC",
+      "evidence_ids": [
+        "f08756785382-fix"
+      ],
+      "exclusion_reason": "not_agent_boundary",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch fixes Docker CLI semantic-version parsing, which is deployment tooling rather than a tool-using Agent execution boundary.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-06029DF804F5",
+      "evidence_ids": [
+        "de757707bcaa-fix"
+      ],
+      "exclusion_reason": "not_agent_boundary",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch upgrades and validates the Quarto website build tool and changes notebook-title processing, not Agent runtime behavior.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-10A44C35EBC4",
+      "evidence_ids": [
+        "c930251ebc95-fix"
+      ],
+      "exclusion_reason": "refactor_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The change only increases a C# lambda's static return-type precision and provides no incorrect external behavior.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-1A55A455930E",
+      "evidence_ids": [
+        "5861bd92a681-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The Cohere adapter changes tool-result conversion, but the packet supplies no regression test, reproduction, or detailed report for a concrete failure.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-1EB93F23C63B",
+      "evidence_ids": [
+        "6c8b656588cc-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch repairs examples and imports inside docstrings without changing the documented library implementations.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [
+        "model",
+        "tool"
+      ],
+      "decision": "include",
+      "defect_id": "MICROSOFT-AUTOGEN-1FE3CE06F15B",
+      "evidence_ids": [
+        "aa0d835f4dd9-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "Agents using llama3.3 cannot invoke declared tools through the supported Ollama path.",
+      "operator_ids": [],
+      "rationale": "The public patch explanation identifies the incorrect metadata and cites the model's documented capability; the fix flips that bound capability flag.",
+      "root_cause": "The model-information table incorrectly set llama3.3 function_calling to false.",
+      "symptom": "The framework reports that the model lacks function-calling support and blocks tool use even though llama3.3 supports it.",
+      "trigger": "AutoGen selects the built-in metadata for llama3.3 through the Ollama adapter and attempts function calling."
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-25828CF6C797",
+      "evidence_ids": [
+        "b0f42a1bd415-fix"
+      ],
+      "exclusion_reason": "not_agent_boundary",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The commit primarily repairs external-service tests and docstring examples; it does not evidence a production Agent-boundary defect.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-4AE8B72F6FF7",
+      "evidence_ids": [
+        "83f9f3e73336-fix"
+      ],
+      "exclusion_reason": "dependency_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The only production change adds a pinned protobuf dependency to the retrieve_chat extra; no framework implementation defect is changed.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-5B5000568D6B",
+      "evidence_ids": [
+        "e83301ed187f-fix"
+      ],
+      "exclusion_reason": "not_agent_boundary",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch relaxes a flaky logging-cost test assertion and changes no runtime implementation.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-5F876512E45E",
+      "evidence_ids": [
+        "d999b452e8be-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch only fixes Markdown fence and admonition formatting in contributor documentation.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-623C635D5A11",
+      "evidence_ids": [
+        "e32f4193870b-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The tracing implementation changes parent links and span creation, but no regression test, reproduction, or precise public symptom establishes an eligible Agent-boundary defect.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-6EF6213DAE38",
+      "evidence_ids": [
+        "c620683ba640-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch adds a missing installation step in user documentation only.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-78E69889C9F1",
+      "evidence_ids": [
+        "20f8ba9cfae4-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The timestamp unit correction affects model response construction, but the packet provides no regression test or report establishing an observable Agent failure.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-86292287626C",
+      "evidence_ids": [
+        "eec854279a7a-fix"
+      ],
+      "exclusion_reason": "dependency_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch changes CI-only dependency installation for unstructured and does not repair Agent runtime code.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [
+        "model",
+        "tool"
+      ],
+      "decision": "include",
+      "defect_id": "MICROSOFT-AUTOGEN-864AA4594BF8",
+      "evidence_ids": [
+        "b868e32b0579-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "Agents can invoke the wrong tool or pass truncated arguments after a streamed model response.",
+      "operator_ids": [],
+      "rationale": "The patch adds a chunk-merging state machine and regression tests for streamed tool-call assembly.",
+      "root_cause": "The streaming adapter treated each FunctionCallContent independently instead of merging chunks by call ID and continuation.",
+      "symptom": "The adapter emits incomplete or malformed tool calls because partial arguments are not accumulated reliably.",
+      "trigger": "Semantic Kernel streams a function call whose name and arguments arrive across multiple chunks, including chunks without an ID."
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-8C56CF8FA3CF",
+      "evidence_ids": [
+        "fef953e062bf-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The Markdown converter is switched from text to bytes for Playwright HTML, but no regression test or public reproduction establishes the prior web-surfer failure.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "uncertain",
+      "defect_id": "MICROSOFT-AUTOGEN-93657DE5BA24",
+      "evidence_ids": [
+        "db287183f2ec-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "Some retrieval behavior may be repaired, but the single root cause and supporting regression role cannot be stated reliably.",
+      "operator_ids": [],
+      "rationale": "The fixing change combines multiple unrelated roots, preventing an independent one-defect judgment.",
+      "root_cause": "Candidate tests do not isolate the production vector-format change from the many unrelated maintenance edits.",
+      "symptom": "The patch mixes Azure-test disabling, model updates, notebook edits, and a pgvector query-format change, so one primary Agent defect is not identifiable.",
+      "trigger": "Running the broad test suite or pgvector retrieval paths changed by the commit."
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-9D8F5F3B62A1",
+      "evidence_ids": [
+        "44640e29a37a-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "Studio replaces removed InnerMessage imports with AgentMessage, but no regression test or report shows the concrete Agent execution symptom.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-C025039423FB",
+      "evidence_ids": [
+        "501f8d22726e-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch corrects a typo in a conversation-patterns notebook only.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-C03E9EB5C672",
+      "evidence_ids": [
+        "ac74305913e4-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The team-description normalization can affect orchestration prompts, but no regression test, reproduction, or precise failure report supports inclusion.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-CD83AD319253",
+      "evidence_ids": [
+        "0a314c17c780-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The database response now guards result.data, but no test or report establishes the triggering operation and Agent-boundary impact.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-DACBD27A78A4",
+      "evidence_ids": [
+        "bfcbb630172b-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch only updates a README documentation link.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [
+        "other"
+      ],
+      "decision": "include",
+      "defect_id": "MICROSOFT-AUTOGEN-E39723653FA6",
+      "evidence_ids": [
+        "811fd6926d71-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "Execution telemetry for concurrent Agent activity can be incomplete or crash even when the underlying run proceeds.",
+      "operator_ids": [],
+      "rationale": "The patch serializes queries with a threading lock, permits cross-thread SQLite use, and includes a regression test for threaded runtime logging; this observability defect does not fit a narrower named boundary.",
+      "root_cause": "The logger used non-thread-safe shared database operations without a lock and opened SQLite with the default same-thread restriction.",
+      "symptom": "Concurrent threads share connection and query state unsafely, causing logging failures or lost records.",
+      "trigger": "Multiple Agent or LLM events are logged concurrently through the same SQLite logger."
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-EA936C1865C5",
+      "evidence_ids": [
+        "dc55ec964bdc-fix"
+      ],
+      "exclusion_reason": "doc_or_format_only",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "The patch changes documentation CSS for visual accessibility and does not alter Agent execution.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [],
+      "decision": "exclude",
+      "defect_id": "MICROSOFT-AUTOGEN-F5AED66A8629",
+      "evidence_ids": [
+        "0df6be1fc1a8-fix"
+      ],
+      "exclusion_reason": "insufficient_public_evidence",
+      "impact": "",
+      "operator_ids": [],
+      "rationale": "Adding extra_body to forwarded OpenAI client arguments plausibly restores request options, but no regression test or public reproduction establishes the disabled-thinking failure.",
+      "root_cause": "",
+      "symptom": "",
+      "trigger": ""
+    },
+    {
+      "boundaries": [
+        "context",
+        "control_flow"
+      ],
+      "decision": "include",
+      "defect_id": "MICROSOFT-AUTOGEN-FFBEE2BB6CEF",
+      "evidence_ids": [
+        "e10767421f62-fix"
+      ],
+      "exclusion_reason": "",
+      "impact": "Users and downstream agents observe framework-internal termination content as if it were part of the conversation.",
+      "operator_ids": [],
+      "rationale": "Regression tests verify natural termination now returns only participant messages while resetting execution state and signaling stop directly.",
+      "root_cause": "Termination was modeled by scheduling a synthetic participant instead of signaling completion directly in GraphFlowManager.",
+      "symptom": "The framework adds an internal _StopAgent message to the returned conversation history.",
+      "trigger": "A GraphFlow reaches natural completion with no ready speakers."
+    }
+  ],
+  "manual_version": "2.0",
+  "packet_sha256": "92fc19ca1f96e183dfb21087aae966445ce46e3ae75e81dbdbacfa1f74f82593",
+  "pass_id": "pass_a",
+  "schema_version": 1
+}

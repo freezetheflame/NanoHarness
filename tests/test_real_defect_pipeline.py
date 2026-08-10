@@ -18,6 +18,9 @@ from research.defects.real_corpus_v1.enrich_candidates import enrich_candidates
 from research.defects.real_corpus_v1.archive_search_pages import (
     archive_search_pages,
 )
+from research.defects.real_corpus_v1.agent_dispatch import (
+    validate_frozen_submission,
+)
 from research.defects.real_corpus_v1.machine_precode import machine_precode
 from research.defects.real_corpus_v1.build_human_package import build_package
 from research.defects.real_corpus_v1.pipeline import (
@@ -965,6 +968,7 @@ def test_frozen_agent_input_checksums_are_complete_sorted_and_match_bytes():
         if path.is_file()
         and path != inventory
         and path.name != "DISPATCH_BINDING.json"
+        and path.name not in {"DISPATCH_RECORD.json", "RAW_SHA256SUMS"}
         and not path.relative_to(root).as_posix().startswith("pass_a/")
     )
     assert relative_paths == expected_paths
@@ -975,6 +979,89 @@ def test_frozen_agent_input_checksums_are_complete_sorted_and_match_bytes():
         expected, relative = line.split("  ", 1)
         assert len(expected) == 64
         assert hashlib.sha256((root / relative).read_bytes()).hexdigest() == expected
+
+
+def test_frozen_agent_raw_checksums_are_exact_sorted_and_match_bytes():
+    root = (
+        __import__("pathlib").Path(__file__).parents[1]
+        / "research"
+        / "defects"
+        / "real_corpus_v1"
+        / "formal"
+        / "agent-review-v1"
+    )
+    assert (root / "RAW_SHA256SUMS").read_text(encoding="utf-8").splitlines() == [
+        "fe3f7e78e65faac1012bca9494fa2a6a367082ff734641728720103903d7cbd0  DISPATCH_RECORD.json",
+        "e0b4a64e53758013c027f34f730faf8aa1925561568457f99f3828a57004efea  pass_a/A1.json",
+        "86119192a0ad02f6653a69f096896ba6d6c0295787241eac529e3de8face5c27  pass_a/A2.json",
+        "16151f85c3dc52634aefd65fde497025fad5dd1e03e8645f42d7ae30193ee9bb  pass_a/A3.json",
+    ]
+    for line in (root / "RAW_SHA256SUMS").read_text(
+        encoding="utf-8"
+    ).splitlines():
+        expected, relative = line.split("  ", 1)
+        assert hashlib.sha256((root / relative).read_bytes()).hexdigest() == expected
+
+
+def test_frozen_agent_binding_manifests_remain_byte_identical():
+    corpus = (
+        __import__("pathlib").Path(__file__).parents[1]
+        / "research"
+        / "defects"
+        / "real_corpus_v1"
+    )
+    expected = {
+        "SHA256SUMS": "571baedbcdc3c05d676a7509aceab3a2c191d730da253366a6c2d9408684723d",
+        "formal/agent-review-v1/DISPATCH_BINDING.json": "a1d20efbbfb251ad0e173136b1e8923dbfe156a8a9345b51f26dff0cd7da89eb",
+        "formal/agent-review-v1/SHA256SUMS": "732253682781e1f3f53422c1ac85536a5999cfb4f6b755621b300a629193e195",
+    }
+    assert {
+        relative: hashlib.sha256((corpus / relative).read_bytes()).hexdigest()
+        for relative in expected
+    } == expected
+
+
+def test_frozen_agent_raw_submissions_strictly_validate_without_analysis_output():
+    root = (
+        __import__("pathlib").Path(__file__).parents[1]
+        / "research"
+        / "defects"
+        / "real_corpus_v1"
+        / "formal"
+        / "agent-review-v1"
+    )
+    binding_path = root / "DISPATCH_BINDING.json"
+    record_path = root / "DISPATCH_RECORD.json"
+    binding = json.loads(binding_path.read_bytes())
+    record = json.loads(record_path.read_bytes())
+    assignments = {
+        assignment["annotator_id"]: assignment
+        for assignment in record["assignments"]
+    }
+    binding_sha256 = hashlib.sha256(binding_path.read_bytes()).hexdigest()
+
+    for annotator_id in ("A1", "A2", "A3"):
+        result = validate_frozen_submission(
+            binding_path=binding_path,
+            dispatch_record_path=record_path,
+            protocol_path=root / "protocol.json",
+            expected_annotator=annotator_id,
+            template_path=root / f"templates/{annotator_id}/pass_a.json",
+            submission_path=root / f"pass_a/{annotator_id}.json",
+            expected_binding_sha256=binding_sha256,
+            expected_freeze_payload_revision=binding["freeze_payload_revision"],
+            expected_start_workspace_sha256=assignments[annotator_id][
+                "start_preflight"
+            ]["workspace_snapshot_sha256"],
+        )
+        assert result == {
+            "valid": True,
+            "annotator_id": annotator_id,
+            "entry_count": 77,
+        }
+
+    assert not list(root.rglob("pass_a_agreement.json"))
+    assert not list(root.rglob("human_audit_packet.json"))
 
 
 def test_machine_precode_is_conservative_and_partition_blind():

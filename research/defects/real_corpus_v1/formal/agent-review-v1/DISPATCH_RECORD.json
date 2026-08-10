@@ -1,0 +1,56 @@
+{
+  "actual_payload_sha256": "db24b8a1a539762fadf75a96638622529fe1be44cdca9b769e1671796d9e8a94",
+  "assignments": [
+    {
+      "annotator_id": "A1",
+      "canonical_task_name": "formal_a1",
+      "returned_task_id": "/root/formal_a1",
+      "start_preflight": {
+        "checked_at": "2026-08-10T22:51:45.1789815+08:00",
+        "workspace_snapshot_sha256": "19d00772350ed71317cad5fd10647c78e5153c74d38e4585cf0b2b1d3c369b04"
+      },
+      "started_at": "2026-08-10T22:45:39.0234922+08:00"
+    },
+    {
+      "annotator_id": "A2",
+      "canonical_task_name": "formal_a2",
+      "returned_task_id": "/root/formal_a2",
+      "start_preflight": {
+        "checked_at": "2026-08-10T22:51:24.7915073+08:00",
+        "workspace_snapshot_sha256": "19d00772350ed71317cad5fd10647c78e5153c74d38e4585cf0b2b1d3c369b04"
+      },
+      "started_at": "2026-08-10T22:45:39.0474514+08:00"
+    },
+    {
+      "annotator_id": "A3",
+      "canonical_task_name": "formal_a3",
+      "returned_task_id": "/root/task2_templates/formal_a3",
+      "start_preflight": {
+        "checked_at": "2026-08-10T22:57:43.5047283+08:00",
+        "workspace_snapshot_sha256": "19d00772350ed71317cad5fd10647c78e5153c74d38e4585cf0b2b1d3c369b04"
+      },
+      "started_at": "2026-08-10T22:53:20.9699041+08:00"
+    }
+  ],
+  "batch_preflight": {
+    "canonical_outputs_absent": [
+      "research/defects/real_corpus_v1/formal/agent-review-v1/pass_a/A1.json",
+      "research/defects/real_corpus_v1/formal/agent-review-v1/pass_a/A2.json",
+      "research/defects/real_corpus_v1/formal/agent-review-v1/pass_a/A3.json"
+    ],
+    "checked_at": "2026-08-10T22:45:18.6627706+08:00",
+    "receipt_sha256": "ae93b5e41bc1941a3b3e5daa9affbb8aae8ca1077d551da74bea4a04f48e12b9",
+    "workspace_snapshot_sha256": "19d00772350ed71317cad5fd10647c78e5153c74d38e4585cf0b2b1d3c369b04"
+  },
+  "binding_sha256": "a1d20efbbfb251ad0e173136b1e8923dbfe156a8a9345b51f26dff0cd7da89eb",
+  "fork_turns": "none",
+  "freeze_payload_revision": "b5095acc300d2376fca7afe8a253e3eb8f58e5d2",
+  "model_configuration": {
+    "reasoning_effort": "high"
+  },
+  "model_id": "gpt-5.6-sol",
+  "prompt_sha256": "db24b8a1a539762fadf75a96638622529fe1be44cdca9b769e1671796d9e8a94",
+  "protocol_id": "agent-review-v1",
+  "schema_version": 1,
+  "workspace_snapshot_sha256": "19d00772350ed71317cad5fd10647c78e5153c74d38e4585cf0b2b1d3c369b04"
+}
