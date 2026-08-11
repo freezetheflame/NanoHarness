@@ -12,6 +12,13 @@ from typing import Any, Mapping
 
 SCHEMA_VERSION = 1
 AUDIT_PACKET_SHA256 = "8bfb7bc288de2890af2268978b0efa8cc69820081ee4151d8861f5586f4d369c"
+DEFAULT_AUDIT_PACKET_PATH = (
+    Path(__file__).parent
+    / "formal"
+    / "agent-review-v1"
+    / "analysis"
+    / "human_audit_packet.json"
+)
 BOUNDARIES = {
     "model", "tool", "context", "state", "hook", "evaluator", "permission",
     "control_flow", "replay", "other",
@@ -78,6 +85,28 @@ def initialize_empty_response(
         "audit_packet_sha256": audit_packet_sha256,
         "reviews": [_empty_review(candidate) for candidate in candidates],
     }
+
+
+def load_pinned_audit_packet() -> dict[str, Any]:
+    """Read only the public frozen audit packet and enforce its byte digest."""
+    packet_bytes = DEFAULT_AUDIT_PACKET_PATH.read_bytes()
+    if hashlib.sha256(packet_bytes).hexdigest() != AUDIT_PACKET_SHA256:
+        raise ValueError("pinned audit packet SHA-256 does not match AUDIT_PACKET_SHA256")
+    try:
+        packet = json.loads(packet_bytes)
+    except json.JSONDecodeError as exc:
+        raise ValueError("pinned audit packet is not valid JSON") from exc
+    if not isinstance(packet, dict):
+        raise ValueError("pinned audit packet must be a JSON object")
+    _packet_candidates(packet)
+    return packet
+
+
+def initialize_pinned_empty_response() -> dict[str, Any]:
+    """Create the only production draft: one bound to the frozen public packet."""
+    return initialize_empty_response(
+        load_pinned_audit_packet(), audit_packet_sha256=AUDIT_PACKET_SHA256
+    )
 
 
 def _packet_candidates(audit_packet: Mapping[str, Any]) -> list[Mapping[str, Any]]:
@@ -218,24 +247,59 @@ def validate_complete_response(response: Mapping[str, Any], audit_packet: Mappin
     _validate_response(response, audit_packet, audit_packet_sha256=audit_packet_sha256, complete=True)
 
 
-def build_manifest(response_path: str | Path, *, source_sha256: str, response_count: int, created_at: str) -> dict[str, Any]:
-    """Build the external manifest; it is deliberately not written into the response."""
+def validate_pinned_draft_response(response: Mapping[str, Any]) -> None:
+    """Validate a draft only against the byte-pinned public audit packet."""
+    validate_draft_response(
+        response,
+        load_pinned_audit_packet(),
+        audit_packet_sha256=AUDIT_PACKET_SHA256,
+    )
+
+
+def validate_pinned_complete_response(response: Mapping[str, Any]) -> None:
+    """Validate a complete response only against the byte-pinned public packet."""
+    validate_complete_response(
+        response,
+        load_pinned_audit_packet(),
+        audit_packet_sha256=AUDIT_PACKET_SHA256,
+    )
+
+
+def build_manifest(
+    response_path: str | Path,
+    response: Mapping[str, Any],
+    *,
+    created_at: str,
+) -> dict[str, Any]:
+    """Build a manifest from a complete response bound to the pinned packet."""
     _validate_timestamp(created_at, "manifest")
-    if not isinstance(source_sha256, str) or len(source_sha256) != 64:
-        raise ValueError("manifest source_sha256 must be a SHA-256 digest")
+    validate_pinned_complete_response(response)
     response_path = Path(response_path)
+    try:
+        stored_response = read_json(response_path)
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError("manifest response path must contain JSON") from exc
+    if stored_response != response:
+        raise ValueError("manifest response bytes do not match validated response")
     return {
         "schema_version": SCHEMA_VERSION,
         "response_filename": response_path.name,
         "response_sha256": sha256_file(response_path),
-        "source_audit_packet_sha256": source_sha256,
-        "response_count": response_count,
+        "source_audit_packet_sha256": AUDIT_PACKET_SHA256,
+        "response_count": len(response["reviews"]),
         "created_at": created_at,
     }
 
 
-def write_manifest(path: str | Path, manifest: Mapping[str, Any]) -> None:
-    """Atomically write an already-built external manifest."""
+def write_manifest(
+    path: str | Path,
+    response_path: str | Path,
+    response: Mapping[str, Any],
+    *,
+    created_at: str,
+) -> dict[str, Any]:
+    """Build and atomically write a manifest for a complete pinned response."""
+    manifest = build_manifest(response_path, response, created_at=created_at)
     target = Path(path)
     target.parent.mkdir(parents=True, exist_ok=True)
     temporary = target.with_name(f".{target.name}.tmp")
@@ -243,3 +307,4 @@ def write_manifest(path: str | Path, manifest: Mapping[str, Any]) -> None:
         json.dump(manifest, handle, indent=2, sort_keys=True)
         handle.write("\n")
     os.replace(temporary, target)
+    return manifest

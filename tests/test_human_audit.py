@@ -5,11 +5,15 @@ from datetime import datetime, timezone
 
 import pytest
 
+import research.defects.real_corpus_v1.human_audit as human_audit
 from research.defects.real_corpus_v1.human_audit import (
     AUDIT_PACKET_SHA256,
     build_manifest,
+    initialize_pinned_empty_response,
     initialize_empty_response,
+    load_pinned_audit_packet,
     sha256_file,
+    validate_pinned_draft_response,
     validate_complete_response,
     validate_draft_response,
     validate_review,
@@ -128,24 +132,9 @@ def test_draft_permits_only_empty_judgments_and_complete_requires_all_reviews():
 def test_manifest_is_external_non_self_referential_and_hash_bound(tmp_path):
     response_path = tmp_path / "human_audit_response.json"
     response_path.write_text('{"schema_version": 1}\n', encoding="utf-8")
-    manifest = build_manifest(
-        response_path,
-        source_sha256="a" * 64,
-        response_count=2,
-        created_at="2026-08-11T12:00:00+08:00",
-    )
-    assert manifest == {
-        "schema_version": 1,
-        "response_filename": "human_audit_response.json",
-        "response_sha256": hashlib.sha256(response_path.read_bytes()).hexdigest(),
-        "source_audit_packet_sha256": "a" * 64,
-        "response_count": 2,
-        "created_at": "2026-08-11T12:00:00+08:00",
-    }
-    manifest_path = tmp_path / "human_audit_response.manifest.json"
-    write_manifest(manifest_path, manifest)
-    assert json.loads(manifest_path.read_text(encoding="utf-8")) == manifest
-    assert "manifest" not in response_path.read_text(encoding="utf-8")
+    response = initialize_pinned_empty_response()
+    with pytest.raises(ValueError, match="reviewer_id"):
+        build_manifest(response_path, response, created_at="2026-08-11T12:00:00+08:00")
 
 
 def test_real_packet_dry_run_does_not_mutate_source(tmp_path):
@@ -155,11 +144,25 @@ def test_real_packet_dry_run_does_not_mutate_source(tmp_path):
     )
     before = sha256_file(source)
     assert before == AUDIT_PACKET_SHA256
-    packet = json.loads(open(source, encoding="utf-8").read())
-    response = initialize_empty_response(packet, audit_packet_sha256=before)
+    packet = load_pinned_audit_packet()
+    response = initialize_pinned_empty_response()
     output = tmp_path.resolve() / "human_audit_response.json"
     output.write_text(json.dumps(response), encoding="utf-8")
-    validate_draft_response(response, packet, audit_packet_sha256=before)
+    validate_pinned_draft_response(response)
     assert len(response["reviews"]) == 30
     assert all(review["reviewer_id"] is None for review in response["reviews"])
     assert sha256_file(source) == before
+
+
+def test_pinned_api_rejects_self_consistent_different_packet_and_altered_bytes(
+    tmp_path, monkeypatch
+):
+    different = initialize_empty_response(_packet(), audit_packet_sha256=AUDIT_PACKET_SHA256)
+    with pytest.raises(ValueError, match="response IDs"):
+        validate_pinned_draft_response(different)
+
+    altered = tmp_path / "human_audit_packet.json"
+    altered.write_bytes(human_audit.DEFAULT_AUDIT_PACKET_PATH.read_bytes() + b"\n")
+    monkeypatch.setattr(human_audit, "DEFAULT_AUDIT_PACKET_PATH", altered)
+    with pytest.raises(ValueError, match="pinned audit packet SHA-256"):
+        load_pinned_audit_packet()

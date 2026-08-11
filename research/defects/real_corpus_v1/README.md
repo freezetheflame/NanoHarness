@@ -71,16 +71,6 @@ It contains 30 records, but every human-review field remains blank and the
 human audit has not started. Unreviewed unanimous Agent judgments are not
 individually human verified.
 
-The planned audit response is a separate, mutable
-`human_audit_response.json` draft stored outside the formal evidence tree.
-Its shape is versioned by
-`human_audit_response.schema.json`; the
-public `human_audit.py` validator binds any response to the frozen packet's
-digest, record IDs and order, copied selection reasons, and record-local
-evidence IDs. A completed response is accompanied by a separate manifest that
-binds the response filename and digest to the source digest. No response has
-been created and the human audit has not started.
-
 ## Reproduction
 
 Run the focused pipeline tests:
