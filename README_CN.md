@@ -104,23 +104,21 @@ tests/                   # 内核契约测试
 
 ---
 
-## 快速开始
+## Windows 规范环境
 
-```bash
+NanoHarness 唯一的 canonical（规范）环境是 Windows、**PowerShell 7**、`uv` 和精确的 Python 3.12.2。在 PowerShell 7 中执行：
+
+```powershell
 git clone https://github.com/HabitGraylight/NanoHarness.git
-cd NanoHarness
-pip install -e .
+Set-Location NanoHarness
+pwsh -File .\scripts\bootstrap_canonical_env.ps1
+& .\.venv\Scripts\python.exe .\main.py
+pwsh -File .\scripts\verify_canonical_env.ps1 -Tier Focused
 ```
 
-内核仅依赖 Pydantic 和 PyYAML。LLM 客户端和其他集成由各应用按需安装。
+脚本从自身位置解析仓库根目录，不依赖环境激活。规范运行禁止 bare system `python`、`pip`、`pytest`、`make` 及 MSYS/Git Bash。`requirements.txt` 仅保留为 legacy（旧式）、非规范依赖输入；`uv.lock` 才是权威锁文件。WSL 与 tau2 原生执行使用独立环境，不能作为 Windows 规范环境的验证证据。
 
-```bash
-# 运行最简示例
-python main.py
-
-# 运行 Coding Agent
-cd examples/coding_agent && python main.py
-```
+使用 `-Tier Full` 运行全部公开测试；默认 `Focused` 层运行环境契约以及关键公开内核/基准测试。
 
 ---
 
@@ -253,9 +251,8 @@ Trace Schema v2 承载这些 Event；确定性 Replay 可迁移旧 v1 Model/Tool
 [语料协议](REAL_DEFECT_PROTOCOL_CN.md) 将 Operator Derivation 与留出 Validation
 隔离，保留独立 Coder Annotation，并定义证据和冻结门槛。查看当前草案语料：
 
-```bash
-.venv/bin/python -m nanoharness.testing.defect_cli \
-  research/defects/corpus.json
+```powershell
+& .\.venv\Scripts\python.exe -m nanoharness.testing.defect_cli research/defects/corpus.json
 ```
 
 Candidate 记录不作为已验证缺陷计数。
@@ -270,10 +267,8 @@ Candidate 记录不作为已验证缺陷计数。
 Subject Revision、完整 Scenario、Cell 顺序、Seed 和 Metadata 绑定到 Digest。
 可如下复现锁定真实 LangGraph Plumbing Pilot：
 
-```bash
-uv pip install --python .venv/bin/python -e '.[research]'
-.venv/bin/python research/pilots/langgraph_deterministic/run.py \
-  --output /tmp/langgraph-pilot-report.json
+```powershell
+& .\.venv\Scripts\python.exe research/pilots/langgraph_deterministic/run.py --output "$env:TEMP\langgraph-pilot-report.json"
 ```
 
 详见[实验协议](EXPERIMENT_PROTOCOL_CN.md) 和 Pilot README 中的严格主张边界；
@@ -288,10 +283,8 @@ Mutation Score。
 Package/Commit Provenance、显式 Task ID、Environment Digest、Reference Call 与
 原始 Scorer Provenance：
 
-```bash
-uv pip install --python .venv/bin/python -e '.[agentdojo-research]'
-.venv/bin/python research/pilots/agentdojo_offline_conversion/run.py \
-  --output-dir /tmp/agentdojo-conversion
+```powershell
+& .\.venv\Scripts\python.exe research/pilots/agentdojo_offline_conversion/run.py --output-dir "$env:TEMP\agentdojo-conversion"
 ```
 
 转换后的 Reference Call 不是规范性唯一答案，Oracle 也保持未绑定；将这些 Scenario
@@ -341,13 +334,12 @@ def chat(self, messages, tools=None) -> LLMResponse: ...
 
 ## 测试
 
-```bash
-# 内核测试（74 个）
-PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -v
+```powershell
+# 规范环境重点验证
+pwsh -File .\scripts\verify_canonical_env.ps1 -Tier Focused
 
-# Coding Agent 测试（434 个：291 UT + 143 ST）
-cd examples/coding_agent
-PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -v
+# 全部公开测试
+pwsh -File .\scripts\verify_canonical_env.ps1 -Tier Full
 ```
 
 **共 508 个测试。** 内核测试只需要内核依赖与 pytest。

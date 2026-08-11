@@ -104,23 +104,21 @@ tests/                   # Kernel contract tests
 
 ---
 
-## Quick Start
+## Canonical Windows environment
 
-```bash
+The only canonical NanoHarness environment is Windows with **PowerShell 7**, `uv`, and exactly Python 3.12.2. From PowerShell 7:
+
+```powershell
 git clone https://github.com/HabitGraylight/NanoHarness.git
-cd NanoHarness
-pip install -e .
+Set-Location NanoHarness
+pwsh -File .\scripts\bootstrap_canonical_env.ps1
+& .\.venv\Scripts\python.exe .\main.py
+pwsh -File .\scripts\verify_canonical_env.ps1 -Tier Focused
 ```
 
-The kernel depends only on Pydantic and PyYAML. LLM clients and other integrations are installed by each application as needed.
+The scripts resolve the repository from their own location, so they do not depend on activation. Do not use bare system `python`, `pip`, or `pytest`, `make`, or MSYS/Git Bash for canonical runs. `requirements.txt` remains a legacy, non-canonical dependency input; `uv.lock` is authoritative. WSL and tau2 native execution use separate environments and are not evidence for the canonical Windows environment.
 
-```bash
-# Run the minimal example
-python main.py
-
-# Run the coding agent
-cd examples/coding_agent && python main.py
-```
+Use `-Tier Full` to run all public tests. The default `Focused` tier runs the environment contracts and key public kernel/benchmark tests.
 
 ---
 
@@ -262,9 +260,8 @@ notes. The [corpus protocol](REAL_DEFECT_PROTOCOL.md) separates operator
 derivation from held-out validation, retains independent coder annotations, and
 defines evidence and freeze gates. Inspect the current draft corpus with:
 
-```bash
-.venv/bin/python -m nanoharness.testing.defect_cli \
-  research/defects/corpus.json
+```powershell
+& .\.venv\Scripts\python.exe -m nanoharness.testing.defect_cli research/defects/corpus.json
 ```
 
 Candidate records are not counted as verified defects.
@@ -282,10 +279,8 @@ External subjects implement a small `SubjectAdapter` contract. Frozen
 order, seeds, and metadata to a digest before execution. The pinned real
 LangGraph plumbing pilot can be reproduced with:
 
-```bash
-uv pip install --python .venv/bin/python -e '.[research]'
-.venv/bin/python research/pilots/langgraph_deterministic/run.py \
-  --output /tmp/langgraph-pilot-report.json
+```powershell
+& .\.venv\Scripts\python.exe research/pilots/langgraph_deterministic/run.py --output "$env:TEMP\langgraph-pilot-report.json"
 ```
 
 See the [experiment protocol](EXPERIMENT_PROTOCOL.md) and Pilot README for its
@@ -301,10 +296,8 @@ External Benchmark ingestion is kept separate from subject execution. The
 pinned AgentDojo converter freezes package/commit provenance, explicit task
 IDs, environment digests, reference calls, and original scorer provenance:
 
-```bash
-uv pip install --python .venv/bin/python -e '.[agentdojo-research]'
-.venv/bin/python research/pilots/agentdojo_offline_conversion/run.py \
-  --output-dir /tmp/agentdojo-conversion
+```powershell
+& .\.venv\Scripts\python.exe research/pilots/agentdojo_offline_conversion/run.py --output-dir "$env:TEMP\agentdojo-conversion"
 ```
 
 Converted reference calls are non-normative and their Oracles remain unbound;
@@ -362,13 +355,12 @@ See `examples/coding_agent/` for a reference that wires together a custom LLM ad
 
 ## Testing
 
-```bash
-# Kernel tests (74)
-PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -v
+```powershell
+# Canonical focused verification
+pwsh -File .\scripts\verify_canonical_env.ps1 -Tier Focused
 
-# Coding agent tests (434: 291 UT + 143 ST)
-cd examples/coding_agent
-PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -v
+# All public tests
+pwsh -File .\scripts\verify_canonical_env.ps1 -Tier Full
 ```
 
 **Total: 508 tests.** Kernel tests require only the kernel dependencies and pytest.
