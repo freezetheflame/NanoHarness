@@ -337,3 +337,22 @@ def test_manifest_reads_external_response_once_and_binds_its_exact_bytes(
     manifest_path = tmp_path / "human_audit_response.manifest.json"
     assert write_manifest(manifest_path, response_path, created_at="2026-08-11T12:00:00+08:00") == manifest
     assert json.loads(manifest_path.read_text(encoding="utf-8")) == manifest
+
+
+def test_manifest_publication_never_replaces_existing_file_or_leaves_temporary(tmp_path, monkeypatch):
+    packet = _packet()
+    response = initialize_empty_response(packet, audit_packet_sha256=AUDIT_PACKET_SHA256)
+    for review in response["reviews"]:
+        _complete_review(review)
+    response_path = tmp_path / "response.json"
+    response_path.write_text(json.dumps(response), encoding="utf-8")
+    monkeypatch.setattr(human_audit, "load_pinned_audit_packet", lambda: packet)
+    manifest_path = tmp_path / "manifest.json"
+
+    write_manifest(manifest_path, response_path, created_at="2026-08-11T12:00:00+08:00")
+    original = manifest_path.read_bytes()
+    with pytest.raises(ValueError, match="refusing to overwrite"):
+        write_manifest(manifest_path, response_path, created_at="2026-08-11T12:00:00+08:00")
+
+    assert manifest_path.read_bytes() == original
+    assert list(tmp_path.glob(".manifest.json.*.tmp")) == []

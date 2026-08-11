@@ -313,15 +313,10 @@ def write_manifest(
     *,
     created_at: str,
 ) -> dict[str, Any]:
-    """Build and atomically write a manifest for a complete pinned response."""
+    """Build and atomically create a manifest for a complete pinned response."""
     target = ensure_external_output_path(path)
     manifest = build_manifest(response_path, created_at=created_at)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    temporary = target.with_name(f".{target.name}.tmp")
-    with temporary.open("w", encoding="utf-8", newline="\n") as handle:
-        json.dump(manifest, handle, indent=2, sort_keys=True)
-        handle.write("\n")
-    os.replace(temporary, target)
+    _atomic_create_json(target, manifest)
     return manifest
 
 
