@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "human_audit_response.schema.json",
+  "title": "Human audit response v1",
+  "description": "Separate response artifact for the frozen human audit packet. The Python validator is authoritative for source bindings and draft/complete semantics.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "audit_packet_sha256", "reviews"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "audit_packet_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "reviews": {"type": "array", "items": {"$ref": "#/$defs/review"}}
+  },
+  "$defs": {
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["defect_id", "selection_reasons", "reviewer_id", "reviewed_at", "evidence_considered", "disposition", "final_decision", "final_exclusion_reason", "final_boundaries", "final_trigger", "final_symptom", "final_root_cause", "final_impact", "final_rationale"],
+      "properties": {
+        "defect_id": {"type": "string", "minLength": 1},
+        "selection_reasons": {"type": "array", "items": {"type": "string"}},
+        "reviewer_id": {"type": ["string", "null"]},
+        "reviewed_at": {"type": ["string", "null"], "format": "date-time"},
+        "evidence_considered": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "disposition": {"type": ["string", "null"], "enum": ["confirm", "override", "disputed", null]},
+        "final_decision": {"type": ["string", "null"], "enum": ["include", "exclude", "uncertain", null]},
+        "final_exclusion_reason": {"type": "string", "enum": ["", "doc_or_format_only", "feature_request", "insufficient_public_evidence", "model_quality_only", "not_agent_boundary", "refactor_only"]},
+        "final_boundaries": {"type": "array", "uniqueItems": true, "items": {"enum": ["model", "tool", "context", "state", "hook", "evaluator", "permission", "control_flow", "replay", "other"]}},
+        "final_trigger": {"type": "string"},
+        "final_symptom": {"type": "string"},
+        "final_root_cause": {"type": "string"},
+        "final_impact": {"type": "string"},
+        "final_rationale": {"type": "string"}
+      },
+      "allOf": [
+        {"if": {"properties": {"final_decision": {"const": "include"}}}, "then": {"properties": {"final_boundaries": {"minItems": 1}, "final_exclusion_reason": {"const": ""}}}},
+        {"if": {"properties": {"final_decision": {"const": "exclude"}}}, "then": {"properties": {"final_boundaries": {"maxItems": 0}, "final_exclusion_reason": {"not": {"const": ""}}}}},
+        {"if": {"properties": {"final_decision": {"const": "uncertain"}}}, "then": {"properties": {"final_boundaries": {"maxItems": 0}, "final_exclusion_reason": {"const": ""}}}},
+        {"if": {"properties": {"disposition": {"const": "disputed"}}}, "then": {"properties": {"final_decision": {"const": "uncertain"}, "final_boundaries": {"maxItems": 0}, "final_exclusion_reason": {"const": ""}}}}
+      ]
+    }
+  }
+}
