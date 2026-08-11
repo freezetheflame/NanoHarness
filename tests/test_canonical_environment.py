@@ -197,6 +197,7 @@ class _CallableAnalyzer:
         os_path_module_names: set[str] | None = None,
         path_join_names: set[str] | None = None,
         open_alias_names: set[str] | None = None,
+        builtins_module_names: set[str] | None = None,
     ) -> None:
         self.module_callables = module_callables
         self.os_module_names = {"os"} if os_module_names is None else os_module_names
@@ -205,6 +206,9 @@ class _CallableAnalyzer:
         )
         self.path_join_names = set() if path_join_names is None else path_join_names
         self.open_alias_names = set() if open_alias_names is None else open_alias_names
+        self.builtins_module_names = (
+            {"builtins"} if builtins_module_names is None else builtins_module_names
+        )
         self.facts = _CallableFacts()
         self.local_callables: set[str] = set()
         self.callable_aliases: dict[str, set[str]] = {}
@@ -290,7 +294,7 @@ class _CallableAnalyzer:
             isinstance(value, ast.Attribute)
             and value.attr == "open"
             and isinstance(value.value, ast.Name)
-            and value.value.id == "builtins"
+            and value.value.id in self.builtins_module_names
         )
 
     def _analyze_call(self, node: ast.Call, environment: PathEnvironment) -> None:
@@ -300,7 +304,7 @@ class _CallableAnalyzer:
             if (
                 node.func.attr == "open"
                 and isinstance(node.func.value, ast.Name)
-                and node.func.value.id == "builtins"
+                and node.func.value.id in self.builtins_module_names
                 and node.args
             ):
                 self.facts.reads_private_repo_data |= self._is_protected(
@@ -456,14 +460,19 @@ def _os_path_join_aliases(tree: ast.Module) -> tuple[set[str], set[str], set[str
     return os_modules, os_path_modules, join_names
 
 
-def _builtins_open_aliases(tree: ast.Module) -> set[str]:
-    return {
-        alias.asname or alias.name
-        for node in tree.body
-        if isinstance(node, ast.ImportFrom) and node.module == "builtins"
-        for alias in node.names
-        if alias.name == "open"
-    }
+def _builtins_open_aliases(tree: ast.Module) -> tuple[set[str], set[str]]:
+    open_aliases: set[str] = set()
+    builtins_modules = {"builtins"}
+    for node in tree.body:
+        if isinstance(node, ast.Import):
+            builtins_modules.update(
+                alias.asname or "builtins" for alias in node.names if alias.name == "builtins"
+            )
+        elif isinstance(node, ast.ImportFrom) and node.module == "builtins":
+            open_aliases.update(
+                alias.asname or alias.name for alias in node.names if alias.name == "open"
+            )
+    return open_aliases, builtins_modules
 
 
 def _private_repo_data_readers_from_source(
@@ -471,6 +480,7 @@ def _private_repo_data_readers_from_source(
 ) -> dict[str, bool]:
     """Conservatively resolve same-module helper and fixture dependencies only.
 
+    Supported imports are Path aliases, os.path.join aliases, and builtins.open aliases.
     Module-external dynamic dispatch cannot be inferred from public AST; callers that
     may consume protected paths through such dispatch must declare the marker directly.
     """
@@ -489,10 +499,11 @@ def _private_repo_data_readers_from_source(
         name for name, node in module_functions.items() if _is_fixture(node)
     }
     os_modules, os_path_modules, join_names = _os_path_join_aliases(tree)
-    open_alias_names = _builtins_open_aliases(tree)
+    open_alias_names, builtins_module_names = _builtins_open_aliases(tree)
     facts = {
         name: _CallableAnalyzer(
-            set(module_functions), os_modules, os_path_modules, join_names, open_alias_names
+            set(module_functions), os_modules, os_path_modules, join_names, open_alias_names,
+            builtins_module_names,
         ).analyze(node)
         for name, node in module_functions.items()
     }
@@ -519,7 +530,8 @@ def _private_repo_data_readers_from_source(
             consumes_private = consumes_private_repo_data(name, set())
         else:
             fact = _CallableAnalyzer(
-                set(module_functions), os_modules, os_path_modules, join_names, open_alias_names
+                set(module_functions), os_modules, os_path_modules, join_names, open_alias_names,
+                builtins_module_names,
             ).analyze(node)
             fact.calls.update(
                 argument.arg for argument in node.args.args if argument.arg in fixtures
@@ -711,6 +723,60 @@ def test_imported_open_alias_reader():
     assert readers == {
         "tests/test_synthetic_private.py::test_imported_open_alias_reader": False
     }
+
+
+def test_module_analysis_marks_a_builtins_module_alias_reader() -> None:
+    readers = _synthetic_private_reader_markers(
+        """
+import builtins as b
+from pathlib import Path
+
+def test_builtins_module_alias_reader():
+    root = Path(__file__).parents[1] / "research" / "defects" / "real_corpus_v1"
+    private_path = root / "selected_candidates.private.json"
+    return b.open(private_path).read()
+"""
+    )
+
+    assert readers == {
+        "tests/test_synthetic_private.py::test_builtins_module_alias_reader": False
+    }
+
+
+def test_module_analysis_marks_os_module_and_os_path_module_alias_readers() -> None:
+    readers = _synthetic_private_reader_markers(
+        """
+import os as o
+import os.path as osp
+
+def test_os_module_alias_reader():
+    root = o.path.join("research", "defects", "real_corpus_v1")
+    return open(o.path.join(root, "selected_candidates.private.json")).read()
+
+def test_os_path_module_alias_reader():
+    root = osp.join("research", "defects", "real_corpus_v1")
+    return open(osp.join(root, "selected_candidates.private.json")).read()
+"""
+    )
+
+    assert readers == {
+        "tests/test_synthetic_private.py::test_os_module_alias_reader": False,
+        "tests/test_synthetic_private.py::test_os_path_module_alias_reader": False,
+    }
+
+
+def test_module_analysis_marks_a_path_import_alias_reader() -> None:
+    readers = _synthetic_private_reader_markers(
+        """
+from pathlib import Path as P
+
+def test_path_alias_reader():
+    root = P(__file__).parents[1] / "research" / "defects" / "real_corpus_v1"
+    return (root / "selected_candidates.private.json").read_text()
+"""
+    )
+
+    assert readers == {"tests/test_synthetic_private.py::test_path_alias_reader": False}
 
 
 def test_module_analysis_propagates_private_fixture_through_another_fixture() -> None:
