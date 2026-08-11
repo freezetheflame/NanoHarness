@@ -1,8 +1,9 @@
 # Real-Defect Corpus v1 Retrieval Snapshot
 
-Status: candidate retrieval and blind packet complete; independent human coding
-has not started; no verified-defect or operator-representativeness claim is
-supported yet.
+Status: candidate retrieval, blind-packet construction, and independent
+A1/A2/A3 Agent Pass A are complete. Pass A remains unadjudicated, the targeted
+human audit has not started, and no verified-defect or
+operator-representativeness claim is supported yet.
 
 ## Authoritative sampling frame
 
@@ -44,14 +45,31 @@ used to calculate the 1,600-candidate universe.
 
 - `evidence_packet.json`: 77 partition-blind candidates.
 - `patches/`: one immutable patch per candidate.
-- `coding_templates/H1/pass_a.json`: blank H1 submission.
-- `coding_templates/H2/pass_a.json`: blank H2 submission.
+- `coding_templates/H1/pass_a.json`: historical, superseded blank H1 template.
+- `coding_templates/H2/pass_a.json`: historical, superseded blank H2 template.
 - `selected_candidates.private.json`: original hidden split.
 - `selected_candidates.enriched.private.json`: hidden split plus patch metadata.
 
 The evidence packet SHA-256 is
 `92fc19ca1f96e183dfb21087aae966445ce46e3ae75e81dbdbacfa1f74f82593`.
 Neither coder may receive either private file or a machine pre-code.
+
+## Formal independent Agent Pass A
+
+The completed, bound A1/A2/A3 run is under
+`formal/agent-review-v1/`. Each strict submission contains all 77 candidates.
+The raw agreement report is
+`formal/agent-review-v1/analysis/pass_a_agreement.json` (SHA-256
+`38d4f5150f2ca233d18ec2d422f5293b736dc3662147b1d2b018f7aff7884ed0`).
+It records unadjudicated inter-Agent agreement, not human inter-rater
+reliability and not human-verified labels.
+
+The targeted human packet is
+`formal/agent-review-v1/analysis/human_audit_packet.json` (SHA-256
+`8bfb7bc288de2890af2268978b0efa8cc69820081ee4151d8861f5586f4d369c`).
+It contains 30 records, but every human-review field remains blank and the
+human audit has not started. Unreviewed unanimous Agent judgments are not
+individually human verified.
 
 ## Reproduction
 
@@ -83,5 +101,6 @@ never retained. After regeneration, verify every entry in `SHA256SUMS`.
 The counts above describe retrieval and deterministic sampling only. They are
 not verified defect counts, defect prevalence, Operator support, held-out
 mapping, Mutation Score, Agent performance, or confirmation of Claim C2. C2
-remains planned until H1/H2 Pass A, adjudication, derivation-only Operator
-freeze, H1/H2 Pass B, readiness, and checksum gates all pass.
+remains planned. Targeted human audit and adjudication, derivation-only human
+Operator-Catalog signoff, A1/A2/A3 Pass B and its audit, held-out mapping,
+readiness, and checksum gates remain pending.
