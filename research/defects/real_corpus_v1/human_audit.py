@@ -226,7 +226,12 @@ def _validate_response_header(
     if not isinstance(response, Mapping):
         raise ValueError("response must be a JSON object")
     _unexpected_fields(response, RESPONSE_FIELDS, "response")
-    if type(response["schema_version"]) is not int or response["schema_version"] != SCHEMA_VERSION:
+    schema_version = response["schema_version"]
+    if (
+        isinstance(schema_version, bool)
+        or not isinstance(schema_version, (int, float))
+        or schema_version != SCHEMA_VERSION
+    ):
         raise ValueError("response schema_version is unsupported")
     if response["audit_packet_sha256"] != audit_packet_sha256:
         raise ValueError("response audit_packet_sha256 does not match source")

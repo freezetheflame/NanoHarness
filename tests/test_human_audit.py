@@ -4,6 +4,7 @@ import json
 from datetime import datetime, timezone
 
 import pytest
+from jsonschema import Draft202012Validator
 
 import research.defects.real_corpus_v1.human_audit as human_audit
 from research.defects.real_corpus_v1.human_audit import (
@@ -168,15 +169,24 @@ def test_pinned_api_rejects_self_consistent_different_packet_and_altered_bytes(
         load_pinned_audit_packet()
 
 
-def test_schema_version_rejects_boolean_and_schema_declares_integer():
+@pytest.mark.parametrize(
+    ("value", "accepted"),
+    [(True, False), (False, False), (1, True), (1.0, True), (1.5, False), (2, False)],
+)
+def test_schema_version_matches_draft202012_numeric_semantics(value, accepted):
     response = initialize_empty_response(_packet(), audit_packet_sha256="a" * 64)
-    response["schema_version"] = True
-    with pytest.raises(ValueError, match="schema_version"):
-        validate_draft_response(response, _packet(), audit_packet_sha256="a" * 64)
-
+    response["schema_version"] = value
     schema_path = human_audit.Path(__file__).parents[1] / "research/defects/real_corpus_v1/human_audit_response.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
     assert schema["properties"]["schema_version"] == {"type": "integer", "const": 1}
+    schema_accepts = not list(Draft202012Validator(schema).iter_errors(response))
+    assert schema_accepts is accepted
+    if accepted:
+        validate_draft_response(response, _packet(), audit_packet_sha256="a" * 64)
+    else:
+        with pytest.raises(ValueError, match="schema_version"):
+            validate_draft_response(response, _packet(), audit_packet_sha256="a" * 64)
+    assert response["schema_version"] == value
 
 
 def test_manifest_paths_must_be_external_to_sealed_formal_snapshot(tmp_path):
