@@ -5,6 +5,7 @@ import os
 import re
 import subprocess
 import sys
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import pytest
@@ -39,50 +40,56 @@ def _contains_file_reference(node: ast.AST) -> bool:
     return any(isinstance(child, ast.Name) and child.id == "__file__" for child in ast.walk(node))
 
 
-def _path_value(
-    node: ast.AST, bindings: dict[str, tuple[bool, tuple[str, ...]]]
-) -> tuple[bool, tuple[str, ...]] | None:
+PathValue = tuple[bool, tuple[str, ...]]
+PathEnvironment = dict[str, set[PathValue]]
+
+
+def _path_values(node: ast.AST, bindings: PathEnvironment) -> set[PathValue]:
     if isinstance(node, ast.Name):
-        return bindings.get(node.id)
+        return bindings.get(node.id, set())
     if isinstance(node, ast.Constant) and isinstance(node.value, str):
         parts = _path_parts(node.value)
-        return (_contains_parts(parts, REAL_CORPUS_PATH), parts)
+        return {(_contains_parts(parts, REAL_CORPUS_PATH), parts)}
     if isinstance(node, ast.BinOp) and isinstance(node.op, (ast.Add, ast.Div)):
-        left = _path_value(node.left, bindings)
-        right = _path_value(node.right, bindings)
-        if left is None or right is None:
-            return None
-        return (left[0] or right[0], (*left[1], *right[1]))
+        left = _path_values(node.left, bindings)
+        right = _path_values(node.right, bindings)
+        return {
+            (left_value[0] or right_value[0], (*left_value[1], *right_value[1]))
+            for left_value in left
+            for right_value in right
+        }
     if isinstance(node, ast.Call):
         if isinstance(node.func, ast.Name) and node.func.id == "str" and node.args:
-            return _path_value(node.args[0], bindings)
+            return _path_values(node.args[0], bindings)
         is_path_constructor = (
             isinstance(node.func, ast.Name) and node.func.id == "Path"
         ) or (isinstance(node.func, ast.Attribute) and node.func.attr == "Path")
         if is_path_constructor and node.args:
             if _contains_file_reference(node.args[0]):
-                return (True, ())
-            return _path_value(node.args[0], bindings)
+                return {(True, ())}
+            return _path_values(node.args[0], bindings)
     if _contains_file_reference(node):
-        return (True, ())
-    return None
+        return {(True, ())}
+    return set()
 
 
 def _is_protected_repo_path(
-    node: ast.AST, bindings: dict[str, tuple[bool, tuple[str, ...]]]
+    node: ast.AST, bindings: PathEnvironment
 ) -> bool:
-    value = _path_value(node, bindings)
-    if value is None or not value[0] or not _contains_parts(value[1], REAL_CORPUS_PATH):
-        return False
-    corpus_index = next(
-        index
-        for index in range(len(value[1]))
-        if value[1][index : index + len(REAL_CORPUS_PATH)] == REAL_CORPUS_PATH
-    )
-    artifact_parts = value[1][corpus_index + len(REAL_CORPUS_PATH) :]
-    return "private" in artifact_parts or any(
-        part.endswith(".private.json") for part in artifact_parts
-    )
+    for anchored_to_repo, parts in _path_values(node, bindings):
+        if not anchored_to_repo or not _contains_parts(parts, REAL_CORPUS_PATH):
+            continue
+        corpus_index = next(
+            index
+            for index in range(len(parts))
+            if parts[index : index + len(REAL_CORPUS_PATH)] == REAL_CORPUS_PATH
+        )
+        artifact_parts = parts[corpus_index + len(REAL_CORPUS_PATH) :]
+        if "private" in artifact_parts or any(
+            part.endswith(".private.json") for part in artifact_parts
+        ):
+            return True
+    return False
 
 
 def _assigned_names(target: ast.AST) -> list[str]:
@@ -93,33 +100,54 @@ def _assigned_names(target: ast.AST) -> list[str]:
     return []
 
 
-class _PrivateRepoReadVisitor(ast.NodeVisitor):
-    def __init__(self) -> None:
-        self.bindings: dict[str, tuple[bool, tuple[str, ...]]] = {}
-        self.reads_private_repo_data = False
+def _merge_path_environments(*environments: PathEnvironment) -> PathEnvironment:
+    merged: PathEnvironment = {}
+    for environment in environments:
+        for name, values in environment.items():
+            merged.setdefault(name, set()).update(values)
+    return merged
 
-    def _bind(self, targets: list[ast.AST], value: ast.AST) -> None:
-        path = _path_value(value, self.bindings)
+
+def _copy_path_environment(environment: PathEnvironment) -> PathEnvironment:
+    return {name: set(values) for name, values in environment.items()}
+
+
+@dataclass
+class _CallableFacts:
+    reads_private_repo_data: bool = False
+    calls: set[str] = field(default_factory=set)
+
+
+class _CallableAnalyzer:
+    def __init__(self, module_callables: set[str]) -> None:
+        self.module_callables = module_callables
+        self.facts = _CallableFacts()
+        self.local_callables: set[str] = set()
+
+    def analyze(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> _CallableFacts:
+        self.local_callables = {
+            child.name
+            for child in ast.walk(node)
+            if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)) and child is not node
+        }
+        self._analyze_statements(node.body, {})
+        return self.facts
+
+    def _bind(
+        self, environment: PathEnvironment, targets: list[ast.AST], value: ast.AST
+    ) -> None:
+        values = _path_values(value, environment)
         for target in targets:
             for name in _assigned_names(target):
-                if path is None:
-                    self.bindings.pop(name, None)
+                if values:
+                    environment[name] = values
                 else:
-                    self.bindings[name] = path
+                    environment.pop(name, None)
 
-    def visit_Assign(self, node: ast.Assign) -> None:
-        self.visit(node.value)
-        self._bind(node.targets, node.value)
-
-    def visit_AnnAssign(self, node: ast.AnnAssign) -> None:
-        if node.value is not None:
-            self.visit(node.value)
-            self._bind([node.target], node.value)
-
-    def visit_Call(self, node: ast.Call) -> None:
+    def _analyze_call(self, node: ast.Call, environment: PathEnvironment) -> None:
         if isinstance(node.func, ast.Name) and node.func.id == "open" and node.args:
-            self.reads_private_repo_data |= _is_protected_repo_path(
-                node.args[0], self.bindings
+            self.facts.reads_private_repo_data |= _is_protected_repo_path(
+                node.args[0], environment
             )
         elif isinstance(node.func, ast.Attribute):
             if (
@@ -128,68 +156,199 @@ class _PrivateRepoReadVisitor(ast.NodeVisitor):
                 and node.func.value.id == "builtins"
                 and node.args
             ):
-                self.reads_private_repo_data |= _is_protected_repo_path(
-                    node.args[0], self.bindings
+                self.facts.reads_private_repo_data |= _is_protected_repo_path(
+                    node.args[0], environment
                 )
             elif node.func.attr in READ_METHODS:
-                self.reads_private_repo_data |= _is_protected_repo_path(
-                    node.func.value, self.bindings
+                self.facts.reads_private_repo_data |= _is_protected_repo_path(
+                    node.func.value, environment
                 )
-        self.generic_visit(node)
+        if isinstance(node.func, ast.Name):
+            if node.func.id in self.module_callables:
+                self.facts.calls.add(node.func.id)
+            elif node.func.id not in self.local_callables and any(
+                _is_protected_repo_path(argument, environment) for argument in node.args
+            ):
+                self.facts.reads_private_repo_data = True
 
-    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        return
+    def _analyze_expression(self, node: ast.AST, environment: PathEnvironment) -> None:
+        for child in ast.walk(node):
+            if isinstance(child, ast.Name) and child.id in self.module_callables:
+                self.facts.calls.add(child.id)
+            if isinstance(child, ast.Call):
+                self._analyze_call(child, environment)
 
-    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
-        return
+    def _analyze_statements(
+        self, statements: list[ast.stmt], environment: PathEnvironment
+    ) -> PathEnvironment:
+        current = _copy_path_environment(environment)
+        for statement in statements:
+            if isinstance(statement, ast.Assign):
+                self._analyze_expression(statement.value, current)
+                self._bind(current, statement.targets, statement.value)
+            elif isinstance(statement, ast.AnnAssign) and statement.value is not None:
+                self._analyze_expression(statement.value, current)
+                self._bind(current, [statement.target], statement.value)
+            elif isinstance(statement, ast.If):
+                self._analyze_expression(statement.test, current)
+                current = _merge_path_environments(
+                    self._analyze_statements(statement.body, current),
+                    self._analyze_statements(statement.orelse, current),
+                )
+            elif isinstance(statement, (ast.For, ast.AsyncFor, ast.While)):
+                if isinstance(statement, (ast.For, ast.AsyncFor)):
+                    self._analyze_expression(statement.iter, current)
+                elif isinstance(statement, ast.While):
+                    self._analyze_expression(statement.test, current)
+                body_environment = _copy_path_environment(current)
+                if isinstance(statement, (ast.For, ast.AsyncFor)):
+                    self._bind(body_environment, [statement.target], ast.Constant(None))
+                current = _merge_path_environments(
+                    current,
+                    self._analyze_statements(statement.body, body_environment),
+                    self._analyze_statements(statement.orelse, current),
+                )
+            elif isinstance(statement, ast.Try):
+                alternatives = [self._analyze_statements(statement.body, current)]
+                alternatives.extend(
+                    self._analyze_statements(handler.body, current)
+                    for handler in statement.handlers
+                )
+                alternatives.append(self._analyze_statements(statement.orelse, current))
+                current = self._analyze_statements(
+                    statement.finalbody, _merge_path_environments(*alternatives)
+                )
+            elif isinstance(statement, (ast.With, ast.AsyncWith)):
+                for item in statement.items:
+                    self._analyze_expression(item.context_expr, current)
+                current = self._analyze_statements(statement.body, current)
+            elif isinstance(statement, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                self._analyze_statements(statement.body, current)
+            else:
+                self._analyze_expression(statement, current)
+        return current
 
 
 def _test_function_reads_private_repo_data(node: ast.AST) -> bool:
     assert isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
-    visitor = _PrivateRepoReadVisitor()
-    for statement in node.body:
-        visitor.visit(statement)
-    return visitor.reads_private_repo_data
+    return _CallableAnalyzer(set()).analyze(node).reads_private_repo_data
+
+
+def _is_fixture(node: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+    for decorator in node.decorator_list:
+        value = decorator.func if isinstance(decorator, ast.Call) else decorator
+        if isinstance(value, ast.Attribute) and value.attr == "fixture":
+            return True
+    return False
+
+
+def _is_marked_private_repo_data(node: ast.AST, parents: dict[ast.AST, ast.AST]) -> bool:
+    decorators = list(getattr(node, "decorator_list", []))
+    ancestor = parents[node]
+    while isinstance(ancestor, ast.ClassDef):
+        decorators.extend(ancestor.decorator_list)
+        ancestor = parents[ancestor]
+    return any(
+        isinstance(decorator.func if isinstance(decorator, ast.Call) else decorator, ast.Attribute)
+        and (decorator.func if isinstance(decorator, ast.Call) else decorator).attr
+        == PRIVATE_REPO_DATA_MARKER
+        for decorator in decorators
+    )
+
+
+def _test_nodes(tree: ast.Module) -> list[ast.FunctionDef | ast.AsyncFunctionDef]:
+    tests: list[ast.FunctionDef | ast.AsyncFunctionDef] = []
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith("test_"):
+            tests.append(node)
+        elif isinstance(node, ast.ClassDef):
+            tests.extend(
+                child
+                for child in node.body
+                if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef))
+                and child.name.startswith("test_")
+            )
+    return tests
+
+
+def _node_id(node: ast.AST, relative_path: str, parents: dict[ast.AST, ast.AST]) -> str:
+    classes: list[str] = []
+    ancestor = parents[node]
+    while isinstance(ancestor, ast.ClassDef):
+        classes.append(ancestor.name)
+        ancestor = parents[ancestor]
+    return "::".join([relative_path, *reversed(classes), node.name])
+
+
+def _private_repo_data_readers_from_source(
+    source: str, relative_path: str
+) -> dict[str, bool]:
+    """Conservatively resolve same-module helper and fixture dependencies only.
+
+    Module-external dynamic dispatch cannot be inferred from public AST; callers that
+    may consume protected paths through such dispatch must declare the marker directly.
+    """
+    tree = ast.parse(source, filename=relative_path)
+    parents = {
+        child: parent
+        for parent in ast.walk(tree)
+        for child in ast.iter_child_nodes(parent)
+    }
+    module_functions = {
+        node.name: node
+        for node in tree.body
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+    }
+    fixtures = {
+        name for name, node in module_functions.items() if _is_fixture(node)
+    }
+    facts = {
+        name: _CallableAnalyzer(set(module_functions)).analyze(node)
+        for name, node in module_functions.items()
+    }
+    for name, node in module_functions.items():
+        if name in fixtures or name.startswith("test_"):
+            facts[name].calls.update(
+                argument.arg for argument in node.args.args if argument.arg in fixtures
+            )
+
+    def consumes_private_repo_data(name: str, seen: set[str]) -> bool:
+        if name in seen:
+            return True
+        fact = facts.get(name)
+        if fact is None:
+            return True
+        return fact.reads_private_repo_data or any(
+            consumes_private_repo_data(called, seen | {name}) for called in fact.calls
+        )
+
+    readers: dict[str, bool] = {}
+    for node in _test_nodes(tree):
+        if node in module_functions.values():
+            name = node.name
+            consumes_private = consumes_private_repo_data(name, set())
+        else:
+            fact = _CallableAnalyzer(set(module_functions)).analyze(node)
+            fact.calls.update(
+                argument.arg for argument in node.args.args if argument.arg in fixtures
+            )
+            facts["__test_method__"] = fact
+            consumes_private = consumes_private_repo_data("__test_method__", set())
+        if consumes_private:
+            readers[_node_id(node, relative_path, parents)] = _is_marked_private_repo_data(
+                node, parents
+            )
+    return readers
 
 
 def _private_repo_data_readers() -> dict[str, bool]:
     readers: dict[str, bool] = {}
     for test_path in TESTS.rglob("*.py"):
-        source = _read(test_path)
-        tree = ast.parse(source, filename=str(test_path))
-        parents = {
-            child: parent
-            for parent in ast.walk(tree)
-            for child in ast.iter_child_nodes(parent)
-        }
-        for node in ast.walk(tree):
-            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                continue
-            if not node.name.startswith("test_"):
-                continue
-            if not _test_function_reads_private_repo_data(node):
-                continue
-            classes: list[str] = []
-            ancestor = parents[node]
-            while ancestor is not tree:
-                if isinstance(ancestor, ast.ClassDef):
-                    classes.append(ancestor.name)
-                ancestor = parents[ancestor]
-            node_id = "::".join(
-                [test_path.relative_to(ROOT).as_posix(), *reversed(classes), node.name]
+        readers.update(
+            _private_repo_data_readers_from_source(
+                _read(test_path), test_path.relative_to(ROOT).as_posix()
             )
-            decorators = list(node.decorator_list)
-            ancestor = parents[node]
-            while ancestor is not tree:
-                if isinstance(ancestor, ast.ClassDef):
-                    decorators.extend(ancestor.decorator_list)
-                ancestor = parents[ancestor]
-            readers[node_id] = any(
-                isinstance(decorator.func if isinstance(decorator, ast.Call) else decorator, ast.Attribute)
-                and (decorator.func if isinstance(decorator, ast.Call) else decorator).attr
-                == PRIVATE_REPO_DATA_MARKER
-                for decorator in decorators
-            )
+        )
     return readers
 
 
@@ -200,6 +359,151 @@ def _fixture_test_function(body: str) -> ast.FunctionDef:
     function = ast.parse(source).body[0]
     assert isinstance(function, ast.FunctionDef)
     return function
+
+
+def _synthetic_private_reader_markers(source: str) -> dict[str, bool]:
+    return _private_repo_data_readers_from_source(source, "tests/test_synthetic_private.py")
+
+
+def test_module_analysis_marks_an_unmarked_private_fixture_consumer() -> None:
+    readers = _synthetic_private_reader_markers(
+        """
+import pytest
+from pathlib import Path
+
+@pytest.fixture
+def private_fixture():
+    root = Path(__file__).parents[1] / "research" / "defects" / "real_corpus_v1"
+    return (root / "selected_candidates.private.json").read_text()
+
+def test_fixture_consumer(private_fixture):
+    assert private_fixture
+"""
+    )
+
+    assert readers == {"tests/test_synthetic_private.py::test_fixture_consumer": False}
+
+
+def test_module_analysis_marks_an_unmarked_private_helper_caller() -> None:
+    readers = _synthetic_private_reader_markers(
+        """
+from pathlib import Path
+
+def private_helper():
+    root = Path(__file__).parents[1] / "research" / "defects" / "real_corpus_v1"
+    return (root / "selected_candidates.private.json").read_bytes()
+
+def test_helper_consumer():
+    assert private_helper()
+"""
+    )
+
+    assert readers == {"tests/test_synthetic_private.py::test_helper_consumer": False}
+
+
+def test_module_analysis_marks_an_unmarked_private_helper_alias_caller() -> None:
+    readers = _synthetic_private_reader_markers(
+        """
+from pathlib import Path
+
+def private_helper():
+    root = Path(__file__).parents[1] / "research" / "defects" / "real_corpus_v1"
+    return (root / "selected_candidates.private.json").read_bytes()
+
+def test_helper_alias_consumer():
+    callback = private_helper
+    assert callback()
+"""
+    )
+
+    assert readers == {"tests/test_synthetic_private.py::test_helper_alias_consumer": False}
+
+
+def test_module_analysis_marks_an_unmarked_nested_private_reader() -> None:
+    readers = _synthetic_private_reader_markers(
+        """
+from pathlib import Path
+
+def test_nested_consumer():
+    def private_reader():
+        root = Path(__file__).parents[1] / "research" / "defects" / "real_corpus_v1"
+        return (root / "selected_candidates.private.json").read_text()
+    assert private_reader()
+"""
+    )
+
+    assert readers == {"tests/test_synthetic_private.py::test_nested_consumer": False}
+
+
+def test_module_analysis_unions_conditional_private_path_assignments() -> None:
+    readers = _synthetic_private_reader_markers(
+        """
+from pathlib import Path
+
+def test_conditional_consumer(tmp_path, use_private):
+    root = Path(__file__).parents[1] / "research" / "defects" / "real_corpus_v1"
+    if use_private:
+        candidate = root / "selected_candidates.private.json"
+    else:
+        candidate = tmp_path / "scratch.json"
+    return candidate.read_text()
+"""
+    )
+
+    assert readers == {"tests/test_synthetic_private.py::test_conditional_consumer": False}
+
+
+def test_module_analysis_unions_loop_and_try_private_path_assignments() -> None:
+    readers = _synthetic_private_reader_markers(
+        """
+from pathlib import Path
+
+def test_loop_consumer(tmp_path, use_private):
+    root = Path(__file__).parents[1] / "research" / "defects" / "real_corpus_v1"
+    for selected in (use_private,):
+        if selected:
+            candidate = root / "selected_candidates.private.json"
+        else:
+            candidate = tmp_path / "scratch.json"
+    return candidate.read_text()
+
+def test_try_consumer(tmp_path):
+    root = Path(__file__).parents[1] / "research" / "defects" / "real_corpus_v1"
+    try:
+        candidate = root / "selected_candidates.private.json"
+    except OSError:
+        candidate = tmp_path / "scratch.json"
+    return candidate.read_text()
+"""
+    )
+
+    assert readers == {
+        "tests/test_synthetic_private.py::test_loop_consumer": False,
+        "tests/test_synthetic_private.py::test_try_consumer": False,
+    }
+
+
+def test_module_analysis_accepts_marked_consumers_and_ignores_tmp_nonreaders() -> None:
+    readers = _synthetic_private_reader_markers(
+        """
+import pytest
+from pathlib import Path
+
+def private_helper():
+    root = Path(__file__).parents[1] / "research" / "defects" / "real_corpus_v1"
+    return (root / "selected_candidates.private.json").read_text()
+
+@pytest.mark.private_repo_data
+def test_marked_helper_consumer():
+    assert private_helper()
+
+def test_tmp_nonreader(tmp_path):
+    candidate = tmp_path / "x.private.json"
+    assert candidate.exists() is False
+"""
+    )
+
+    assert readers == {"tests/test_synthetic_private.py::test_marked_helper_consumer": True}
 
 
 def test_ast_read_sink_requires_a_marker_for_a_direct_real_private_artifact_read() -> None:
