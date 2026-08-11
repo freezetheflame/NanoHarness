@@ -123,6 +123,7 @@ class _CallableAnalyzer:
         self.module_callables = module_callables
         self.facts = _CallableFacts()
         self.local_callables: set[str] = set()
+        self.callable_aliases: dict[str, set[str]] = {}
 
     def analyze(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> _CallableFacts:
         self.local_callables = {
@@ -130,6 +131,7 @@ class _CallableAnalyzer:
             for child in ast.walk(node)
             if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)) and child is not node
         }
+        self.callable_aliases = {}
         self._analyze_statements(node.body, {})
         return self.facts
 
@@ -137,12 +139,24 @@ class _CallableAnalyzer:
         self, environment: PathEnvironment, targets: list[ast.AST], value: ast.AST
     ) -> None:
         values = _path_values(value, environment)
+        aliases = self._callable_aliases(value)
         for target in targets:
             for name in _assigned_names(target):
                 if values:
                     environment[name] = values
                 else:
                     environment.pop(name, None)
+                if aliases:
+                    self.callable_aliases[name] = aliases
+                else:
+                    self.callable_aliases.pop(name, None)
+
+    def _callable_aliases(self, value: ast.AST) -> set[str]:
+        if not isinstance(value, ast.Name):
+            return set()
+        if value.id in self.module_callables:
+            return {value.id}
+        return self.callable_aliases.get(value.id, set())
 
     def _analyze_call(self, node: ast.Call, environment: PathEnvironment) -> None:
         if isinstance(node.func, ast.Name) and node.func.id == "open" and node.args:
@@ -166,15 +180,11 @@ class _CallableAnalyzer:
         if isinstance(node.func, ast.Name):
             if node.func.id in self.module_callables:
                 self.facts.calls.add(node.func.id)
-            elif node.func.id not in self.local_callables and any(
-                _is_protected_repo_path(argument, environment) for argument in node.args
-            ):
-                self.facts.reads_private_repo_data = True
+            elif node.func.id in self.callable_aliases:
+                self.facts.calls.update(self.callable_aliases[node.func.id])
 
     def _analyze_expression(self, node: ast.AST, environment: PathEnvironment) -> None:
         for child in ast.walk(node):
-            if isinstance(child, ast.Name) and child.id in self.module_callables:
-                self.facts.calls.add(child.id)
             if isinstance(child, ast.Call):
                 self._analyze_call(child, environment)
 
@@ -417,6 +427,69 @@ def test_helper_alias_consumer():
     )
 
     assert readers == {"tests/test_synthetic_private.py::test_helper_alias_consumer": False}
+
+
+def test_module_analysis_ignores_an_uncalled_private_helper_reference() -> None:
+    readers = _synthetic_private_reader_markers(
+        """
+from pathlib import Path
+
+def private_helper():
+    root = Path(__file__).parents[1] / "research" / "defects" / "real_corpus_v1"
+    return (root / "selected_candidates.private.json").read_bytes()
+
+def test_helper_reference():
+    callback = private_helper
+    assert callback is private_helper
+"""
+    )
+
+    assert readers == {}
+
+
+def test_module_analysis_ignores_an_unknown_call_that_is_not_a_read_sink() -> None:
+    readers = _synthetic_private_reader_markers(
+        """
+from pathlib import Path
+
+def test_unknown_call():
+    root = Path(__file__).parents[1] / "research" / "defects" / "real_corpus_v1"
+    private_path = root / "selected_candidates.private.json"
+    some_unknown(private_path)
+"""
+    )
+
+    assert readers == {}
+
+
+def test_module_analysis_propagates_private_fixture_through_another_fixture() -> None:
+    readers = _synthetic_private_reader_markers(
+        """
+import pytest
+from pathlib import Path
+
+@pytest.fixture
+def private_base_fixture():
+    root = Path(__file__).parents[1] / "research" / "defects" / "real_corpus_v1"
+    return (root / "selected_candidates.private.json").read_text()
+
+@pytest.fixture
+def intermediate_fixture(private_base_fixture):
+    return private_base_fixture
+
+def test_unmarked_fixture_chain(intermediate_fixture):
+    assert intermediate_fixture
+
+@pytest.mark.private_repo_data
+def test_marked_fixture_chain(intermediate_fixture):
+    assert intermediate_fixture
+"""
+    )
+
+    assert readers == {
+        "tests/test_synthetic_private.py::test_unmarked_fixture_chain": False,
+        "tests/test_synthetic_private.py::test_marked_fixture_chain": True,
+    }
 
 
 def test_module_analysis_marks_an_unmarked_nested_private_reader() -> None:
