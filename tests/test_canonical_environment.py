@@ -44,39 +44,110 @@ PathValue = tuple[bool, tuple[str, ...]]
 PathEnvironment = dict[str, set[PathValue]]
 
 
-def _path_values(node: ast.AST, bindings: PathEnvironment) -> set[PathValue]:
+def _combine_path_values(*groups: set[PathValue]) -> set[PathValue]:
+    values: set[PathValue] = {(False, ())}
+    for group in groups:
+        values = {
+            (
+                left[0]
+                or right[0]
+                or _contains_parts((*left[1], *right[1]), REAL_CORPUS_PATH),
+                (*left[1], *right[1]),
+            )
+            for left in values
+            for right in group
+        }
+    return values
+
+
+def _is_os_path_join_callee(
+    node: ast.AST,
+    os_module_names: set[str],
+    os_path_module_names: set[str],
+    path_join_names: set[str],
+) -> bool:
+    if isinstance(node, ast.Name):
+        return node.id in path_join_names
+    if not isinstance(node, ast.Attribute) or node.attr != "join":
+        return False
+    if isinstance(node.value, ast.Name):
+        return node.value.id in os_path_module_names
+    return (
+        isinstance(node.value, ast.Attribute)
+        and node.value.attr == "path"
+        and isinstance(node.value.value, ast.Name)
+        and node.value.value.id in os_module_names
+    )
+
+
+def _path_values(
+    node: ast.AST,
+    bindings: PathEnvironment,
+    os_module_names: set[str] | None = None,
+    os_path_module_names: set[str] | None = None,
+    path_join_names: set[str] | None = None,
+) -> set[PathValue]:
+    os_module_names = {"os"} if os_module_names is None else os_module_names
+    os_path_module_names = set() if os_path_module_names is None else os_path_module_names
+    path_join_names = set() if path_join_names is None else path_join_names
     if isinstance(node, ast.Name):
         return bindings.get(node.id, set())
     if isinstance(node, ast.Constant) and isinstance(node.value, str):
         parts = _path_parts(node.value)
         return {(_contains_parts(parts, REAL_CORPUS_PATH), parts)}
     if isinstance(node, ast.BinOp) and isinstance(node.op, (ast.Add, ast.Div)):
-        left = _path_values(node.left, bindings)
-        right = _path_values(node.right, bindings)
-        return {
-            (left_value[0] or right_value[0], (*left_value[1], *right_value[1]))
-            for left_value in left
-            for right_value in right
-        }
+        return _combine_path_values(
+            _path_values(
+                node.left, bindings, os_module_names, os_path_module_names, path_join_names
+            ),
+            _path_values(
+                node.right, bindings, os_module_names, os_path_module_names, path_join_names
+            ),
+        )
     if isinstance(node, ast.Call):
+        if _is_os_path_join_callee(
+            node.func, os_module_names, os_path_module_names, path_join_names
+        ):
+            return _combine_path_values(
+                *[
+                    _path_values(
+                        argument,
+                        bindings,
+                        os_module_names,
+                        os_path_module_names,
+                        path_join_names,
+                    )
+                    for argument in node.args
+                ]
+            )
         if isinstance(node.func, ast.Name) and node.func.id == "str" and node.args:
-            return _path_values(node.args[0], bindings)
+            return _path_values(
+                node.args[0], bindings, os_module_names, os_path_module_names, path_join_names
+            )
         is_path_constructor = (
             isinstance(node.func, ast.Name) and node.func.id == "Path"
         ) or (isinstance(node.func, ast.Attribute) and node.func.attr == "Path")
         if is_path_constructor and node.args:
             if _contains_file_reference(node.args[0]):
                 return {(True, ())}
-            return _path_values(node.args[0], bindings)
+            return _path_values(
+                node.args[0], bindings, os_module_names, os_path_module_names, path_join_names
+            )
     if _contains_file_reference(node):
         return {(True, ())}
     return set()
 
 
 def _is_protected_repo_path(
-    node: ast.AST, bindings: PathEnvironment
+    node: ast.AST,
+    bindings: PathEnvironment,
+    os_module_names: set[str] | None = None,
+    os_path_module_names: set[str] | None = None,
+    path_join_names: set[str] | None = None,
 ) -> bool:
-    for anchored_to_repo, parts in _path_values(node, bindings):
+    for anchored_to_repo, parts in _path_values(
+        node, bindings, os_module_names, os_path_module_names, path_join_names
+    ):
         if not anchored_to_repo or not _contains_parts(parts, REAL_CORPUS_PATH):
             continue
         corpus_index = next(
@@ -119,11 +190,24 @@ class _CallableFacts:
 
 
 class _CallableAnalyzer:
-    def __init__(self, module_callables: set[str]) -> None:
+    def __init__(
+        self,
+        module_callables: set[str],
+        os_module_names: set[str] | None = None,
+        os_path_module_names: set[str] | None = None,
+        path_join_names: set[str] | None = None,
+    ) -> None:
         self.module_callables = module_callables
+        self.os_module_names = {"os"} if os_module_names is None else os_module_names
+        self.os_path_module_names = (
+            set() if os_path_module_names is None else os_path_module_names
+        )
+        self.path_join_names = set() if path_join_names is None else path_join_names
         self.facts = _CallableFacts()
         self.local_callables: set[str] = set()
         self.callable_aliases: dict[str, set[str]] = {}
+        self.bound_read_aliases: dict[str, bool] = {}
+        self.open_aliases: set[str] = set()
 
     def analyze(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> _CallableFacts:
         self.local_callables = {
@@ -132,14 +216,36 @@ class _CallableAnalyzer:
             if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)) and child is not node
         }
         self.callable_aliases = {}
+        self.bound_read_aliases = {}
+        self.open_aliases = set()
         self._analyze_statements(node.body, {})
         return self.facts
+
+    def _path_values(self, node: ast.AST, environment: PathEnvironment) -> set[PathValue]:
+        return _path_values(
+            node,
+            environment,
+            self.os_module_names,
+            self.os_path_module_names,
+            self.path_join_names,
+        )
+
+    def _is_protected(self, node: ast.AST, environment: PathEnvironment) -> bool:
+        return _is_protected_repo_path(
+            node,
+            environment,
+            self.os_module_names,
+            self.os_path_module_names,
+            self.path_join_names,
+        )
 
     def _bind(
         self, environment: PathEnvironment, targets: list[ast.AST], value: ast.AST
     ) -> None:
-        values = _path_values(value, environment)
+        values = self._path_values(value, environment)
         aliases = self._callable_aliases(value)
+        bound_read = self._bound_read_alias(value, environment)
+        open_alias = self._is_open_alias(value)
         for target in targets:
             for name in _assigned_names(target):
                 if values:
@@ -150,6 +256,14 @@ class _CallableAnalyzer:
                     self.callable_aliases[name] = aliases
                 else:
                     self.callable_aliases.pop(name, None)
+                if bound_read is not None:
+                    self.bound_read_aliases[name] = bound_read
+                else:
+                    self.bound_read_aliases.pop(name, None)
+                if open_alias:
+                    self.open_aliases.add(name)
+                else:
+                    self.open_aliases.discard(name)
 
     def _callable_aliases(self, value: ast.AST) -> set[str]:
         if not isinstance(value, ast.Name):
@@ -158,11 +272,28 @@ class _CallableAnalyzer:
             return {value.id}
         return self.callable_aliases.get(value.id, set())
 
+    def _bound_read_alias(
+        self, value: ast.AST, environment: PathEnvironment
+    ) -> bool | None:
+        if isinstance(value, ast.Name) and value.id in self.bound_read_aliases:
+            return self.bound_read_aliases[value.id]
+        if isinstance(value, ast.Attribute) and value.attr in READ_METHODS:
+            return self._is_protected(value.value, environment)
+        return None
+
+    def _is_open_alias(self, value: ast.AST) -> bool:
+        if isinstance(value, ast.Name):
+            return value.id == "open" or value.id in self.open_aliases
+        return (
+            isinstance(value, ast.Attribute)
+            and value.attr == "open"
+            and isinstance(value.value, ast.Name)
+            and value.value.id == "builtins"
+        )
+
     def _analyze_call(self, node: ast.Call, environment: PathEnvironment) -> None:
         if isinstance(node.func, ast.Name) and node.func.id == "open" and node.args:
-            self.facts.reads_private_repo_data |= _is_protected_repo_path(
-                node.args[0], environment
-            )
+            self.facts.reads_private_repo_data |= self._is_protected(node.args[0], environment)
         elif isinstance(node.func, ast.Attribute):
             if (
                 node.func.attr == "open"
@@ -170,15 +301,21 @@ class _CallableAnalyzer:
                 and node.func.value.id == "builtins"
                 and node.args
             ):
-                self.facts.reads_private_repo_data |= _is_protected_repo_path(
+                self.facts.reads_private_repo_data |= self._is_protected(
                     node.args[0], environment
                 )
             elif node.func.attr in READ_METHODS:
-                self.facts.reads_private_repo_data |= _is_protected_repo_path(
+                self.facts.reads_private_repo_data |= self._is_protected(
                     node.func.value, environment
                 )
         if isinstance(node.func, ast.Name):
-            if node.func.id in self.module_callables:
+            if node.func.id in self.bound_read_aliases:
+                self.facts.reads_private_repo_data |= self.bound_read_aliases[node.func.id]
+            elif node.func.id in self.open_aliases and node.args:
+                self.facts.reads_private_repo_data |= self._is_protected(
+                    node.args[0], environment
+                )
+            elif node.func.id in self.module_callables:
                 self.facts.calls.add(node.func.id)
             elif node.func.id in self.callable_aliases:
                 self.facts.calls.update(self.callable_aliases[node.func.id])
@@ -290,6 +427,33 @@ def _node_id(node: ast.AST, relative_path: str, parents: dict[ast.AST, ast.AST])
     return "::".join([relative_path, *reversed(classes), node.name])
 
 
+def _os_path_join_aliases(tree: ast.Module) -> tuple[set[str], set[str], set[str]]:
+    os_modules = {"os"}
+    os_path_modules: set[str] = set()
+    join_names: set[str] = set()
+    for node in tree.body:
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name == "os":
+                    os_modules.add(alias.asname or "os")
+                elif alias.name == "os.path":
+                    os_path_modules.add(alias.asname or "path")
+        elif isinstance(node, ast.ImportFrom):
+            if node.module == "os.path":
+                join_names.update(
+                    alias.asname or alias.name for alias in node.names if alias.name == "join"
+                )
+            elif node.module == "os":
+                os_path_modules.update(
+                    alias.asname or alias.name for alias in node.names if alias.name == "path"
+                )
+        elif isinstance(node, ast.Assign) and _is_os_path_join_callee(
+            node.value, os_modules, os_path_modules, join_names
+        ):
+            join_names.update(name for target in node.targets for name in _assigned_names(target))
+    return os_modules, os_path_modules, join_names
+
+
 def _private_repo_data_readers_from_source(
     source: str, relative_path: str
 ) -> dict[str, bool]:
@@ -312,8 +476,11 @@ def _private_repo_data_readers_from_source(
     fixtures = {
         name for name, node in module_functions.items() if _is_fixture(node)
     }
+    os_modules, os_path_modules, join_names = _os_path_join_aliases(tree)
     facts = {
-        name: _CallableAnalyzer(set(module_functions)).analyze(node)
+        name: _CallableAnalyzer(
+            set(module_functions), os_modules, os_path_modules, join_names
+        ).analyze(node)
         for name, node in module_functions.items()
     }
     for name, node in module_functions.items():
@@ -324,7 +491,7 @@ def _private_repo_data_readers_from_source(
 
     def consumes_private_repo_data(name: str, seen: set[str]) -> bool:
         if name in seen:
-            return True
+            return False
         fact = facts.get(name)
         if fact is None:
             return True
@@ -338,7 +505,9 @@ def _private_repo_data_readers_from_source(
             name = node.name
             consumes_private = consumes_private_repo_data(name, set())
         else:
-            fact = _CallableAnalyzer(set(module_functions)).analyze(node)
+            fact = _CallableAnalyzer(
+                set(module_functions), os_modules, os_path_modules, join_names
+            ).analyze(node)
             fact.calls.update(
                 argument.arg for argument in node.args.args if argument.arg in fixtures
             )
@@ -460,6 +629,57 @@ def test_unknown_call():
     )
 
     assert readers == {}
+
+
+def test_module_analysis_marks_an_os_path_join_private_reader() -> None:
+    readers = _synthetic_private_reader_markers(
+        """
+import os
+
+def test_os_path_join_reader():
+    root = os.path.join("research", "defects", "real_corpus_v1")
+    private_path = os.path.join(root, "selected_candidates.private.json")
+    return open(private_path).read()
+"""
+    )
+
+    assert readers == {"tests/test_synthetic_private.py::test_os_path_join_reader": False}
+
+
+def test_module_analysis_marks_an_imported_os_path_join_alias_reader() -> None:
+    readers = _synthetic_private_reader_markers(
+        """
+from os.path import join as path_join
+
+join_alias = path_join
+
+def test_imported_os_path_join_reader():
+    root = join_alias("research", "defects", "real_corpus_v1")
+    private_path = join_alias(root, "selected_candidates.private.json")
+    return open(private_path).read()
+"""
+    )
+
+    assert readers == {
+        "tests/test_synthetic_private.py::test_imported_os_path_join_reader": False
+    }
+
+
+def test_module_analysis_marks_bound_read_and_open_sink_aliases() -> None:
+    readers = _synthetic_private_reader_markers(
+        """
+from pathlib import Path
+
+def test_sink_aliases():
+    root = Path(__file__).parents[1] / "research" / "defects" / "real_corpus_v1"
+    private_path = root / "selected_candidates.private.json"
+    reader = private_path.read_text
+    opener = open
+    return reader(), opener(private_path).read()
+"""
+    )
+
+    assert readers == {"tests/test_synthetic_private.py::test_sink_aliases": False}
 
 
 def test_module_analysis_propagates_private_fixture_through_another_fixture() -> None:
@@ -891,6 +1111,8 @@ def test_private_repo_data_marker_collects_only_static_readers() -> None:
 @pytest.mark.parametrize("readme", [ROOT / "README.md", ROOT / "README_CN.md"])
 def test_documentation_declares_the_single_windows_canonical_path(readme: Path) -> None:
     text = _read(readme)
+    assert "Python-3.12.2-blue.svg" in text
+    assert "Python 3.10+" not in text
     for required in (
         "PowerShell 7",
         "uv",

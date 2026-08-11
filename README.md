@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.10+-blue.svg" alt="Python 3.10+">
+  <img src="https://img.shields.io/badge/Python-3.12.2-blue.svg" alt="Python 3.12.2">
   <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT">
   <img src="https://img.shields.io/badge/Tests-508%20passed-brightgreen.svg" alt="Tests">
   <img src="https://img.shields.io/badge/Framework-ETCSLV-purple.svg" alt="ETCSLV">
@@ -313,7 +313,7 @@ Oracle. `Tau2SubjectAdapter` binds a native half-duplex `SimulationRun` to the
 original deterministic DB evaluator, task-derived state deltas, and semantic
 side-effect ledgers. Native execution and grading require a separate Python
 3.12 environment containing the pinned Git revision; the core NanoHarness
-environment remains usable on Python 3.10 and 3.11. See
+environment requires Python 3.12. See
 `research/pilots/tau2_native_bridge/` for the claim-bounded Pilot runner.
 
 The companion `agentdojo_scorer_bridge/` Pilot derives explicitly bound
