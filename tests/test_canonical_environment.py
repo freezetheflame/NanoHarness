@@ -46,14 +46,13 @@ def _path_value(
         return bindings.get(node.id)
     if isinstance(node, ast.Constant) and isinstance(node.value, str):
         parts = _path_parts(node.value)
-        return (True, parts) if _contains_parts(parts, REAL_CORPUS_PATH) else None
-    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Div):
-        base = _path_value(node.left, bindings)
-        if base is None or not isinstance(node.right, ast.Constant):
+        return (_contains_parts(parts, REAL_CORPUS_PATH), parts)
+    if isinstance(node, ast.BinOp) and isinstance(node.op, (ast.Add, ast.Div)):
+        left = _path_value(node.left, bindings)
+        right = _path_value(node.right, bindings)
+        if left is None or right is None:
             return None
-        if not isinstance(node.right.value, str):
-            return None
-        return (base[0], (*base[1], *_path_parts(node.right.value)))
+        return (left[0] or right[0], (*left[1], *right[1]))
     if isinstance(node, ast.Call):
         if isinstance(node.func, ast.Name) and node.func.id == "str" and node.args:
             return _path_value(node.args[0], bindings)
@@ -257,6 +256,46 @@ def test_ast_read_sink_detects_builtins_open_for_a_real_private_artifact() -> No
             [
                 'root = Path(__file__).parents[1] / "research" / "defects" / "real_corpus_v1"',
                 'payload = builtins.open(root / "selected_candidates.private.json").read()',
+            ]
+        )
+    )
+
+    assert _test_function_reads_private_repo_data(function)
+
+
+def test_ast_read_sink_tracks_added_private_artifact_path_into_bare_open() -> None:
+    function = _fixture_test_function(
+        "\n".join(
+            [
+                'root = "research/defects/real_corpus_v1"',
+                'private_path = root + "/x.private.json"',
+                "payload = open(private_path).read()",
+            ]
+        )
+    )
+
+    assert _test_function_reads_private_repo_data(function)
+
+
+def test_ast_read_sink_detects_bare_open_for_a_real_private_artifact() -> None:
+    function = _fixture_test_function(
+        "\n".join(
+            [
+                'root = Path(__file__).parents[1] / "research" / "defects" / "real_corpus_v1"',
+                'payload = open(root / "selected_candidates.private.json").read()',
+            ]
+        )
+    )
+
+    assert _test_function_reads_private_repo_data(function)
+
+
+def test_ast_read_sink_detects_path_open_for_a_real_private_artifact() -> None:
+    function = _fixture_test_function(
+        "\n".join(
+            [
+                'root = Path(__file__).parents[1] / "research" / "defects" / "real_corpus_v1"',
+                'payload = (root / "selected_candidates.private.json").open().read()',
             ]
         )
     )
