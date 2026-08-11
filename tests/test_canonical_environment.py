@@ -196,6 +196,7 @@ class _CallableAnalyzer:
         os_module_names: set[str] | None = None,
         os_path_module_names: set[str] | None = None,
         path_join_names: set[str] | None = None,
+        open_alias_names: set[str] | None = None,
     ) -> None:
         self.module_callables = module_callables
         self.os_module_names = {"os"} if os_module_names is None else os_module_names
@@ -203,6 +204,7 @@ class _CallableAnalyzer:
             set() if os_path_module_names is None else os_path_module_names
         )
         self.path_join_names = set() if path_join_names is None else path_join_names
+        self.open_alias_names = set() if open_alias_names is None else open_alias_names
         self.facts = _CallableFacts()
         self.local_callables: set[str] = set()
         self.callable_aliases: dict[str, set[str]] = {}
@@ -217,7 +219,7 @@ class _CallableAnalyzer:
         }
         self.callable_aliases = {}
         self.bound_read_aliases = {}
-        self.open_aliases = set()
+        self.open_aliases = set(self.open_alias_names)
         self._analyze_statements(node.body, {})
         return self.facts
 
@@ -454,6 +456,16 @@ def _os_path_join_aliases(tree: ast.Module) -> tuple[set[str], set[str], set[str
     return os_modules, os_path_modules, join_names
 
 
+def _builtins_open_aliases(tree: ast.Module) -> set[str]:
+    return {
+        alias.asname or alias.name
+        for node in tree.body
+        if isinstance(node, ast.ImportFrom) and node.module == "builtins"
+        for alias in node.names
+        if alias.name == "open"
+    }
+
+
 def _private_repo_data_readers_from_source(
     source: str, relative_path: str
 ) -> dict[str, bool]:
@@ -477,9 +489,10 @@ def _private_repo_data_readers_from_source(
         name for name, node in module_functions.items() if _is_fixture(node)
     }
     os_modules, os_path_modules, join_names = _os_path_join_aliases(tree)
+    open_alias_names = _builtins_open_aliases(tree)
     facts = {
         name: _CallableAnalyzer(
-            set(module_functions), os_modules, os_path_modules, join_names
+            set(module_functions), os_modules, os_path_modules, join_names, open_alias_names
         ).analyze(node)
         for name, node in module_functions.items()
     }
@@ -506,7 +519,7 @@ def _private_repo_data_readers_from_source(
             consumes_private = consumes_private_repo_data(name, set())
         else:
             fact = _CallableAnalyzer(
-                set(module_functions), os_modules, os_path_modules, join_names
+                set(module_functions), os_modules, os_path_modules, join_names, open_alias_names
             ).analyze(node)
             fact.calls.update(
                 argument.arg for argument in node.args.args if argument.arg in fixtures
@@ -680,6 +693,24 @@ def test_sink_aliases():
     )
 
     assert readers == {"tests/test_synthetic_private.py::test_sink_aliases": False}
+
+
+def test_module_analysis_marks_an_imported_builtins_open_alias_reader() -> None:
+    readers = _synthetic_private_reader_markers(
+        """
+from builtins import open as private_open
+from pathlib import Path
+
+def test_imported_open_alias_reader():
+    root = Path(__file__).parents[1] / "research" / "defects" / "real_corpus_v1"
+    private_path = root / "selected_candidates.private.json"
+    return private_open(private_path).read()
+"""
+    )
+
+    assert readers == {
+        "tests/test_synthetic_private.py::test_imported_open_alias_reader": False
+    }
 
 
 def test_module_analysis_propagates_private_fixture_through_another_fixture() -> None:
