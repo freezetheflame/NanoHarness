@@ -898,6 +898,7 @@ def test_archive_search_pages_is_deterministic_and_indexes_exact_bytes(tmp_path)
     ).hexdigest()
 
 
+@pytest.mark.private_repo_data
 def test_retained_real_defect_packet_is_blind_and_complete():
     root = (
         __import__("pathlib").Path(__file__).parents[1]

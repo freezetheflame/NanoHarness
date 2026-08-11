@@ -34,3 +34,6 @@ include = ["nanoharness*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "private_repo_data: reads protected repository-private artifacts and is excluded from canonical Full verification",
+]

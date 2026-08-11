@@ -46,10 +46,7 @@ try {
             -q
     }
     else {
-        $fullDeselections = @(
-            "--deselect=tests/test_real_defect_pipeline.py::test_retained_real_defect_packet_is_blind_and_complete"
-        )
-        & $venvPython -m pytest tests -q @fullDeselections
+        & $venvPython -m pytest tests -q --strict-markers -m "not private_repo_data"
     }
     Stop-OnFailure
 }

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import os
 import re
 import subprocess
@@ -12,14 +13,58 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 BOOTSTRAP = ROOT / "scripts" / "bootstrap_canonical_env.ps1"
 VERIFY = ROOT / "scripts" / "verify_canonical_env.ps1"
-PRIVATE_TEST_NODES = (
-    "tests/test_real_defect_pipeline.py::test_retained_real_defect_packet_is_blind_and_complete",
+TESTS = ROOT / "tests"
+PRIVATE_REPO_DATA_MARKER = "private_repo_data"
+PRIVATE_REPO_DATA_PATH = re.compile(
+    r"(?:research[\\/]+defects[\\/]+real_corpus_v1[\\/]+private[\\/]+|\.private\.json\b)"
 )
 
 
 def _read(path: Path) -> str:
     assert path.is_file(), f"missing canonical environment file: {path.relative_to(ROOT)}"
     return path.read_text(encoding="utf-8")
+
+
+def _private_repo_data_readers() -> dict[str, bool]:
+    readers: dict[str, bool] = {}
+    for test_path in TESTS.rglob("*.py"):
+        source = _read(test_path)
+        tree = ast.parse(source, filename=str(test_path))
+        parents = {
+            child: parent
+            for parent in ast.walk(tree)
+            for child in ast.iter_child_nodes(parent)
+        }
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            if not node.name.startswith("test_"):
+                continue
+            function_source = ast.get_source_segment(source, node) or ""
+            if not PRIVATE_REPO_DATA_PATH.search(function_source):
+                continue
+            classes: list[str] = []
+            ancestor = parents[node]
+            while ancestor is not tree:
+                if isinstance(ancestor, ast.ClassDef):
+                    classes.append(ancestor.name)
+                ancestor = parents[ancestor]
+            node_id = "::".join(
+                [test_path.relative_to(ROOT).as_posix(), *reversed(classes), node.name]
+            )
+            decorators = list(node.decorator_list)
+            ancestor = parents[node]
+            while ancestor is not tree:
+                if isinstance(ancestor, ast.ClassDef):
+                    decorators.extend(ancestor.decorator_list)
+                ancestor = parents[ancestor]
+            readers[node_id] = any(
+                isinstance(decorator.func if isinstance(decorator, ast.Call) else decorator, ast.Attribute)
+                and (decorator.func if isinstance(decorator, ast.Call) else decorator).attr
+                == PRIVATE_REPO_DATA_MARKER
+                for decorator in decorators
+            )
+    return readers
 
 
 def test_python_version_is_pinned_exactly() -> None:
@@ -187,17 +232,34 @@ def test_verifier_enforces_interpreter_health_and_test_isolation() -> None:
     assert "$LASTEXITCODE" in text and "exit $LASTEXITCODE" in text
 
 
-def test_full_tier_deselects_every_test_that_reads_private_repo_data() -> None:
+def test_private_repo_data_marker_is_registered_and_used_by_full_tier() -> None:
+    project = _read(ROOT / "pyproject.toml")
     text = _read(VERIFY)
-    for node in PRIVATE_TEST_NODES:
-        assert f"--deselect={node}" in text
+    assert f"{PRIVATE_REPO_DATA_MARKER}:" in project
+    assert '--strict-markers -m "not private_repo_data"' in text
+    assert "--deselect=" not in text
 
 
-def test_full_tier_private_deselections_are_valid_pytest_node_ids() -> None:
+def test_every_direct_private_repo_reader_is_marked() -> None:
+    readers = _private_repo_data_readers()
+    assert readers
+    assert all(readers.values()), readers
+
+
+def test_private_repo_data_marker_collects_only_static_readers() -> None:
     env = os.environ.copy()
     env["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
-    command = [sys.executable, "-m", "pytest", "--collect-only", "tests", "-q"]
-    command.extend(f"--deselect={node}" for node in PRIVATE_TEST_NODES)
+    command = [
+        sys.executable,
+        "-m",
+        "pytest",
+        "--collect-only",
+        "tests",
+        "-q",
+        "--strict-markers",
+        "-m",
+        PRIVATE_REPO_DATA_MARKER,
+    ]
     result = subprocess.run(
         command,
         cwd=ROOT,
@@ -207,8 +269,10 @@ def test_full_tier_private_deselections_are_valid_pytest_node_ids() -> None:
         check=False,
     )
     assert result.returncode == 0, result.stdout + result.stderr
-    for node in PRIVATE_TEST_NODES:
-        assert node not in result.stdout
+    collected = {
+        line for line in result.stdout.splitlines() if line.startswith("tests/")
+    }
+    assert collected == set(_private_repo_data_readers())
 
 
 @pytest.mark.parametrize("readme", [ROOT / "README.md", ROOT / "README_CN.md"])
