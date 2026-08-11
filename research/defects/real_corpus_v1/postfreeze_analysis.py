@@ -33,13 +33,45 @@ def _json_bytes(payload: Any) -> bytes:
     ).encode("utf-8")
 
 
-def _without_source_metadata(packet: Mapping[str, Any]) -> dict[str, Any]:
+def _strict_equal(left: Any, right: Any) -> bool:
+    if type(left) is not type(right):
+        return False
+    if isinstance(left, dict):
+        return left.keys() == right.keys() and all(
+            _strict_equal(left[key], right[key]) for key in left
+        )
+    if isinstance(left, list):
+        return len(left) == len(right) and all(
+            _strict_equal(left_item, right_item)
+            for left_item, right_item in zip(left, right)
+        )
+    return left == right
+
+
+def _without_timestamp_lexemes(packet: Mapping[str, Any]) -> dict[str, Any]:
     stripped = deepcopy(packet)
     for agent_id in AGENT_IDS:
         source = stripped["source_submissions"][agent_id]
-        source.pop("provenance")
-        source.pop("completion")
+        source["provenance"].pop("started_at")
+        source["completion"].pop("completed_at")
     return stripped
+
+
+def _replace_timestamp_lexeme(
+    bound_metadata: Mapping[str, Any],
+    raw_metadata: Mapping[str, Any],
+    timestamp_field: str,
+    label: str,
+) -> dict[str, Any]:
+    if not isinstance(raw_metadata.get(timestamp_field), str):
+        raise ValueError(f"post-freeze {label} timestamp must be a raw string")
+    normalized_raw = deepcopy(raw_metadata)
+    normalized_raw[timestamp_field] = bound_metadata[timestamp_field]
+    if not _strict_equal(normalized_raw, bound_metadata):
+        raise ValueError(f"post-freeze non-timestamp metadata differs: {label}")
+    corrected = deepcopy(bound_metadata)
+    corrected[timestamp_field] = raw_metadata[timestamp_field]
+    return corrected
 
 
 def build_postfreeze_artifacts(
@@ -59,13 +91,23 @@ def build_postfreeze_artifacts(
     for agent_id in AGENT_IDS:
         raw_submission = json.loads(submission_bytes[agent_id])
         source = corrected_packet["source_submissions"][agent_id]
-        source["provenance"] = deepcopy(raw_submission["agent_provenance"])
-        source["completion"] = deepcopy(raw_submission["completion"])
+        source["provenance"] = _replace_timestamp_lexeme(
+            source["provenance"],
+            raw_submission["agent_provenance"],
+            "started_at",
+            f"{agent_id} provenance",
+        )
+        source["completion"] = _replace_timestamp_lexeme(
+            source["completion"],
+            raw_submission["completion"],
+            "completed_at",
+            f"{agent_id} completion",
+        )
 
-    if _without_source_metadata(corrected_packet) != _without_source_metadata(
+    if _without_timestamp_lexemes(corrected_packet) != _without_timestamp_lexemes(
         bound_packet
     ):
-        raise ValueError("post-freeze correction changed non-metadata packet content")
+        raise ValueError("post-freeze correction changed non-timestamp packet content")
     return agreement, corrected_packet
 
 
@@ -140,7 +182,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         )
         if corrected_agreement != bound_agreement:
             raise ValueError("post-freeze correction changed agreement results")
-        if _without_source_metadata(corrected_packet) != _without_source_metadata(
+        if _without_timestamp_lexemes(corrected_packet) != _without_timestamp_lexemes(
             bound_packet
         ):
             raise ValueError("post-freeze correction changed bound packet content")

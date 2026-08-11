@@ -1442,6 +1442,29 @@ def test_agent_review_preserves_validated_raw_source_metadata_verbatim(tmp_path)
         assert source["completion"] == expected[agent_id]["completion"]
 
 
+@pytest.mark.parametrize("raw_value", ["true", 1])
+def test_postfreeze_analysis_rejects_non_timestamp_metadata_coercion(
+    tmp_path,
+    raw_value,
+):
+    from research.defects.real_corpus_v1.postfreeze_analysis import (
+        build_postfreeze_artifacts,
+    )
+
+    packet, paths, _, decisions = _agent_review_fixture(tmp_path)
+    raw_submissions = _raw_agent_submissions(paths)
+    submission = json.loads(raw_submissions["A2"])
+    submission["completion"]["independent"] = raw_value
+    raw_submissions["A2"] = json.dumps(submission).encode("utf-8")
+
+    with pytest.raises(ValueError, match="non-timestamp metadata differs"):
+        build_postfreeze_artifacts(
+            packet.read_bytes(),
+            raw_submissions,
+            patch_payloads=_agent_patch_payloads(tmp_path, decisions),
+        )
+
+
 @pytest.mark.parametrize("field_name", ["boundaries", "evidence_ids"])
 def test_agent_review_rejects_duplicate_entry_multivalue_fields(
     tmp_path,
@@ -1739,111 +1762,4 @@ def test_agent_review_cli_rejects_unbound_analysis_inputs(tmp_path):
     assert completed.returncode != 0
     assert "--binding" in completed.stderr
     assert "--dispatch-record" in completed.stderr
-    assert not output.exists()
-
-
-@pytest.mark.parametrize("failure", ["missing", "wrong_hash"])
-def test_agent_review_cli_rejects_missing_or_mismatched_selected_patch(
-    tmp_path,
-    failure,
-):
-    packet, paths, _, _ = _agent_review_fixture(tmp_path)
-    script = (
-        __import__("pathlib").Path(__file__).parents[1]
-        / "research" / "defects" / "real_corpus_v1" / "agent_review_cli.py"
-    )
-    packet_payload = json.loads(packet.read_text(encoding="utf-8"))
-    if failure == "missing":
-        packet_payload["candidates"][1].pop("patch_path")
-    else:
-        packet_payload["candidates"][1]["patch_sha256"] = "0" * 64
-    packet.write_text(json.dumps(packet_payload, sort_keys=True), encoding="utf-8")
-    new_digest = hashlib.sha256(packet.read_bytes()).hexdigest()
-    for path in paths.values():
-        submission = json.loads(path.read_text(encoding="utf-8"))
-        submission["packet_sha256"] = new_digest
-        submission["agent_provenance"]["input_sha256"] = new_digest
-        submission["completion"]["packet_sha256"] = new_digest
-        path.write_text(json.dumps(submission), encoding="utf-8")
-    output = tmp_path / "output"
-
-    completed = subprocess.run([
-        sys.executable, str(script),
-        "--packet", str(packet), "--a1", str(paths["A1"]),
-        "--a2", str(paths["A2"]), "--a3", str(paths["A3"]),
-        "--output", str(output),
-    ], text=True, capture_output=True)
-
-    assert completed.returncode != 0
-    assert not output.exists()
-
-
-@pytest.mark.parametrize(
-    ("field_name", "invalid_value", "provenance_field"),
-    [
-        ("manual_version", "3.0", False),
-        ("protocol_id", "agent-review-v2", True),
-        ("model_id", "different-model", True),
-        ("prompt_sha256", "C" * 64, True),
-    ],
-)
-def test_agent_review_cli_rejects_invalid_inputs_before_writing(
-    tmp_path,
-    field_name,
-    invalid_value,
-    provenance_field,
-):
-    packet, paths, _, _ = _agent_review_fixture(tmp_path)
-    script = (
-        __import__("pathlib").Path(__file__).parents[1]
-        / "research" / "defects" / "real_corpus_v1" / "agent_review_cli.py"
-    )
-    invalid = json.loads(paths["A3"].read_text(encoding="utf-8"))
-    target = invalid["agent_provenance"] if provenance_field else invalid
-    target[field_name] = invalid_value
-    invalid_path = tmp_path / "invalid-a3.json"
-    invalid_path.write_text(json.dumps(invalid), encoding="utf-8")
-    output = tmp_path / "invalid-output"
-
-    completed = subprocess.run([
-        sys.executable, str(script),
-        "--packet", str(packet), "--a1", str(paths["A1"]),
-        "--a2", str(paths["A2"]), "--a3", str(invalid_path),
-        "--output", str(output),
-    ], text=True, capture_output=True)
-
-    assert completed.returncode != 0
-    assert not output.exists()
-
-    existing = tmp_path / "existing"
-    existing.mkdir()
-    completed = subprocess.run([
-        sys.executable, str(script),
-        "--packet", str(packet), "--a1", str(paths["A1"]),
-        "--a2", str(paths["A2"]), "--a3", str(paths["A3"]),
-        "--output", str(existing),
-    ], text=True, capture_output=True)
-    assert completed.returncode != 0
-
-
-def test_agent_review_cli_rejects_mismatched_input_id_set(tmp_path):
-    packet, paths, _, _ = _agent_review_fixture(tmp_path)
-    script = (
-        __import__("pathlib").Path(__file__).parents[1]
-        / "research" / "defects" / "real_corpus_v1" / "agent_review_cli.py"
-    )
-    mismatched = json.loads(paths["A3"].read_text(encoding="utf-8"))
-    mismatched["entries"].pop()
-    mismatched_path = tmp_path / "mismatched-a3.json"
-    mismatched_path.write_text(json.dumps(mismatched), encoding="utf-8")
-    output = tmp_path / "mismatched-output"
-
-    completed = subprocess.run([
-        sys.executable, str(script),
-        "--packet", str(packet), "--a1", str(paths["A1"]),
-        "--a2", str(paths["A2"]), "--a3", str(mismatched_path),
-        "--output", str(output),
-    ], text=True, capture_output=True)
-
-    assert completed.returncode != 0
     assert not output.exists()

@@ -1161,11 +1161,7 @@ def test_dispatch_cli_runs_preflight_and_submission_validation(
     record.unlink()
 
 
-def test_agent_review_cli_requires_bound_dispatch_before_analysis(
-    frozen_dispatch,
-):
-    from research.defects.real_corpus_v1.agent_review_cli import main
-
+def _write_complete_review_outputs(frozen_dispatch):
     record = _create_test_dispatch_record(frozen_dispatch)
     mapping = frozen_dispatch["binding_payload"]["canonical_task_mapping"]
     outputs = []
@@ -1208,6 +1204,16 @@ def test_agent_review_cli_requires_bound_dispatch_before_analysis(
         path = frozen_dispatch["nano"] / assignment["output"]
         _write_json(path, payload)
         outputs.append(path)
+    return record, outputs
+
+
+def test_agent_review_cli_requires_bound_dispatch_before_analysis(
+    frozen_dispatch,
+):
+    from research.defects.real_corpus_v1.agent_review_cli import main
+
+    record, outputs = _write_complete_review_outputs(frozen_dispatch)
+    mapping = frozen_dispatch["binding_payload"]["canonical_task_mapping"]
     analysis_output = frozen_dispatch["formal"] / "analysis-test"
     try:
         assert main(
@@ -1254,6 +1260,124 @@ def test_agent_review_cli_requires_bound_dispatch_before_analysis(
             for path in analysis_output.iterdir():
                 path.unlink()
             analysis_output.rmdir()
+
+
+@pytest.mark.parametrize("failure", ["missing", "wrong_hash"])
+def test_postfreeze_cli_rejects_patch_failure_before_writing(
+    frozen_dispatch,
+    monkeypatch,
+    capsys,
+    failure,
+):
+    from research.defects.real_corpus_v1 import postfreeze_analysis
+
+    record, outputs = _write_complete_review_outputs(frozen_dispatch)
+    output = frozen_dispatch["formal"] / f"postfreeze-{failure}"
+    original = postfreeze_analysis._selected_patch_payloads
+
+    def broken_patch_payloads(*args, **kwargs):
+        payloads = original(*args, **kwargs)
+        defect_id = sorted(payloads)[0]
+        if failure == "missing":
+            payloads.pop(defect_id)
+        else:
+            payloads[defect_id] = b"wrong patch bytes"
+        return payloads
+
+    monkeypatch.setattr(
+        postfreeze_analysis,
+        "_selected_patch_payloads",
+        broken_patch_payloads,
+    )
+    try:
+        assert postfreeze_analysis.main(
+            [
+                "--binding",
+                str(frozen_dispatch["binding"]),
+                "--dispatch-record",
+                str(record),
+                "--output",
+                str(output),
+            ]
+        ) == 1
+        expected = (
+            "patch payloads are required"
+            if failure == "missing"
+            else "patch SHA-256 mismatch"
+        )
+        assert expected in capsys.readouterr().err
+        assert not output.exists()
+    finally:
+        for path in outputs:
+            if path.exists():
+                path.unlink()
+        if record.exists():
+            record.unlink()
+
+
+def test_postfreeze_cli_rejects_invalid_raw_before_writing(
+    frozen_dispatch,
+    capsys,
+):
+    from research.defects.real_corpus_v1 import postfreeze_analysis
+
+    record, outputs = _write_complete_review_outputs(frozen_dispatch)
+    mapping = frozen_dispatch["binding_payload"]["canonical_task_mapping"]
+    a3_path = frozen_dispatch["nano"] / mapping["formal_a3"]["output"]
+    invalid = json.loads(a3_path.read_text(encoding="utf-8"))
+    invalid["completion"]["independent"] = "true"
+    _write_json(a3_path, invalid)
+    output = frozen_dispatch["formal"] / "postfreeze-invalid-raw"
+    try:
+        assert postfreeze_analysis.main(
+            [
+                "--binding",
+                str(frozen_dispatch["binding"]),
+                "--dispatch-record",
+                str(record),
+                "--output",
+                str(output),
+            ]
+        ) == 1
+        assert "non-timestamp metadata differs" in capsys.readouterr().err
+        assert not output.exists()
+    finally:
+        for path in outputs:
+            if path.exists():
+                path.unlink()
+        if record.exists():
+            record.unlink()
+
+
+def test_postfreeze_cli_rejects_existing_output_before_writing(
+    frozen_dispatch,
+    capsys,
+):
+    from research.defects.real_corpus_v1 import postfreeze_analysis
+
+    record, outputs = _write_complete_review_outputs(frozen_dispatch)
+    output = frozen_dispatch["formal"] / "postfreeze-existing"
+    output.mkdir()
+    try:
+        assert postfreeze_analysis.main(
+            [
+                "--binding",
+                str(frozen_dispatch["binding"]),
+                "--dispatch-record",
+                str(record),
+                "--output",
+                str(output),
+            ]
+        ) == 1
+        assert "output directory must not already exist" in capsys.readouterr().err
+        assert not list(output.iterdir())
+    finally:
+        output.rmdir()
+        for path in outputs:
+            if path.exists():
+                path.unlink()
+        if record.exists():
+            record.unlink()
 
 
 @pytest.mark.parametrize(
