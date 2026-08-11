@@ -3009,7 +3009,7 @@
   "source_submissions": {
     "A1": {
       "completion": {
-        "completed_at": "2026-08-10T23:24:55.353925+08:00",
+        "completed_at": "2026-08-10T23:24:55.3539251+08:00",
         "independent": true,
         "packet_sha256": "92fc19ca1f96e183dfb21087aae966445ce46e3ae75e81dbdbacfa1f74f82593"
       },
@@ -3020,13 +3020,13 @@
         "model_id": "gpt-5.6-sol",
         "prompt_sha256": "db24b8a1a539762fadf75a96638622529fe1be44cdca9b769e1671796d9e8a94",
         "protocol_id": "agent-review-v1",
-        "started_at": "2026-08-10T22:45:39.023492+08:00"
+        "started_at": "2026-08-10T22:45:39.0234922+08:00"
       },
       "sha256": "e0b4a64e53758013c027f34f730faf8aa1925561568457f99f3828a57004efea"
     },
     "A2": {
       "completion": {
-        "completed_at": "2026-08-10T15:47:13.366000Z",
+        "completed_at": "2026-08-10T15:47:13.366Z",
         "independent": true,
         "packet_sha256": "92fc19ca1f96e183dfb21087aae966445ce46e3ae75e81dbdbacfa1f74f82593"
       },
@@ -3037,13 +3037,13 @@
         "model_id": "gpt-5.6-sol",
         "prompt_sha256": "db24b8a1a539762fadf75a96638622529fe1be44cdca9b769e1671796d9e8a94",
         "protocol_id": "agent-review-v1",
-        "started_at": "2026-08-10T22:45:39.047451+08:00"
+        "started_at": "2026-08-10T22:45:39.0474514+08:00"
       },
       "sha256": "86119192a0ad02f6653a69f096896ba6d6c0295787241eac529e3de8face5c27"
     },
     "A3": {
       "completion": {
-        "completed_at": "2026-08-10T23:39:15.571473+08:00",
+        "completed_at": "2026-08-10T23:39:15.5714736+08:00",
         "independent": true,
         "packet_sha256": "92fc19ca1f96e183dfb21087aae966445ce46e3ae75e81dbdbacfa1f74f82593"
       },
@@ -3054,7 +3054,7 @@
         "model_id": "gpt-5.6-sol",
         "prompt_sha256": "db24b8a1a539762fadf75a96638622529fe1be44cdca9b769e1671796d9e8a94",
         "protocol_id": "agent-review-v1",
-        "started_at": "2026-08-10T22:53:20.969904+08:00"
+        "started_at": "2026-08-10T22:53:20.9699041+08:00"
       },
       "sha256": "16151f85c3dc52634aefd65fde497025fad5dd1e03e8645f42d7ae30193ee9bb"
     }

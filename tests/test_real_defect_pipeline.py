@@ -1100,7 +1100,7 @@ def test_formal_agent_analysis_checksums_are_complete_and_deterministic(tmp_path
         assert hashlib.sha256((analysis / relative).read_bytes()).hexdigest() == expected
 
     regenerated = tmp_path / "analysis"
-    script = root.parents[1] / "agent_review_cli.py"
+    script = root.parents[1] / "postfreeze_analysis.py"
     completed = subprocess.run(
         [
             sys.executable,
@@ -1321,7 +1321,9 @@ def test_agent_review_rejects_unvalidated_source_submission_extras(
     container,
     extra_key,
 ):
-    from research.defects.real_corpus_v1.agent_review import build_review_artifacts
+    from research.defects.real_corpus_v1.postfreeze_analysis import (
+        build_postfreeze_artifacts,
+    )
 
     packet, paths, _, decisions = _agent_review_fixture(tmp_path)
     raw_submissions = _raw_agent_submissions(paths)
@@ -1330,7 +1332,7 @@ def test_agent_review_rejects_unvalidated_source_submission_extras(
     raw_submissions["A3"] = json.dumps(tampered).encode("utf-8")
 
     with pytest.raises(ValueError, match="unexpected field"):
-        build_review_artifacts(
+        build_postfreeze_artifacts(
             packet.read_bytes(),
             raw_submissions,
             patch_payloads=_agent_patch_payloads(tmp_path, decisions),
@@ -1391,6 +1393,53 @@ def test_agent_review_source_sha_is_bound_to_analyzed_raw_bytes(tmp_path):
     assert human_packet["source_submissions"]["A2"]["sha256"] == hashlib.sha256(
         raw_submissions["A2"]
     ).hexdigest()
+
+
+def test_agent_review_preserves_validated_raw_source_metadata_verbatim(tmp_path):
+    from research.defects.real_corpus_v1.agent_review import build_review_artifacts
+    from research.defects.real_corpus_v1.postfreeze_analysis import (
+        build_postfreeze_artifacts,
+    )
+
+    packet, paths, _, decisions = _agent_review_fixture(tmp_path)
+    raw_submissions = _raw_agent_submissions(paths)
+    expected = {}
+    for index, agent_id in enumerate(("A1", "A2", "A3"), start=1):
+        submission = json.loads(raw_submissions[agent_id])
+        submission["agent_provenance"]["started_at"] = (
+            f"2026-08-10T00:00:00.123456{index}Z"
+        )
+        submission["completion"]["completed_at"] = (
+            f"2026-08-10T00:00:01.765432{index}Z"
+        )
+        expected[agent_id] = {
+            "provenance": submission["agent_provenance"],
+            "completion": submission["completion"],
+        }
+        raw_submissions[agent_id] = json.dumps(submission).encode("utf-8")
+
+    bound_agreement, bound_packet = build_review_artifacts(
+        packet.read_bytes(),
+        raw_submissions,
+        patch_payloads=_agent_patch_payloads(tmp_path, decisions),
+    )
+    agreement, human_packet = build_postfreeze_artifacts(
+        packet.read_bytes(),
+        raw_submissions,
+        patch_payloads=_agent_patch_payloads(tmp_path, decisions),
+    )
+
+    assert agreement == bound_agreement
+    assert human_packet["schema_version"] == bound_packet["schema_version"]
+    assert human_packet["packet_sha256"] == bound_packet["packet_sha256"]
+    assert human_packet["candidates"] == bound_packet["candidates"]
+    for agent_id in ("A1", "A2", "A3"):
+        source = human_packet["source_submissions"][agent_id]
+        assert source["sha256"] == bound_packet["source_submissions"][agent_id][
+            "sha256"
+        ]
+        assert source["provenance"] == expected[agent_id]["provenance"]
+        assert source["completion"] == expected[agent_id]["completion"]
 
 
 @pytest.mark.parametrize("field_name", ["boundaries", "evidence_ids"])
