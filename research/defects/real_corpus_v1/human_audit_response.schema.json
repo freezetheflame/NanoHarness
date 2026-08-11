@@ -7,7 +7,7 @@
   "additionalProperties": false,
   "required": ["schema_version", "audit_packet_sha256", "reviews"],
   "properties": {
-    "schema_version": {"const": 1},
+    "schema_version": {"type": "integer", "const": 1},
     "audit_packet_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "reviews": {"type": "array", "items": {"$ref": "#/$defs/review"}}
   },

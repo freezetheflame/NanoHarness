@@ -131,10 +131,10 @@ def test_draft_permits_only_empty_judgments_and_complete_requires_all_reviews():
 
 def test_manifest_is_external_non_self_referential_and_hash_bound(tmp_path):
     response_path = tmp_path / "human_audit_response.json"
-    response_path.write_text('{"schema_version": 1}\n', encoding="utf-8")
     response = initialize_pinned_empty_response()
+    response_path.write_text(json.dumps(response), encoding="utf-8")
     with pytest.raises(ValueError, match="reviewer_id"):
-        build_manifest(response_path, response, created_at="2026-08-11T12:00:00+08:00")
+        build_manifest(response_path, created_at="2026-08-11T12:00:00+08:00")
 
 
 def test_real_packet_dry_run_does_not_mutate_source(tmp_path):
@@ -166,3 +166,60 @@ def test_pinned_api_rejects_self_consistent_different_packet_and_altered_bytes(
     monkeypatch.setattr(human_audit, "DEFAULT_AUDIT_PACKET_PATH", altered)
     with pytest.raises(ValueError, match="pinned audit packet SHA-256"):
         load_pinned_audit_packet()
+
+
+def test_schema_version_rejects_boolean_and_schema_declares_integer():
+    response = initialize_empty_response(_packet(), audit_packet_sha256="a" * 64)
+    response["schema_version"] = True
+    with pytest.raises(ValueError, match="schema_version"):
+        validate_draft_response(response, _packet(), audit_packet_sha256="a" * 64)
+
+    schema_path = human_audit.Path(__file__).parents[1] / "research/defects/real_corpus_v1/human_audit_response.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    assert schema["properties"]["schema_version"] == {"type": "integer", "const": 1}
+
+
+def test_manifest_paths_must_be_external_to_sealed_formal_snapshot(tmp_path):
+    source = human_audit.DEFAULT_AUDIT_PACKET_PATH
+    before = source.read_bytes()
+    response = initialize_pinned_empty_response()
+    with pytest.raises(ValueError, match="external to the sealed formal snapshot"):
+        build_manifest(source, created_at="2026-08-11T12:00:00+08:00")
+    with pytest.raises(ValueError, match="external to the sealed formal snapshot"):
+        write_manifest(
+            source.parent / "forbidden.manifest.json",
+            tmp_path / "response.json",
+            created_at="2026-08-11T12:00:00+08:00",
+        )
+    assert source.read_bytes() == before
+
+
+def test_manifest_reads_external_response_once_and_binds_its_exact_bytes(
+    tmp_path, monkeypatch
+):
+    packet = _packet()
+    response = initialize_empty_response(packet, audit_packet_sha256=AUDIT_PACKET_SHA256)
+    for review in response["reviews"]:
+        _complete_review(review)
+    response_path = tmp_path / "human_audit_response.json"
+    response_bytes = json.dumps(response, sort_keys=True).encode("utf-8")
+    response_path.write_bytes(response_bytes)
+    monkeypatch.setattr(human_audit, "load_pinned_audit_packet", lambda: packet)
+    original_read = human_audit.Path.read_bytes
+    reads = 0
+
+    def counted_read(path):
+        nonlocal reads
+        if path == response_path:
+            reads += 1
+        return original_read(path)
+
+    monkeypatch.setattr(human_audit.Path, "read_bytes", counted_read)
+    manifest = build_manifest(response_path, created_at="2026-08-11T12:00:00+08:00")
+    assert reads == 1
+    assert manifest["response_sha256"] == hashlib.sha256(response_bytes).hexdigest()
+    assert manifest["response_count"] == 2
+
+    manifest_path = tmp_path / "human_audit_response.manifest.json"
+    assert write_manifest(manifest_path, response_path, created_at="2026-08-11T12:00:00+08:00") == manifest
+    assert json.loads(manifest_path.read_text(encoding="utf-8")) == manifest

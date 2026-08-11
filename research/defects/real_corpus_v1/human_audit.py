@@ -19,6 +19,7 @@ DEFAULT_AUDIT_PACKET_PATH = (
     / "analysis"
     / "human_audit_packet.json"
 )
+SEALED_FORMAL_ROOT = DEFAULT_AUDIT_PACKET_PATH.parents[1]
 BOUNDARIES = {
     "model", "tool", "context", "state", "hook", "evaluator", "permission",
     "control_flow", "replay", "other",
@@ -54,6 +55,14 @@ def read_json(path: str | Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError(f"{path} must contain a JSON object")
     return value
+
+
+def ensure_external_output_path(path: str | Path) -> Path:
+    """Resolve an output path and reject the sealed formal evidence tree."""
+    resolved = Path(path).resolve()
+    if resolved.is_relative_to(SEALED_FORMAL_ROOT.resolve()):
+        raise ValueError("output path must be external to the sealed formal snapshot")
+    return resolved
 
 
 def _empty_review(candidate: Mapping[str, Any]) -> dict[str, Any]:
@@ -217,7 +226,7 @@ def _validate_response_header(
     if not isinstance(response, Mapping):
         raise ValueError("response must be a JSON object")
     _unexpected_fields(response, RESPONSE_FIELDS, "response")
-    if response["schema_version"] != SCHEMA_VERSION:
+    if type(response["schema_version"]) is not int or response["schema_version"] != SCHEMA_VERSION:
         raise ValueError("response schema_version is unsupported")
     if response["audit_packet_sha256"] != audit_packet_sha256:
         raise ValueError("response audit_packet_sha256 does not match source")
@@ -267,24 +276,24 @@ def validate_pinned_complete_response(response: Mapping[str, Any]) -> None:
 
 def build_manifest(
     response_path: str | Path,
-    response: Mapping[str, Any],
     *,
     created_at: str,
 ) -> dict[str, Any]:
     """Build a manifest from a complete response bound to the pinned packet."""
     _validate_timestamp(created_at, "manifest")
-    validate_pinned_complete_response(response)
-    response_path = Path(response_path)
+    response_path = ensure_external_output_path(response_path)
     try:
-        stored_response = read_json(response_path)
+        response_bytes = response_path.read_bytes()
+        response = json.loads(response_bytes)
     except (OSError, json.JSONDecodeError) as exc:
         raise ValueError("manifest response path must contain JSON") from exc
-    if stored_response != response:
-        raise ValueError("manifest response bytes do not match validated response")
+    if not isinstance(response, dict):
+        raise ValueError("manifest response path must contain a JSON object")
+    validate_pinned_complete_response(response)
     return {
         "schema_version": SCHEMA_VERSION,
         "response_filename": response_path.name,
-        "response_sha256": sha256_file(response_path),
+        "response_sha256": hashlib.sha256(response_bytes).hexdigest(),
         "source_audit_packet_sha256": AUDIT_PACKET_SHA256,
         "response_count": len(response["reviews"]),
         "created_at": created_at,
@@ -294,13 +303,12 @@ def build_manifest(
 def write_manifest(
     path: str | Path,
     response_path: str | Path,
-    response: Mapping[str, Any],
     *,
     created_at: str,
 ) -> dict[str, Any]:
     """Build and atomically write a manifest for a complete pinned response."""
-    manifest = build_manifest(response_path, response, created_at=created_at)
-    target = Path(path)
+    target = ensure_external_output_path(path)
+    manifest = build_manifest(response_path, created_at=created_at)
     target.parent.mkdir(parents=True, exist_ok=True)
     temporary = target.with_name(f".{target.name}.tmp")
     with temporary.open("w", encoding="utf-8", newline="\n") as handle:
