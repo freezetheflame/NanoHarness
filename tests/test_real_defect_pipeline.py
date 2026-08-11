@@ -969,7 +969,9 @@ def test_frozen_agent_input_checksums_are_complete_sorted_and_match_bytes():
         and path != inventory
         and path.name != "DISPATCH_BINDING.json"
         and path.name not in {"DISPATCH_RECORD.json", "RAW_SHA256SUMS"}
-        and not path.relative_to(root).as_posix().startswith("pass_a/")
+        and not path.relative_to(root).as_posix().startswith(
+            ("pass_a/", "analysis/")
+        )
     )
     assert relative_paths == expected_paths
     assert "AGENT_PROMPT.md" in relative_paths
@@ -1021,7 +1023,7 @@ def test_frozen_agent_binding_manifests_remain_byte_identical():
     } == expected
 
 
-def test_frozen_agent_raw_submissions_strictly_validate_without_analysis_output():
+def test_frozen_agent_raw_submissions_strictly_validate_after_analysis_output():
     root = (
         __import__("pathlib").Path(__file__).parents[1]
         / "research"
@@ -1039,6 +1041,19 @@ def test_frozen_agent_raw_submissions_strictly_validate_without_analysis_output(
         for assignment in record["assignments"]
     }
     binding_sha256 = hashlib.sha256(binding_path.read_bytes()).hexdigest()
+
+    analysis = root / "analysis"
+    assert (analysis / "pass_a_agreement.json").is_file()
+    assert (analysis / "human_audit_packet.json").is_file()
+    for inventory_name in ("SHA256SUMS", "RAW_SHA256SUMS"):
+        for line in (root / inventory_name).read_text(
+            encoding="utf-8"
+        ).splitlines():
+            expected, relative = line.split("  ", 1)
+            assert (
+                hashlib.sha256((root / relative).read_bytes()).hexdigest()
+                == expected
+            )
 
     for annotator_id in ("A1", "A2", "A3"):
         result = validate_frozen_submission(
@@ -1060,8 +1075,52 @@ def test_frozen_agent_raw_submissions_strictly_validate_without_analysis_output(
             "entry_count": 77,
         }
 
-    assert not list(root.rglob("pass_a_agreement.json"))
-    assert not list(root.rglob("human_audit_packet.json"))
+
+
+def test_formal_agent_analysis_checksums_are_complete_and_deterministic(tmp_path):
+    root = (
+        __import__("pathlib").Path(__file__).parents[1]
+        / "research"
+        / "defects"
+        / "real_corpus_v1"
+        / "formal"
+        / "agent-review-v1"
+    )
+    analysis = root / "analysis"
+    inventory = analysis / "SHA256SUMS"
+    lines = inventory.read_text(encoding="utf-8").splitlines()
+    relative_paths = [line.split("  ", 1)[1] for line in lines]
+
+    assert relative_paths == [
+        "human_audit_packet.json",
+        "pass_a_agreement.json",
+    ]
+    for line in lines:
+        expected, relative = line.split("  ", 1)
+        assert hashlib.sha256((analysis / relative).read_bytes()).hexdigest() == expected
+
+    regenerated = tmp_path / "analysis"
+    script = root.parents[1] / "agent_review_cli.py"
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--binding",
+            str(root / "DISPATCH_BINDING.json"),
+            "--dispatch-record",
+            str(root / "DISPATCH_RECORD.json"),
+            "--output",
+            str(regenerated),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+    for relative in (*relative_paths, "SHA256SUMS"):
+        assert (regenerated / relative).read_bytes() == (
+            analysis / relative
+        ).read_bytes()
 
 
 def test_machine_precode_is_conservative_and_partition_blind():
