@@ -5,6 +5,11 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+if (-not $IsWindows -or $PSVersionTable.PSVersion.Major -lt 7) {
+    Write-Error "Windows PowerShell 7 or newer is required for the canonical environment."
+    exit 2
+}
+
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $venvPython = Join-Path $repoRoot ".venv\Scripts\python.exe"
 
@@ -41,7 +46,10 @@ try {
             -q
     }
     else {
-        & $venvPython -m pytest tests -q
+        $fullDeselections = @(
+            "--deselect=tests/test_real_defect_pipeline.py::test_retained_real_defect_packet_is_blind_and_complete"
+        )
+        & $venvPython -m pytest tests -q @fullDeselections
     }
     Stop-OnFailure
 }

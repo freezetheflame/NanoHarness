@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import os
 import re
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -9,6 +12,9 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 BOOTSTRAP = ROOT / "scripts" / "bootstrap_canonical_env.ps1"
 VERIFY = ROOT / "scripts" / "verify_canonical_env.ps1"
+PRIVATE_TEST_NODES = (
+    "tests/test_real_defect_pipeline.py::test_retained_real_defect_packet_is_blind_and_complete",
+)
 
 
 def _read(path: Path) -> str:
@@ -51,7 +57,122 @@ def test_bootstrap_resolves_repo_root_and_performs_frozen_sync() -> None:
     assert "uv venv --python $sourcePython" in text
     assert "--allow-existing" in text
     assert "uv sync --frozen" in text
+    assert "$sourcePythonVersion = & $sourcePython" in text
+    assert "$actualVersion = & $venvPython" in text
+    assert "import sys; print(sys.version.split()[0])" in text
+    assert "Unexpected source interpreter" in text
+    assert "Unexpected interpreter" in text
     assert "$LASTEXITCODE" in text and "exit $LASTEXITCODE" in text
+
+
+@pytest.mark.parametrize("script", [BOOTSTRAP, VERIFY])
+def test_canonical_scripts_reject_non_windows_or_legacy_powershell(script: Path) -> None:
+    text = _read(script)
+    assert "$IsWindows" in text
+    assert "$PSVersionTable.PSVersion.Major -lt 7" in text
+    assert "Windows PowerShell 7 or newer is required" in text
+
+
+def test_bootstrap_attestation_rejects_an_unexpected_created_interpreter(
+    tmp_path: Path,
+) -> None:
+    fake_root = tmp_path / "repo"
+    fake_scripts = fake_root / "scripts"
+    fake_bin = tmp_path / "bin"
+    fake_source = tmp_path / "python-3.12.2.cmd"
+    fake_python = fake_root / ".venv" / "Scripts" / "python.cmd"
+    fake_scripts.mkdir(parents=True)
+    fake_bin.mkdir()
+    fake_python.parent.mkdir(parents=True)
+    fake_source.write_text("@echo off\r\necho 3.12.2\r\n", encoding="utf-8")
+    fake_python.write_text("@echo off\r\necho 3.12.5\r\n", encoding="utf-8")
+    fake_uv = fake_bin / "uv.cmd"
+    fake_uv.write_text(
+        f'@echo off\r\nif "%1 %2"=="python find" echo {fake_source}\r\nexit /b 0\r\n',
+        encoding="utf-8",
+    )
+    script_text = _read(BOOTSTRAP).replace(
+        '".venv\\Scripts\\python.exe"', '".venv\\Scripts\\python.cmd"'
+    )
+    copied_bootstrap = fake_scripts / BOOTSTRAP.name
+    copied_bootstrap.write_text(script_text, encoding="utf-8")
+    env = os.environ.copy()
+    env["PATH"] = f"{fake_bin}{os.pathsep}{env['PATH']}"
+
+    result = subprocess.run(
+        ["pwsh", "-NoProfile", "-File", str(copied_bootstrap)],
+        cwd=fake_root,
+        env=env,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "Unexpected interpreter" in result.stderr
+
+
+def test_bootstrap_rejects_an_unexpected_source_before_creating_a_venv(
+    tmp_path: Path,
+) -> None:
+    fake_root = tmp_path / "repo"
+    fake_scripts = fake_root / "scripts"
+    fake_bin = tmp_path / "bin"
+    fake_source = tmp_path / "python-3.12.5.cmd"
+    command_log = tmp_path / "uv-commands.log"
+    fake_scripts.mkdir(parents=True)
+    fake_bin.mkdir()
+    fake_source.write_text("@echo off\r\necho 3.12.5\r\n", encoding="utf-8")
+    fake_uv = fake_bin / "uv.cmd"
+    fake_uv.write_text(
+        "@echo off\r\n"
+        f'echo %*>>"{command_log}"\r\n'
+        f'if "%1 %2"=="python find" echo {fake_source}\r\n'
+        "exit /b 0\r\n",
+        encoding="utf-8",
+    )
+    copied_bootstrap = fake_scripts / BOOTSTRAP.name
+    copied_bootstrap.write_text(_read(BOOTSTRAP), encoding="utf-8")
+    env = os.environ.copy()
+    env["PATH"] = f"{fake_bin}{os.pathsep}{env['PATH']}"
+
+    result = subprocess.run(
+        ["pwsh", "-NoProfile", "-File", str(copied_bootstrap)],
+        cwd=fake_root,
+        env=env,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "Unexpected source interpreter" in result.stderr
+    assert command_log.read_text(encoding="utf-8").splitlines() == ["python find 3.12.2"]
+
+
+@pytest.mark.parametrize("script", [BOOTSTRAP, VERIFY])
+def test_canonical_scripts_reject_legacy_powershell_at_runtime(script: Path) -> None:
+    result = subprocess.run(
+        [
+            "pwsh",
+            "-NoProfile",
+            "-Command",
+            f'$PSVersionTable.PSVersion = [version]"5.1"; & "{script}"; exit $LASTEXITCODE',
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "PowerShell 7 or newer is required" in result.stderr
 
 
 def test_verifier_enforces_interpreter_health_and_test_isolation() -> None:
@@ -64,6 +185,30 @@ def test_verifier_enforces_interpreter_health_and_test_isolation() -> None:
     assert "Focused" in text and "Full" in text
     assert "tests/test_canonical_environment.py" in text
     assert "$LASTEXITCODE" in text and "exit $LASTEXITCODE" in text
+
+
+def test_full_tier_deselects_every_test_that_reads_private_repo_data() -> None:
+    text = _read(VERIFY)
+    for node in PRIVATE_TEST_NODES:
+        assert f"--deselect={node}" in text
+
+
+def test_full_tier_private_deselections_are_valid_pytest_node_ids() -> None:
+    env = os.environ.copy()
+    env["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
+    command = [sys.executable, "-m", "pytest", "--collect-only", "tests", "-q"]
+    command.extend(f"--deselect={node}" for node in PRIVATE_TEST_NODES)
+    result = subprocess.run(
+        command,
+        cwd=ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    for node in PRIVATE_TEST_NODES:
+        assert node not in result.stdout
 
 
 @pytest.mark.parametrize("readme", [ROOT / "README.md", ROOT / "README_CN.md"])
