@@ -1,5 +1,6 @@
 import copy
 import hashlib
+import io
 import json
 from datetime import datetime, timezone
 
@@ -66,6 +67,109 @@ def test_initialize_empty_response_copies_packet_ids_order_and_selection_reasons
     assert [review["defect_id"] for review in response["reviews"]] == ["D-1", "D-2"]
     assert response["reviews"][0]["selection_reasons"] == ["decision_disagreement"]
     validate_draft_response(response, _packet(), audit_packet_sha256="a" * 64)
+
+
+def test_cli_init_creates_pinned_empty_external_draft_atomically(tmp_path):
+    output = tmp_path / "response.json"
+    stdout, stderr = io.StringIO(), io.StringIO()
+
+    result = human_audit.main(["init", str(output)], io.StringIO(), stdout, stderr)
+
+    assert result == 0
+    response = json.loads(output.read_text(encoding="utf-8"))
+    validate_pinned_draft_response(response)
+    assert "initialized" in stdout.getvalue().lower()
+    assert stderr.getvalue() == ""
+
+
+def test_cli_review_shows_public_evidence_before_annotations_and_saves_one_record(tmp_path, monkeypatch):
+    packet = {
+        "candidates": [{
+            "defect_id": "D-1", "selection_reasons": ["decision_disagreement"],
+            "candidate": {
+                "metadata": {"repository": "example"}, "commit": "abc123",
+                "changed_files": ["public.py"], "candidate_test_files": ["test_public.py"],
+                "evidence": [{"evidence_id": "D-1-fix", "text": "public proof"}],
+                "patch": "diff --git a/public.py b/public.py\n+",
+            },
+            "annotations": {"A1": "immutable annotation"},
+        }]
+    }
+    monkeypatch.setattr(human_audit, "load_pinned_audit_packet", lambda: packet)
+    output = tmp_path / "response.json"
+    assert human_audit.main(["init", str(output)], io.StringIO(), io.StringIO(), io.StringIO()) == 0
+    answers = "\n".join([
+        "ack", "reviewer-1", "2026-08-11T12:00:00+08:00", "D-1-fix", "confirm", "include", "",
+        "tool", "trigger", "symptom", "cause", "impact", "rationale",
+    ]) + "\n"
+    stdout, stderr = io.StringIO(), io.StringIO()
+
+    result = human_audit.main(["review", str(output)], io.StringIO(answers), stdout, stderr)
+
+    assert result == 0, stderr.getvalue()
+    text = stdout.getvalue()
+    assert text.index("Metadata") < text.index("Full patch") < text.index("ack") < text.index("A1")
+    assert "immutable annotation" in text
+    assert "majority" not in text.lower() and "default" not in text.lower()
+    response = json.loads(output.read_text(encoding="utf-8"))
+    assert response["reviews"][0]["reviewer_id"] == "reviewer-1"
+
+
+def test_cli_review_bad_input_leaves_draft_unchanged_and_completed_record_is_not_overwritten(tmp_path, monkeypatch):
+    packet = _packet()
+    monkeypatch.setattr(human_audit, "load_pinned_audit_packet", lambda: packet)
+    output = tmp_path / "response.json"
+    assert human_audit.main(["init", str(output)], io.StringIO(), io.StringIO(), io.StringIO()) == 0
+    before = output.read_bytes()
+    result = human_audit.main(["review", str(output)], io.StringIO("no\n"), io.StringIO(), io.StringIO())
+    assert result == 1
+    assert output.read_bytes() == before
+
+    response = json.loads(before)
+    _complete_review(response["reviews"][0])
+    output.write_text(json.dumps(response), encoding="utf-8")
+    saved = output.read_bytes()
+    result = human_audit.main(["review", str(output), "D-1"], io.StringIO(), io.StringIO(), io.StringIO())
+    assert result == 1
+    assert output.read_bytes() == saved
+
+
+def test_cli_status_validate_and_freeze_obey_completion_and_sealed_output_rules(tmp_path, monkeypatch):
+    packet = _packet()
+    monkeypatch.setattr(human_audit, "load_pinned_audit_packet", lambda: packet)
+    output = tmp_path / "response.json"
+    assert human_audit.main(["init", str(output)], io.StringIO(), io.StringIO(), io.StringIO()) == 0
+    stdout, stderr = io.StringIO(), io.StringIO()
+    assert human_audit.main(["status", str(output)], io.StringIO(), stdout, stderr) == 0
+    assert "0 completed" in stdout.getvalue() and "2 pending" in stdout.getvalue()
+    assert human_audit.main(["validate", str(output)], io.StringIO(), io.StringIO(), io.StringIO()) == 1
+    assert human_audit.main(["freeze", str(output), str(tmp_path / "manifest.json")], io.StringIO(), io.StringIO(), io.StringIO()) == 1
+    response = json.loads(output.read_text(encoding="utf-8"))
+    for review in response["reviews"]:
+        _complete_review(review)
+    output.write_text(json.dumps(response), encoding="utf-8")
+    manifest = tmp_path / "manifest.json"
+    assert human_audit.main(["freeze", str(output), str(manifest)], io.StringIO(), io.StringIO(), io.StringIO()) == 0
+    assert manifest.exists()
+    sealed = human_audit.DEFAULT_AUDIT_PACKET_PATH.parent / "forbidden.json"
+    assert human_audit.main(["init", str(sealed)], io.StringIO(), io.StringIO(), io.StringIO()) == 1
+
+
+def test_real_cli_dry_run_has_thirty_pending_and_never_overwrites_or_mutates_packet(tmp_path):
+    source = human_audit.DEFAULT_AUDIT_PACKET_PATH
+    before = source.read_bytes()
+    output = tmp_path / "response.json"
+    assert human_audit.main(["init", str(output)], io.StringIO(), io.StringIO(), io.StringIO()) == 0
+    stdout = io.StringIO()
+    assert human_audit.main(["status", str(output)], io.StringIO(), stdout, io.StringIO()) == 0
+    assert "0 completed" in stdout.getvalue() and "30 pending" in stdout.getvalue()
+    assert human_audit.main(["validate", str(output)], io.StringIO(), io.StringIO(), io.StringIO()) == 1
+    original = output.read_bytes()
+    assert human_audit.main(["init", str(output)], io.StringIO(), io.StringIO(), io.StringIO()) == 1
+    assert output.read_bytes() == original
+    response = json.loads(original)
+    assert all(review["reviewer_id"] is None for review in response["reviews"])
+    assert source.read_bytes() == before
 
 
 @pytest.mark.parametrize(

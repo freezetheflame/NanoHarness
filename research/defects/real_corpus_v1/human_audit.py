@@ -5,6 +5,8 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import argparse
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Mapping
@@ -321,3 +323,219 @@ def write_manifest(
         handle.write("\n")
     os.replace(temporary, target)
     return manifest
+
+
+def _atomic_create_json(path: str | Path, value: Mapping[str, Any]) -> Path:
+    """Create JSON once; an existing response is never silently replaced."""
+    target = ensure_external_output_path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    temporary = target.with_name(f".{target.name}.{os.getpid()}.tmp")
+    try:
+        with temporary.open("x", encoding="utf-8", newline="\n") as handle:
+            json.dump(value, handle, indent=2, sort_keys=True)
+            handle.write("\n")
+        # link is atomic and fails if another writer has created the target.
+        os.link(temporary, target)
+    except FileExistsError as exc:
+        raise ValueError(f"refusing to overwrite existing output: {target}") from exc
+    finally:
+        if temporary.exists():
+            temporary.unlink()
+    return target
+
+
+def _cli_init(path: str, stdout: Any) -> None:
+    target = _atomic_create_json(path, initialize_pinned_empty_response())
+    print(f"Initialized empty audit draft: {target}", file=stdout)
+
+
+def _read_response(path: str | Path) -> tuple[Path, dict[str, Any]]:
+    target = ensure_external_output_path(path)
+    return target, read_json(target)
+
+
+def _validate_partial_pinned(response: Mapping[str, Any]) -> tuple[list[Mapping[str, Any]], int]:
+    packet = load_pinned_audit_packet()
+    reviews = _validate_response_header(response, AUDIT_PACKET_SHA256)
+    candidates = _packet_candidates(packet)
+    if [item.get("defect_id") if isinstance(item, Mapping) else None for item in reviews] != [item["defect_id"] for item in candidates]:
+        raise ValueError("response IDs must exactly match packet order, set, and count")
+    completed = 0
+    for review, candidate in zip(reviews, candidates, strict=True):
+        try:
+            validate_review(review, candidate, complete=False)
+        except ValueError:
+            validate_review(review, candidate, complete=True)
+            completed += 1
+    return candidates, completed
+
+
+def _atomic_replace_json(path: Path, value: Mapping[str, Any]) -> None:
+    target = ensure_external_output_path(path)
+    temporary = target.with_name(f".{target.name}.{os.getpid()}.tmp")
+    try:
+        with temporary.open("x", encoding="utf-8", newline="\n") as handle:
+            json.dump(value, handle, indent=2, sort_keys=True)
+            handle.write("\n")
+        os.replace(temporary, target)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
+
+
+def _show_json(label: str, value: Any, stdout: Any) -> None:
+    print(f"{label}:", file=stdout)
+    print(json.dumps(value, indent=2, sort_keys=True), file=stdout)
+
+
+def _show_evidence(candidate: Mapping[str, Any], stdout: Any) -> None:
+    material = candidate.get("candidate", {})
+    if not isinstance(material, Mapping):
+        raise ValueError(f"{candidate['defect_id']} candidate material must be an object")
+    _show_json("Metadata", material.get("metadata", {}), stdout)
+    _show_json("Commit", material.get("commit", material.get("commit_sha", "")), stdout)
+    _show_json("Changed files", material.get("changed_files", []), stdout)
+    _show_json("Candidate test files", material.get("candidate_test_files", material.get("test_files", [])), stdout)
+    _show_json("Public evidence", material.get("evidence", []), stdout)
+    print("Full patch:", file=stdout)
+    print(material.get("patch", material.get("patch_text", "")), file=stdout)
+
+
+def _answer(stdin: Any, stdout: Any, prompt: str) -> str:
+    print(prompt, file=stdout)
+    value = stdin.readline()
+    if value == "":
+        raise ValueError("review paused before a record was saved")
+    return value.rstrip("\r\n")
+
+
+def _record_from_reviewer(candidate: Mapping[str, Any], stdin: Any, stdout: Any) -> dict[str, Any]:
+    reviewer_id = _answer(stdin, stdout, "reviewer_id:")
+    reviewed_at = _answer(stdin, stdout, "reviewed_at (ISO-8601 with timezone):")
+    evidence = _answer(stdin, stdout, "evidence_considered (comma-separated evidence IDs):")
+    disposition = _answer(stdin, stdout, "disposition:")
+    final_decision = _answer(stdin, stdout, "final_decision:")
+    exclusion_reason = _answer(stdin, stdout, "final_exclusion_reason (empty if none):")
+    boundaries = _answer(stdin, stdout, "final_boundaries (comma-separated, empty if none):")
+    return {
+        "defect_id": candidate["defect_id"], "selection_reasons": list(candidate["selection_reasons"]),
+        "reviewer_id": reviewer_id,
+        "reviewed_at": reviewed_at,
+        "evidence_considered": [item.strip() for item in evidence.split(",") if item.strip()],
+        "disposition": disposition,
+        "final_decision": final_decision,
+        "final_exclusion_reason": exclusion_reason,
+        "final_boundaries": [item.strip() for item in boundaries.split(",") if item.strip()],
+        "final_trigger": _answer(stdin, stdout, "final_trigger:"),
+        "final_symptom": _answer(stdin, stdout, "final_symptom:"),
+        "final_root_cause": _answer(stdin, stdout, "final_root_cause:"),
+        "final_impact": _answer(stdin, stdout, "final_impact:"),
+        "final_rationale": _answer(stdin, stdout, "final_rationale:"),
+    }
+
+
+def _cli_review(path: str, selected: str | None, stdin: Any, stdout: Any) -> None:
+    target, response = _read_response(path)
+    candidates, _ = _validate_partial_pinned(response)
+    by_id = {item["defect_id"]: (index, item) for index, item in enumerate(candidates)}
+    if selected is not None:
+        if selected not in by_id:
+            raise ValueError(f"unknown defect ID: {selected}")
+        index, candidate = by_id[selected]
+    else:
+        pending = [(index, item) for index, item in enumerate(candidates) if response["reviews"][index] == _empty_review(item)]
+        if not pending:
+            raise ValueError("no pending reviews")
+        index, candidate = pending[0]
+    if response["reviews"][index] != _empty_review(candidate):
+        raise ValueError(f"{candidate['defect_id']} is already completed")
+    _show_evidence(candidate, stdout)
+    if _answer(stdin, stdout, "Type ack to view immutable annotations:") != "ack":
+        raise ValueError("review paused before annotations and no changes were saved")
+    _show_json("A1/A2/A3 annotations", candidate.get("annotations", {}), stdout)
+    _show_json("Selection reasons", candidate["selection_reasons"], stdout)
+    record = _record_from_reviewer(candidate, stdin, stdout)
+    validate_review(record, candidate, complete=True)
+    response["reviews"][index] = record
+    _atomic_replace_json(target, response)
+    print(f"Saved review for {candidate['defect_id']}", file=stdout)
+
+
+def _cli_status(path: str, stdout: Any) -> None:
+    _, response = _read_response(path)
+    _, completed = _validate_partial_pinned(response)
+    disputed = sum(1 for review in response["reviews"] if review.get("disposition") == "disputed")
+    print(f"{completed} completed, {len(response['reviews']) - completed} pending, {disputed} disputed", file=stdout)
+
+
+def _cli_validate(path: str, stdout: Any) -> int:
+    _, response = _read_response(path)
+    _, completed = _validate_partial_pinned(response)
+    if completed != len(response["reviews"]):
+        print(f"Response is structurally valid but incomplete: {completed}/{len(response['reviews'])} completed", file=stdout)
+        return 1
+    validate_pinned_complete_response(response)
+    print("Response is complete and valid", file=stdout)
+    return 0
+
+
+def _cli_freeze(response_path: str, manifest_path: str, stdout: Any) -> None:
+    target, response = _read_response(response_path)
+    validate_pinned_complete_response(response)
+    write_manifest(manifest_path, target, created_at=datetime.now().astimezone().isoformat())
+    print(f"Created external manifest: {ensure_external_output_path(manifest_path)}", file=stdout)
+
+
+def main(
+    argv: list[str] | None = None,
+    stdin: Any = None,
+    stdout: Any = None,
+    stderr: Any = None,
+) -> int:
+    """Run the public human-audit command-line interface."""
+    stdin = sys.stdin if stdin is None else stdin
+    stdout = sys.stdout if stdout is None else stdout
+    stderr = sys.stderr if stderr is None else stderr
+    parser = argparse.ArgumentParser(prog="human_audit", add_help=False, exit_on_error=False)
+    subparsers = parser.add_subparsers(dest="command")
+    init = subparsers.add_parser("init")
+    init.add_argument("response_path")
+    review = subparsers.add_parser("review")
+    review.add_argument("response_path")
+    review.add_argument("defect_id", nargs="?")
+    status = subparsers.add_parser("status")
+    status.add_argument("response_path")
+    validate = subparsers.add_parser("validate")
+    validate.add_argument("response_path")
+    freeze = subparsers.add_parser("freeze")
+    freeze.add_argument("response_path")
+    freeze.add_argument("manifest_path")
+    try:
+        args = parser.parse_args(argv)
+    except (argparse.ArgumentError, SystemExit):
+        parser.print_usage(stderr)
+        return 2
+    try:
+        if args.command == "init":
+            _cli_init(args.response_path, stdout)
+            return 0
+        if args.command == "review":
+            _cli_review(args.response_path, args.defect_id, stdin, stdout)
+            return 0
+        if args.command == "status":
+            _cli_status(args.response_path, stdout)
+            return 0
+        if args.command == "validate":
+            return _cli_validate(args.response_path, stdout)
+        if args.command == "freeze":
+            _cli_freeze(args.response_path, args.manifest_path, stdout)
+            return 0
+        parser.print_usage(stderr)
+        return 2
+    except (OSError, ValueError) as exc:
+        print(f"Error: {exc}", file=stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
