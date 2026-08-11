@@ -292,7 +292,7 @@ Package/Commit Provenance、显式 Task ID、Environment Digest、Reference Call
 
 tau2 Converter 同样保持离线，不导入 Benchmark 包，并固定 `tasks.json`、源码版本、
 任务 Fixture、Reward Basis 与 Domain 状态摘要。`Tau2SubjectAdapter` 可在隔离的
-Python 3.12 环境中，将原生 half-duplex `SimulationRun` 绑定到原始确定性 DB
+Python 3.12.2 环境中，将原生 half-duplex `SimulationRun` 绑定到原始确定性 DB
 Evaluator、任务派生的状态增量和语义副作用账本，同时不把 Reference Actions 当成
 唯一正确调用序列。可复现入口与主张边界见 `research/pilots/tau2_native_bridge/`。
 

@@ -312,8 +312,8 @@ separately, and a reference action list is never converted into an exact-call
 Oracle. `Tau2SubjectAdapter` binds a native half-duplex `SimulationRun` to the
 original deterministic DB evaluator, task-derived state deltas, and semantic
 side-effect ledgers. Native execution and grading require a separate Python
-3.12 environment containing the pinned Git revision; the core NanoHarness
-environment requires Python 3.12. See
+3.12.2 environment containing the pinned Git revision; the core NanoHarness
+environment requires exactly Python 3.12.2. See
 `research/pilots/tau2_native_bridge/` for the claim-bounded Pilot runner.
 
 The companion `agentdojo_scorer_bridge/` Pilot derives explicitly bound

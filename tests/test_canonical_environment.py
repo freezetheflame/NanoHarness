@@ -1113,6 +1113,7 @@ def test_documentation_declares_the_single_windows_canonical_path(readme: Path) 
     text = _read(readme)
     assert "Python-3.12.2-blue.svg" in text
     assert "Python 3.10+" not in text
+    assert not re.search(r"Python 3\.12(?!\.2)", text)
     for required in (
         "PowerShell 7",
         "uv",
