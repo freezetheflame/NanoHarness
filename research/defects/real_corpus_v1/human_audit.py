@@ -29,6 +29,7 @@ BOUNDARIES = {
 EXCLUSION_REASONS = {
     "doc_or_format_only", "feature_request", "insufficient_public_evidence",
     "model_quality_only", "not_agent_boundary", "refactor_only",
+    "dependency_only", "benchmark_difficulty", "duplicate", "out_of_scope",
 }
 DISPOSITIONS = {"confirm", "override", "disputed"}
 DECISIONS = {"include", "exclude", "uncertain"}

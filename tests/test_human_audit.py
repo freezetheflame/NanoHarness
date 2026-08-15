@@ -339,6 +339,27 @@ def test_manifest_reads_external_response_once_and_binds_its_exact_bytes(
     assert json.loads(manifest_path.read_text(encoding="utf-8")) == manifest
 
 
+def test_exclusion_reason_vocabulary_matches_coding_manual(tmp_path):
+    manual_reasons = {
+        "doc_or_format_only", "feature_request", "refactor_only",
+        "dependency_only", "not_agent_boundary", "model_quality_only",
+        "benchmark_difficulty", "insufficient_public_evidence",
+        "duplicate", "out_of_scope",
+    }
+    assert human_audit.EXCLUSION_REASONS == manual_reasons
+    for reason in manual_reasons:
+        response = initialize_empty_response(_packet(), audit_packet_sha256=AUDIT_PACKET_SHA256)
+        for review in response["reviews"]:
+            _complete_review(review, decision="exclude")
+            review["final_exclusion_reason"] = reason
+        validate_complete_response(response, _packet(), audit_packet_sha256=AUDIT_PACKET_SHA256)
+
+    schema_path = human_audit.Path(__file__).parents[1] / "research/defects/real_corpus_v1/human_audit_response.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    schema_enum = set(schema["$defs"]["review"]["properties"]["final_exclusion_reason"]["enum"]) - {""}
+    assert schema_enum == manual_reasons
+
+
 def test_manifest_publication_never_replaces_existing_file_or_leaves_temporary(tmp_path, monkeypatch):
     packet = _packet()
     response = initialize_empty_response(packet, audit_packet_sha256=AUDIT_PACKET_SHA256)

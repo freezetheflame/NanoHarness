@@ -24,7 +24,7 @@
         "evidence_considered": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
         "disposition": {"type": ["string", "null"], "enum": ["confirm", "override", "disputed", null]},
         "final_decision": {"type": ["string", "null"], "enum": ["include", "exclude", "uncertain", null]},
-        "final_exclusion_reason": {"type": "string", "enum": ["", "doc_or_format_only", "feature_request", "insufficient_public_evidence", "model_quality_only", "not_agent_boundary", "refactor_only"]},
+        "final_exclusion_reason": {"type": "string", "enum": ["", "doc_or_format_only", "feature_request", "insufficient_public_evidence", "model_quality_only", "not_agent_boundary", "refactor_only", "dependency_only", "benchmark_difficulty", "duplicate", "out_of_scope"]},
         "final_boundaries": {"type": "array", "uniqueItems": true, "items": {"enum": ["model", "tool", "context", "state", "hook", "evaluator", "permission", "control_flow", "replay", "other"]}},
         "final_trigger": {"type": "string"},
         "final_symptom": {"type": "string"},
