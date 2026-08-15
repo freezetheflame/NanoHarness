@@ -22,6 +22,7 @@ DEFAULT_AUDIT_PACKET_PATH = (
     / "human_audit_packet.json"
 )
 SEALED_FORMAL_ROOT = DEFAULT_AUDIT_PACKET_PATH.parents[1]
+PRIVATE_ROOT = Path(__file__).parent / "private"
 BOUNDARIES = {
     "model", "tool", "context", "state", "hook", "evaluator", "permission",
     "control_flow", "replay", "other",
@@ -61,10 +62,12 @@ def read_json(path: str | Path) -> dict[str, Any]:
 
 
 def ensure_external_output_path(path: str | Path) -> Path:
-    """Resolve an output path and reject the sealed formal evidence tree."""
+    """Resolve an output path and reject the sealed formal and private trees."""
     resolved = Path(path).resolve()
     if resolved.is_relative_to(SEALED_FORMAL_ROOT.resolve()):
         raise ValueError("output path must be external to the sealed formal snapshot")
+    if resolved.is_relative_to(PRIVATE_ROOT.resolve()):
+        raise ValueError("output path must be external to the private material tree")
     return resolved
 
 

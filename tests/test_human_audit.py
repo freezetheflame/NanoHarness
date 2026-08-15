@@ -293,6 +293,14 @@ def test_schema_version_matches_draft202012_numeric_semantics(value, accepted):
     assert response["schema_version"] == value
 
 
+def test_output_paths_must_be_external_to_private_material_tree():
+    private_root = human_audit.Path(human_audit.__file__).parent / "private"
+    with pytest.raises(ValueError, match="private material tree"):
+        human_audit.ensure_external_output_path(private_root / "leak.json")
+    with pytest.raises(ValueError, match="private material tree"):
+        human_audit.ensure_external_output_path(private_root / "nested" / "leak.json")
+
+
 def test_manifest_paths_must_be_external_to_sealed_formal_snapshot(tmp_path):
     source = human_audit.DEFAULT_AUDIT_PACKET_PATH
     before = source.read_bytes()
