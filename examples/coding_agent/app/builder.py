@@ -41,11 +41,16 @@ def build_coding_engine(
     model: str = "deepseek-chat",
     base_url: str = "https://api.deepseek.com",
     max_steps: int = 20,
+    permission_mode: str | None = None,
 ) -> NanoEngine:
     """Build and return a configured NanoEngine for coding tasks.
 
     Runtime files (state) are stored in sandbox/.
     Memory files are stored in .memory/ (persisted across sessions).
+
+    ``permission_mode`` is ``auto``, ``interactive``, ``yolo``, or None.
+    None lets build_permissions() read NANOHARNESS_PERM_MODE (default
+    interactive when that variable is unset).
     """
     os.makedirs(SANDBOX, exist_ok=True)
 
@@ -142,7 +147,7 @@ def build_coding_engine(
     tool_hooks = build_tool_hooks()
 
     # --- Permissions ---
-    perms = build_permissions()
+    perms = build_permissions(mode=permission_mode)
 
     # --- Wire system prompt refresh (rebuilds dynamic segments per task) ---
     _wire_system_prompt_refresh(hooks, prompt_builder, context)

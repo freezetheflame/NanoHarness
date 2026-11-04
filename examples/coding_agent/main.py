@@ -6,10 +6,14 @@ Usage:
     cd examples/coding_agent
     python main.py
 
-    # Or with a single task (runs once, prints report, exits):
+    # Or with a single task (runs once, prints report, exits).
+    # Single-shot defaults to permission mode "auto" (no stdin prompt).
     python main.py "Add a docstring to engine.py"
+    python main.py --yolo "Add a docstring to engine.py"
+    NANOHARNESS_PERM_MODE=interactive python main.py "Add a docstring to engine.py"
 """
 
+import argparse
 import sys
 import os
 
@@ -19,6 +23,7 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, _HERE)
 
 from app.builder import build_coding_engine
+from app.permissions import PERM_MODE_ENV, GateMode, resolve_permission_mode
 from app.ui import BANNER, read_input
 
 _BOLD = "\033[1m"
@@ -79,17 +84,103 @@ def _print_goal_verification(engine, query, report):
         print(f"  {_RED}Goal not achieved:{_RESET} {_DIM}{explanation.split(':', 1)[-1].strip()}{_RESET}")
 
 
-def main():
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse CLI flags and an optional single-shot task."""
+    parser = argparse.ArgumentParser(
+        prog="python main.py",
+        description=(
+            "Terminal coding agent. With no task, starts an interactive REPL. "
+            "A task argument runs once and exits."
+        ),
+        epilog=(
+            "Permission mode, highest priority first:\n"
+            "  --yolo / --auto / --interactive or --perm-mode,\n"
+            f"  then {PERM_MODE_ENV},\n"
+            "  then auto for a single-shot task and interactive for the REPL.\n"
+            "\n"
+            "examples:\n"
+            "  python main.py\n"
+            '  python main.py --yolo "Add a docstring to engine.py"\n'
+            f'  {PERM_MODE_ENV}=auto python main.py "List the project tools"'
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument(
+        "--perm-mode",
+        dest="perm_mode",
+        choices=[m.value for m in GateMode],
+        help=(
+            "Permission mode. interactive prompts on stdin; "
+            "auto denies tools that are not allow-listed; "
+            "yolo allows anything that is not explicitly denied."
+        ),
+    )
+    mode.add_argument(
+        "--yolo",
+        action="store_const",
+        const=GateMode.YOLO.value,
+        dest="perm_mode",
+        help="Shortcut for --perm-mode yolo (no prompts; deny rules still apply).",
+    )
+    mode.add_argument(
+        "--auto",
+        action="store_const",
+        const=GateMode.AUTO.value,
+        dest="perm_mode",
+        help="Shortcut for --perm-mode auto (no prompts; unlisted tools denied).",
+    )
+    mode.add_argument(
+        "--interactive",
+        action="store_const",
+        const=GateMode.INTERACTIVE.value,
+        dest="perm_mode",
+        help="Shortcut for --perm-mode interactive (prompt for confirmation).",
+    )
+    parser.add_argument(
+        "task",
+        nargs="*",
+        help="Single-shot task. Omit to start the REPL.",
+    )
+    return parser.parse_args(argv)
+
+
+def _print_permission_mode(mode: GateMode, *, single_shot: bool):
+    """Tell the operator which gate is active before any tool runs."""
+    if mode == GateMode.AUTO:
+        detail = (
+            "unlisted tools (shell, writes, git mutations) are denied "
+            "without prompting. Use --yolo to allow them, or --interactive to prompt."
+        )
+    elif mode == GateMode.YOLO:
+        detail = "anything not explicitly denied runs without prompting."
+    else:
+        if not single_shot:
+            return
+        detail = "tools that need confirmation will prompt on stdin."
+    print(f"{_DIM}Permission mode: {mode.value} — {detail}{_RESET}")
+
+
+def main(argv: list[str] | None = None):
+    args = parse_args(argv)
+    single_shot = bool(args.task)
     try:
-        engine = build_coding_engine()
+        mode = resolve_permission_mode(args.perm_mode, single_shot=single_shot)
+    except ValueError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        sys.exit(2)
+
+    try:
+        engine = build_coding_engine(permission_mode=mode)
     except KeyError:
         print("Error: DEEPSEEK_API_KEY environment variable not set.")
         print("  export DEEPSEEK_API_KEY=\"sk-...\"")
         sys.exit(1)
 
-    if len(sys.argv) > 1:
-        # Single-shot mode
-        query = " ".join(sys.argv[1:])
+    _print_permission_mode(mode, single_shot=single_shot)
+
+    if single_shot:
+        query = " ".join(args.task)
         report = engine.run(query)
         _print_goal_verification(engine, query, report)
         _print_trajectory(report)

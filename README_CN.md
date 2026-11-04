@@ -97,7 +97,7 @@ configs/
   prompts.yaml           # Prompt 模板
   scripts/               # Shell 脚本工具（自动发现，27 个）
 examples/
-  coding_agent/          # 完整 Coding Agent 参考（434 个测试）
+  coding_agent/          # 完整 Coding Agent 参考（453 个测试）
 tests/                   # 74 个内核测试
 ```
 
@@ -189,7 +189,7 @@ def chat(self, messages, tools=None) -> LLMResponse: ...
 # 内核测试（74 个）
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -v
 
-# Coding Agent 测试（434 个：291 UT + 143 ST）
+# Coding Agent 测试（453 个：308 UT + 145 ST）
 cd examples/coding_agent
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -v
 ```

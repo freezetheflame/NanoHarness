@@ -62,6 +62,35 @@ class TestBuilderReturnsEngine:
         assert "skill" in tool_names
         assert "task" in tool_names
 
+    def test_builder_default_permission_mode(self, monkeypatch, tmp_path):
+        """Unset mode stays interactive so the REPL can still prompt."""
+        from unittest.mock import MagicMock
+        from app import builder as builder_mod
+        from app.permissions import PERM_MODE_ENV, GateMode
+
+        monkeypatch.delenv(PERM_MODE_ENV, raising=False)
+        mock_adapter = MagicMock()
+        monkeypatch.setattr(builder_mod, "OpenAIAdapter", lambda *a, **kw: mock_adapter)
+        monkeypatch.setattr(builder_mod, "SANDBOX", str(tmp_path / "sandbox"))
+
+        engine = builder_mod.build_coding_engine(api_key="fake-key")
+        assert engine.permissions.mode == GateMode.INTERACTIVE
+
+    def test_builder_permission_mode_argument(self, monkeypatch, tmp_path):
+        """permission_mode is applied to the gate wired into the engine."""
+        from unittest.mock import MagicMock
+        from app import builder as builder_mod
+        from app.permissions import GateMode
+
+        mock_adapter = MagicMock()
+        monkeypatch.setattr(builder_mod, "OpenAIAdapter", lambda *a, **kw: mock_adapter)
+        monkeypatch.setattr(builder_mod, "SANDBOX", str(tmp_path / "sandbox"))
+
+        engine = builder_mod.build_coding_engine(api_key="fake-key", permission_mode="yolo")
+        assert engine.permissions.mode == GateMode.YOLO
+        assert engine.permissions.check("shell_exec", {}) == "allow"
+        assert engine.permissions.check("git_reset", {}) == "deny"
+
 
 class TestWireTaskAwareness:
     """Tests for _wire_task_awareness hook."""
