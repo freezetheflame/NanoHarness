@@ -97,7 +97,7 @@ configs/
   prompts.yaml           # Prompt templates
   scripts/               # Shell-script tools (auto-discovered, 27 tools)
 examples/
-  coding_agent/          # Full-featured coding agent reference (434 tests)
+  coding_agent/          # Full-featured coding agent reference (453 tests)
 tests/                   # 74 kernel tests
 ```
 
@@ -189,7 +189,7 @@ See `examples/coding_agent/` for a reference that wires together a custom LLM ad
 # Kernel tests (74)
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -v
 
-# Coding agent tests (434: 291 UT + 143 ST)
+# Coding agent tests (453: 308 UT + 145 ST)
 cd examples/coding_agent
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -v
 ```

@@ -64,6 +64,7 @@ HELP_TEXT = f"""{_BOLD}Commands:{_RESET}
   - Be specific about what you want changed
   - The agent will read files, make edits, and run tests
   - Destructive operations (push, reset) require your approval
+  - Permission mode: --interactive, --auto, --yolo, or NANOHARNESS_PERM_MODE
 """
 
 

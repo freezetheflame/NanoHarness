@@ -1,6 +1,15 @@
 """Tests for PermissionGate -- 4-step pipeline: deny -> mode -> allow -> ask."""
+import io
+
 import pytest
-from app.permissions import PermissionGate, GateMode, PermissionLevel, build_permissions
+from app.permissions import (
+    PERM_MODE_ENV,
+    PermissionGate,
+    GateMode,
+    PermissionLevel,
+    build_permissions,
+    resolve_permission_mode,
+)
 
 
 class TestDenyOverridesAllow:
@@ -159,3 +168,121 @@ class TestReset:
         # After reset, no rules -- interactive mode returns CONFIRM
         assert gate.check("something", {}) == PermissionLevel.CONFIRM
         assert gate.check("other", {}) == PermissionLevel.CONFIRM
+
+
+class TestClosedStdin:
+    def test_closed_stdin_denies_without_raising(self, monkeypatch, capsys):
+        """CONFIRM + exhausted stdin must not raise EOFError."""
+        monkeypatch.setattr("sys.stdin", io.StringIO(""))
+        gate = PermissionGate(mode=GateMode.INTERACTIVE)
+        result = gate.enforce("shell_exec", {"command": "find ."})
+        assert result is not None
+        assert "no interactive stdin" in result
+        assert "EOFError" not in capsys.readouterr().err
+
+    def test_approval_callback_eof_is_denied(self):
+        """A callback that hits EOF is a denial, not a crash."""
+        def boom(tool_name, args):
+            raise EOFError
+
+        gate = PermissionGate(mode=GateMode.INTERACTIVE, approval_callback=boom)
+        result = gate.enforce("file_write", {"path": "a.py"})
+        assert result is not None
+        assert "no interactive stdin" in result
+
+    def test_tty_yes_still_approves(self, monkeypatch):
+        """Interactive approval still accepts 'y' when stdin has a reply."""
+        monkeypatch.setattr("sys.stdin", io.StringIO("y\n"))
+        gate = PermissionGate(mode=GateMode.INTERACTIVE)
+        assert gate.enforce("shell_exec", {"command": "ls"}) is None
+
+    def test_tty_no_still_rejects(self, monkeypatch):
+        """Interactive approval still rejects anything other than 'y'."""
+        monkeypatch.setattr("sys.stdin", io.StringIO("n\n"))
+        gate = PermissionGate(mode=GateMode.INTERACTIVE)
+        result = gate.enforce("file_write", {})
+        assert result is not None
+        assert "not approved by user" in result
+
+
+class TestPermissionModeSelection:
+    def test_build_permissions_default_is_interactive(self, monkeypatch):
+        monkeypatch.delenv(PERM_MODE_ENV, raising=False)
+        gate = build_permissions()
+        assert gate.mode == GateMode.INTERACTIVE
+        assert gate.check("shell_exec", {}) == PermissionLevel.CONFIRM
+
+    def test_build_permissions_reads_env(self, monkeypatch):
+        monkeypatch.setenv(PERM_MODE_ENV, "  YOLO ")
+        gate = build_permissions()
+        assert gate.mode == GateMode.YOLO
+        assert gate.check("shell_exec", {}) == PermissionLevel.ALLOW
+        assert gate.check("git_reset", {}) == PermissionLevel.DENY
+
+    def test_build_permissions_explicit_mode_overrides_env(self, monkeypatch):
+        monkeypatch.setenv(PERM_MODE_ENV, "yolo")
+        gate = build_permissions(mode="auto")
+        assert gate.mode == GateMode.AUTO
+        assert gate.check("shell_exec", {}) == PermissionLevel.DENY
+        assert gate.check("file_read", {}) == PermissionLevel.ALLOW
+
+    def test_build_permissions_rejects_unknown_mode(self, monkeypatch):
+        monkeypatch.setenv(PERM_MODE_ENV, "nope")
+        with pytest.raises(ValueError, match="Unknown permission mode"):
+            build_permissions()
+
+    def test_single_shot_defaults_to_auto(self, monkeypatch):
+        monkeypatch.delenv(PERM_MODE_ENV, raising=False)
+        assert resolve_permission_mode(None, single_shot=True) == GateMode.AUTO
+
+    def test_repl_defaults_to_interactive(self, monkeypatch):
+        monkeypatch.delenv(PERM_MODE_ENV, raising=False)
+        assert resolve_permission_mode(None, single_shot=False) == GateMode.INTERACTIVE
+
+    def test_cli_overrides_env_and_single_shot(self, monkeypatch):
+        monkeypatch.setenv(PERM_MODE_ENV, "auto")
+        assert resolve_permission_mode("yolo", single_shot=True) == GateMode.YOLO
+
+    def test_env_overrides_single_shot_default(self, monkeypatch):
+        monkeypatch.setenv(PERM_MODE_ENV, "interactive")
+        mode = resolve_permission_mode(None, single_shot=True)
+        assert mode == GateMode.INTERACTIVE
+
+    def test_blank_env_is_unset(self, monkeypatch):
+        monkeypatch.setenv(PERM_MODE_ENV, "   ")
+        assert resolve_permission_mode(None, single_shot=False) == GateMode.INTERACTIVE
+
+
+class TestCliArgs:
+    def test_flags_are_not_part_of_the_task(self):
+        from main import parse_args
+
+        args = parse_args(["--yolo", "Add", "a", "docstring", "to", "engine.py"])
+        assert args.perm_mode == "yolo"
+        assert args.task == ["Add", "a", "docstring", "to", "engine.py"]
+        assert " ".join(args.task) == "Add a docstring to engine.py"
+
+    def test_single_shot_without_flag_selects_auto(self, monkeypatch):
+        from main import parse_args
+
+        monkeypatch.delenv(PERM_MODE_ENV, raising=False)
+        args = parse_args(["refactor the parser"])
+        assert args.perm_mode is None
+        mode = resolve_permission_mode(args.perm_mode, single_shot=bool(args.task))
+        assert mode == GateMode.AUTO
+        assert " ".join(args.task) == "refactor the parser"
+
+    def test_repl_without_flag_selects_interactive(self, monkeypatch):
+        from main import parse_args
+
+        monkeypatch.delenv(PERM_MODE_ENV, raising=False)
+        args = parse_args([])
+        assert args.task == []
+        mode = resolve_permission_mode(args.perm_mode, single_shot=bool(args.task))
+        assert mode == GateMode.INTERACTIVE
+
+    def test_perm_mode_and_shortcut_are_exclusive(self):
+        from main import parse_args
+
+        with pytest.raises(SystemExit):
+            parse_args(["--perm-mode", "auto", "--yolo", "task"])

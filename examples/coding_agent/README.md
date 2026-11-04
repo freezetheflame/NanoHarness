@@ -16,8 +16,13 @@ export DEEPSEEK_API_KEY="sk-..."
 cd examples/coding_agent
 python main.py
 
-# Or pass a task directly (runs once, prints report, exits)
+# Or pass a task directly (runs once, prints report, exits).
+# Single-shot defaults to permission mode "auto": no stdin prompt, and
+# tools that are not allow-listed (shell, writes) are denied.
 python main.py "Add type hints to all public functions in nanoharness/core/"
+
+# Allow shell and write tools without prompting:
+python main.py --yolo "Add type hints to all public functions in nanoharness/core/"
 ```
 
 ## Why `nanoharness/` is a symlink
@@ -57,7 +62,7 @@ python main.py "Add type hints to all public functions in nanoharness/core/"
 ❯ _
 ```
 
-**Single-shot** — pass a task as argument, exits after completion.
+**Single-shot** — pass a task as argument, exits after completion. This mode defaults to permission mode `auto`, so a closed stdin cannot crash the process on a confirmation prompt. Pass `--yolo` when the task needs shell or file writes, or `--interactive` to prompt on a real terminal.
 
 ## REPL Commands
 
@@ -110,8 +115,8 @@ coding_agent/
 ├── nanoharness/           # Symlink → ../../nanoharness (shared kernel)
 └── tests/                 # Test suite
     ├── conftest.py        #   Shared fixtures + path setup
-    ├── ut/                #   Unit tests (15 files, 291 tests)
-    └── st/                #   System/integration tests (11 files, 143 tests)
+    ├── ut/                #   Unit tests (15 files, 308 tests)
+    └── st/                #   System/integration tests (11 files, 145 tests)
 ```
 
 ## Architecture
@@ -175,23 +180,31 @@ Key subsystems (all app-layer, no kernel changes):
 |---|---|---|
 | DENY | `git_reset`, `git_revert` | Blocked outright |
 | ALLOW | `file_read`, `search_code`, `git_status`, `memory_*`, `task`, `skill`, `mcp__filesystem__*` | Executes immediately |
-| CONFIRM | `file_write`, `file_edit`, `shell_exec`, `git_commit`, `git_push` | User approval required |
+| CONFIRM | `file_write`, `file_edit`, `shell_exec`, `git_commit`, `git_push` | Interactive: prompt. Auto: deny. Yolo: allow |
 
-Modes: `interactive` (default, asks user), `auto` (deny unknown), `yolo` (allow all not denied).
+Modes:
+
+| Mode | Unlisted tools | How to select |
+|---|---|---|
+| `interactive` | Prompt on stdin | REPL default. `--interactive`, or `NANOHARNESS_PERM_MODE=interactive` |
+| `auto` | Deny | Single-shot default. `--auto`, or `NANOHARNESS_PERM_MODE=auto` |
+| `yolo` | Allow | `--yolo`, or `NANOHARNESS_PERM_MODE=yolo`. Deny rules (`git_reset`, `git_revert`) still apply |
+
+Priority is the CLI flag (`--perm-mode`, `--yolo`, `--auto`, `--interactive`), then `NANOHARNESS_PERM_MODE`, then the mode default above. If stdin is closed while a confirmation is still required, the tool is denied instead of raising `EOFError`.
 
 ## Testing
 
 ```bash
 # From examples/coding_agent/
-PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ut/ -v    # Unit tests (291)
-PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/st/ -v    # Integration tests (143)
-PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -v       # All (434)
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ut/ -v    # Unit tests (308)
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/st/ -v    # Integration tests (145)
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest tests/ -v       # All (453)
 ```
 
 | Layer | Files | Tests | What's tested |
 |---|---|---|---|
-| **UT** | 15 | 291 | Pure logic: sandbox, permissions, cron matching, task CRUD, memory I/O, adapter protocol, evaluation detection |
-| **ST** | 11 | 143 | Real OS: git worktrees, subprocess MCP, threading, full engine wiring, builder assembly |
+| **UT** | 15 | 308 | Pure logic: sandbox, permissions, cron matching, task CRUD, memory I/O, adapter protocol, evaluation detection |
+| **ST** | 11 | 145 | Real OS: git worktrees, subprocess MCP, threading, full engine wiring, builder assembly |
 
 UT = no subprocess, no threading, no `time.sleep`. ST = real OS operations, multi-component integration.
 
